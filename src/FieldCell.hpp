@@ -1,12 +1,19 @@
 #pragma once
+#include <utility>
+#include <cstdlib>
+#include <cmath>
 
 class FieldCell {
 private:
-    char c;
+    unsigned objectID;
+    int X;
+    int Y;
 public:
-    FieldCell();
-    ~FieldCell();
-    char getData() const{
-        return c;
-    }
+    std::pair<int, int> getCoord() const;
+    FieldCell(unsigned ID, unsigned X, unsigned Y);
+    unsigned getID() const;
+    void setID(unsigned ID);
+    void swap(FieldCell& cell);
+    int getDistance(FieldCell oth) const;
 };
+ 

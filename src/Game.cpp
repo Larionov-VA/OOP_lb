@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
 Game::Game() {
-    field = new GameField(20,20);
+    field = new GameField(25,25);
     gameLevel = 0;
 }
 
