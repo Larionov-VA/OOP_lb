@@ -1,25 +1,17 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -g
+CXXFLAGS = -Wall -Wextra -std=c++14 -g
 TARGET = game
-SRCS = main.cpp Game.cpp GameField.cpp FieldCell.cpp
+SRCS = main.cpp Game.cpp GameField.cpp FieldCell.cpp Entity.cpp
 OBJS = $(SRCS:.cpp=.o)
+DEPS = Game.hpp GameField.hpp FieldCell.hpp Entity.hpp
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-main.o: main.cpp Game.hpp
-	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
-
-Game.o: Game.cpp Game.hpp GameField.hpp
-	$(CXX) $(CXXFLAGS) -c Game.cpp -o Game.o
-
-GameField.o: GameField.cpp GameField.hpp FieldCell.hpp
-	$(CXX) $(CXXFLAGS) -c GameField.cpp -o GameField.o
-
-FieldCell.o: FieldCell.cpp FieldCell.hpp
-	$(CXX) $(CXXFLAGS) -c FieldCell.cpp -o FieldCell.o
+%.o: %.cpp $(DEPS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(TARGET) $(OBJS)

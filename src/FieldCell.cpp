@@ -1,8 +1,9 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y) {
+FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y, bool avaible) {
     objectID = ID;
+    this->avaible = avaible;
     this->X = X;
     this->Y = Y;
 }
@@ -33,3 +34,10 @@ int FieldCell::getDistance(FieldCell oth) const {
     return distance;
 }
 
+bool FieldCell::isCellAvaible() const {
+    return avaible;
+}
+
+void FieldCell::setAvaible(bool avaible) {
+    this->avaible = avaible;
+}

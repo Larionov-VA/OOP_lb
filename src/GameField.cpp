@@ -15,7 +15,7 @@ GameField::GameField(unsigned width = 10, unsigned height = 10) {
 
 void GameField::generateFieldCells() {
     for (unsigned i = 0; i < widthField * heightField; ++i) {
-        FieldCell new_cell{i + 100, i % widthField, i / widthField};
+        FieldCell new_cell{i, i % widthField, i / widthField};
         cells.push_back(new_cell);
     }
     int randomPoint1 = 0;
@@ -26,8 +26,8 @@ void GameField::generateFieldCells() {
         randomPoint1 = (std::rand() + counter++) % (widthField * heightField);
         randomPoint2 = (std::rand() + counter++) % (widthField * heightField);
     } while (cells[randomPoint1].getDistance(cells[randomPoint2]) < (int)(widthField + heightField)/3);
-    cells[randomPoint1].setID(9999);
-    cells[randomPoint2].setID(9999);
+    // cells[randomPoint1].setAvaible(true);
+    // cells[randomPoint2].setAvaible(true);
 
     FieldCell cell1 = cells[randomPoint1];
     FieldCell cell2 = cells[randomPoint2];
@@ -42,7 +42,7 @@ void GameField::generateFieldCells() {
         int dist1 = cell1.getDistance(currentCell);
         int dist2 = cell2.getDistance(currentCell);
         if (dist1 == dist2 && dist1 > (int)(widthField + heightField)/4) {
-            cells[i].setID(9999);
+            cells[i].setAvaible(true);
             cell3 = cells[i];
             break;
         }
@@ -52,7 +52,7 @@ void GameField::generateFieldCells() {
     for (unsigned i = 0; i < widthField * heightField; ++i) {
         FieldCell currentCell = cells[i];
         if (currentCell.getDistance(cell1) < (int)(widthField + heightField)/6 || currentCell.getDistance(cell2) < (int)(widthField + heightField)/6 || currentCell.getDistance(cell3) < (int)(widthField + heightField)/4) {
-            cells[i].setID(9999);
+            cells[i].setAvaible(true);
         }
     }
     for (unsigned i = 0; i < widthField * heightField; ++i) {
@@ -64,7 +64,7 @@ void GameField::generateFieldCells() {
         int left = (currentCell_X - cell1_X) * dy;
         int right = (currentCell_Y - cell1_Y) * dx;
         if (abs(left - right)  <= abs(dx) + abs(dy) + widthField + heightField) {
-            cells[i].setID(9999);
+            cells[i].setAvaible(true);
         }
     }
     for (unsigned i = 0; i < widthField * heightField; ++i) {
@@ -76,36 +76,41 @@ void GameField::generateFieldCells() {
         int left = (currentCell_X - cell1_X) * dy;
         int right = (currentCell_Y - cell1_Y) * dx;
         if (abs(left - right)  <= abs(dx) + abs(dy) + widthField + heightField) {
-            cells[i].setID(9999);
+            cells[i].setAvaible(true);
         }
     }
+    std::unique_ptr<Entity> p = std::make_unique<Player>();
+    infoMap[randomPoint1] = std::move(p);
+    // std::cout << "here";Entity::Type::PLAYER
+    // std::cout << (int)infoMap[randomPoint1]->getType();
+    // std::cout << (int)Entity::Type::PLAYER;
+    // cells[randomPoint1].setID(0);
 }
 
-
-GameField::~GameField() {
-
-}
 
 void GameField::show() {
-    // std::cout << cells[widthField * heightField - 1].getDistance(cells[0]) << '\n';
     for (unsigned i = 0; i < widthField * heightField; ++i) {
-        // if (cells[i].getData() > 50) {
-        //     std::cout << '#';
-        // } else {
-        //     std::cout << 'o';
-        // }
-        if (cells[i].getID() == 9999) {
-            std::cout << "X";
+        if (cells[i].isCellAvaible()) {
+            // std::cout << (int)infoMap[i]->getType();
+            if (infoMap[i]) {
+                if (infoMap[i]->getType() == Entity::Type::PLAYER) {
+                    std::cout << "P";
+                }
+            }
+            else {
+                std::cout << "-";
+            }
+            // std::cout << "-";
         }
         else {
-            std::cout << " ";
-            // std::cout << cells[i].getCoord().second << ' ' << cells[i].getCoord().first;
+            std::cout << "X";
+            
         }
-        
+        // std::cout << std::setw(3) << cells[i].getID();
         if ((i + 1) % widthField == 0) {
             std::cout << '\n';
-            
-        } else {
+        }
+        else {
             std::cout << "  ";
         }
     }
