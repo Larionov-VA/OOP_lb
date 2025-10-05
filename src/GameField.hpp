@@ -11,6 +11,7 @@
 #include "FieldCell.hpp"
 #include "Entity.hpp"
 #include "Player.hpp"
+#include "Enemy.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
@@ -22,17 +23,19 @@ private:
     std::unordered_map<int, std::unique_ptr<Entity>> infoMap{};
     int widthField;
     int heightField;
-    unsigned gameLevel;
+    int gameLevel;
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
     bool isMoveCorrect(int oldIndex, int newIndex) const;
     int getCellWithPlayer();
+    void spawnEnemy(int index);
+    void generateEnemy();
 public:
     void playerTurn();
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();
-    GameField(std::unique_ptr<Entity> player, int weight, int height, unsigned gameLevel);
+    GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
     void show();
 };

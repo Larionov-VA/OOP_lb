@@ -3,12 +3,12 @@
 
 Game::Game(int width, int height, unsigned level) {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
-    field = new GameField(std::move(player), width, height, gameLevel);
+    field = new GameField(std::move(player), width, height, level);
     gameLevel = level;
 }
 
 
-Game::Game() : Game(10, 10, 1){
+Game::Game() : Game(25, 25, 1){
 }
 
 

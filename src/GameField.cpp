@@ -1,16 +1,18 @@
 #include "GameField.hpp"
 
 
-GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, unsigned gameLevel = 1) {
+GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
     if (width > MAX_FIELD_SIZE || height > MAX_FIELD_SIZE) {
         throw std::range_error("Max size of field is 25");
     }
     if (width < MIN_FIELD_SIZE || height < MIN_FIELD_SIZE) {
         throw std::range_error("Min size of field is 10");
     }
-    widthField = width;
-    heightField = height;
+    this->widthField = width;
+    this->heightField = height;
+    this->gameLevel = level;
     generateFieldCells(std::move(player));
+    generateEnemy();
 }
 
 
@@ -106,6 +108,29 @@ bool GameField::isMoveCorrect(int oldIndex, int newIndex) const {
 }
 
 
+void GameField::spawnEnemy(int index) {
+    cells[index].setAvaible(false);
+    std::unique_ptr<Entity> enemy = std::make_unique<Enemy>();
+    infoMap[index] = std::move(enemy);
+}
+
+
+void GameField::generateEnemy() {
+    int countEnemy = sqrt((widthField + heightField) / 2) + gameLevel;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, widthField * heightField - 1);
+    int playerIndex = getCellWithPlayer();
+    do {
+        int randomIndex = dist(gen);
+        if (cells[randomIndex].isCellAvaible() && (cells[playerIndex].getDistance(cells[randomIndex]) > ((widthField + heightField) / 3))) {
+            spawnEnemy(randomIndex);
+            --countEnemy;
+        }
+    } while (countEnemy >= 0);
+}
+
+
 
 void GameField::playerTurn() {
     char command;
@@ -176,6 +201,9 @@ void GameField::show() {
             if (infoMap[i]) {
                 if (infoMap[i]->getType() == Entity::entityType::PLAYER) {
                     std::cout << "P";
+                }
+                else if (infoMap[i]->getType() == Entity::entityType::ENEMY) {
+                    std::cout << "E";
                 }
             }
             else {
