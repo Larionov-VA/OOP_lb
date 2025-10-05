@@ -1,12 +1,23 @@
 #pragma once
 #include "Entity.hpp"
+#include "ActorAtributes.hpp"
+#include "ActorAttack.hpp"
+#include "ActorEquipment.hpp"
+#include "ActorHealth.hpp"
 
-class Player : public Entity
-{
+
+class Player : public Entity {
 private:
-    /* data */
+    Atributes playerAttributes;
+    Attack playerAttack;
+    Equipment playerEquipment;
+    Health playerHealth;
+    
 public:
-    Type getType() const override {
-        return Type::PLAYER;
+    entityType getType() const override {
+        return entityType::PLAYER;
     }
+    Player();
+    Player(int playerAttack, int playerHealth);
+    bool alive();
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include <unistd.h>
 #include "GameField.hpp"
 #include "Player.hpp"
 
@@ -9,6 +10,7 @@ private:
     unsigned gameLevel;
 public:
     Game();
+    Game(int width, int height, unsigned level);
     ~Game();
-    void start();
+    void startGameLoop();
 };

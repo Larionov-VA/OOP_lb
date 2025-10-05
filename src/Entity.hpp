@@ -1,7 +1,7 @@
 #pragma once
 class Entity {
 public:
-    enum class Type { UNDEFINED, PLAYER, ENEMY, OBJECT };
+    enum class entityType { UNDEFINED, PLAYER, ENEMY, OBJECT };
     virtual ~Entity() = default;
-    virtual Type getType() const = 0;
+    virtual entityType getType() const = 0;
 };

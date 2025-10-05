@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++14 -g
+CXXFLAGS = -Wall -Wextra -std=c++17 -g
 TARGET = game
-SRCS = main.cpp Game.cpp GameField.cpp FieldCell.cpp Entity.cpp
+SRCS = main.cpp Game.cpp GameField.cpp FieldCell.cpp Entity.cpp Player.cpp ActorHealth.cpp ActorEquipment.cpp ActorAttack.cpp ActorAtributes.cpp
 OBJS = $(SRCS:.cpp=.o)
-DEPS = Game.hpp GameField.hpp FieldCell.hpp Entity.hpp
+DEPS = Game.hpp GameField.hpp FieldCell.hpp Entity.hpp Player.hpp ActorHealth.hpp ActorEquipment.hpp ActorAttack.hpp ActorAtributes.hpp 
 
 all: $(TARGET)
 
