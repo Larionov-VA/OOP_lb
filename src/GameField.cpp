@@ -84,6 +84,8 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells[randomPoint1].setAvaible(false);
 }
 
+
+
 void GameField::moveEntity(int oldIndex, int newIndex) {
     infoMap[newIndex] = std::move(infoMap[oldIndex]);
     infoMap.erase(oldIndex);
@@ -120,7 +122,7 @@ void GameField::generateEnemy() {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, widthField * heightField - 1);
-    int playerIndex = getCellWithPlayer();
+    int playerIndex = getCellWithEntity(Entity::entityType::PLAYER);
     do {
         int randomIndex = dist(gen);
         if (cells[randomIndex].isCellAvaible() && (cells[playerIndex].getDistance(cells[randomIndex]) > ((widthField + heightField) / 3))) {
@@ -135,8 +137,8 @@ void GameField::generateEnemy() {
 void GameField::playerTurn() {
     char command;
     std::cin >> command;
-    int index = getCellWithPlayer();
-    std::cout << index << '\n';
+    int index = getCellWithEntity(Entity::entityType::PLAYER);
+    // std::cout << index << '\n';
     int newIndex;
     switch (command) {
     case 'w':
@@ -172,21 +174,65 @@ void GameField::summonsTurn() {
 
 }
 
-void GameField::enemyTurn() {
+int GameField::getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited) {
+    visited[playerIndex] = 1;
+    
+    int up = playerIndex - widthField;
+    int down = playerIndex + widthField;
+    int left = playerIndex - 1;
+    int right = playerIndex + 1;
+    
+    if (up == indexEnemy || down == indexEnemy || left == indexEnemy || right == indexEnemy) {
+        return playerIndex;
+    }
+    
+    int result = -1;
 
+    if (isMoveCorrect(playerIndex, up) && !visited[up]) {
+        result = getBestTurnForEnemy(indexEnemy, up, visited);
+        if (result != -1) return result;
+    }
+    
+    if (isMoveCorrect(playerIndex, down) && !visited[down]) {
+        result = getBestTurnForEnemy(indexEnemy, down, visited);
+        if (result != -1) return result;
+    }
+    
+    if (isMoveCorrect(playerIndex, left) && !visited[left]) {
+        result = getBestTurnForEnemy(indexEnemy, left, visited);
+        if (result != -1) return result;
+    }
+    
+    if (isMoveCorrect(playerIndex, right) && !visited[right]) {
+        result = getBestTurnForEnemy(indexEnemy, right, visited);
+        if (result != -1) return result;
+    }
+    
+    return -1;
+}
+
+void GameField::enemyTurn() {
+    int playerIndex = getCellWithEntity(Entity::entityType::PLAYER);
+    
+    int enemyfirstIndex = getCellWithEntity(Entity::entityType::ENEMY);
+    std::unordered_map<int, int> visited{};
+    int bestTurn = getBestTurnForEnemy(enemyfirstIndex, playerIndex, visited);
+    if (isMoveCorrect(enemyfirstIndex, bestTurn)) {
+        moveEntity(enemyfirstIndex, bestTurn);
+    }
 }
 
 void GameField::buildingsTurn() {
 
 }
 
-int GameField::getCellWithPlayer() {
+
+int GameField::getCellWithEntity(Entity::entityType type) {
     if (infoMap.empty()) {
         return -1;
     }
-    
     for (const auto& pair : infoMap) {
-        if (pair.second && pair.second->getType() == Entity::entityType::PLAYER) {
+        if (pair.second && pair.second->getType() == type) {
             return pair.first;
         }
     }
