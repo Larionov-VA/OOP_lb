@@ -22,16 +22,17 @@
 class GameField {
 private:
     std::vector<FieldCell> cells{};
-    std::unordered_map<int, std::unique_ptr<Entity>> infoMap{};
+    EntityManager entityManager{};
     int widthField;
     int heightField;
     int gameLevel;
+    int gameTurn;
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
     bool isMoveCorrect(int oldIndex, int newIndex) const;
-    int getCellWithEntity(Entity::entityType type);
-    void spawnEnemy(int index);
+    // int getCellWithEntity(Entity::entityType type);
+    void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
     int getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
 public:

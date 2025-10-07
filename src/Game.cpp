@@ -8,7 +8,7 @@ Game::Game(int width, int height, unsigned level) {
 }
 
 
-Game::Game() : Game(25, 25, 1){
+Game::Game() : Game(10, 10, 1){
 }
 
 
