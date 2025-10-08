@@ -8,3 +8,8 @@ Attack::Attack(int attack) {
 
 Attack::~Attack() {
 }
+
+
+int Attack::getAttack() const {
+    return attack < 0 ? 0 : attack;
+}

@@ -12,5 +12,5 @@ Health::~Health() {
 
 
 int Health::getHealth() const {
-    return health;
+    return health < 0 ? 0 : health;
 }

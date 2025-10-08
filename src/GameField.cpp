@@ -209,11 +209,11 @@ void GameField::enemyTurn() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     for (int index : enemyIndexes) {
         std::unordered_map<int, int> visited{};
-        std::cout << index << '\n';
+
         int bestTurn = getBestTurnForEnemy(index, playerIndex, visited);
         if (isMoveCorrect(index, bestTurn)) {
             moveEntity(index, bestTurn);
-            std::cout << index << '\n';
+
         }
     }
 }
@@ -225,6 +225,8 @@ void GameField::buildingsTurn() {
 
 
 void GameField::show() {
+    std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     for (int i = 0; i < widthField * heightField; ++i) {
         Entity* currentEntity = entityManager[i];
         if (cells[i].isCellAvaible() || currentEntity) {
@@ -246,10 +248,19 @@ void GameField::show() {
             
         }
         if ((i + 1) % widthField == 0) {
+            if (i == 0) {
+                std::cout << "\tPlayer stats:"
+            }
+            if (i == 1) {
+                std::cout << "\tintelligence " << 10 << " "
+    int dexterity;
+    int strength;"
+            }
             std::cout << '\n';
         }
         else {
             std::cout << "  ";
         }
     }
+
 }
