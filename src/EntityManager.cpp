@@ -55,7 +55,7 @@ std::unique_ptr<Entity> EntityManager::getEntity(int index){
 }
 
 
-std::vector<int> EntityManager::getIndexesWithEntity(Entity::entityType type) {
+std::vector<int> EntityManager::getIndexesWithEntity(Entity::entityType type) const {
     std::vector<int> indexesOfCellsWithEntity{};
     for (const auto& pair : infoMap) {
         if (pair.second->getType() == type) {

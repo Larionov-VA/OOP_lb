@@ -12,8 +12,30 @@ public:
     void createEntity(std::unique_ptr<Entity> entity, int index);
     void killEntity(int index);
     void changeEntityIndex(int oldIndex, int newIndex);
-    std::vector<int> getIndexesWithEntity(Entity::entityType type);
+    std::vector<int> getIndexesWithEntity(Entity::entityType type) const;
     std::unique_ptr<Entity> getEntity(int index);
     EntityManager();
     ~EntityManager();
+    EntityManager(const EntityManager& other) {
+        for (const auto& [index, entity] : other.infoMap) {
+            if (entity)
+                infoMap[index] = entity->clone();
+        }
+    }
+    EntityManager& operator=(const EntityManager& other) {
+        if (this == &other) return *this;
+        infoMap.clear();
+        for (const auto& [index, entity] : other.infoMap) {
+            if (entity)
+                infoMap[index] = entity->clone();
+        }
+        return *this;
+    }
+    EntityManager(EntityManager&& other) noexcept : infoMap(std::move(other.infoMap)) {}
+
+    EntityManager& operator=(EntityManager&& other) noexcept {
+        if (this == &other) return *this;
+        infoMap = std::move(other.infoMap);
+        return *this;
+    }
 };

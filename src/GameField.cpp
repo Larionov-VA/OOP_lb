@@ -19,7 +19,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
-        cells.emplace_back(i, i % widthField, i / widthField);
+        cells.emplace_back(i, i % widthField, i / heightField);
     }
 
     std::random_device rd;
@@ -287,7 +287,9 @@ void GameField::enemyTurn() {
         int bestTurn = getBestTurnForEnemy(index, playerIndex, visited);
         if (isMoveCorrect(index, bestTurn)) {
             moveEntity(index, bestTurn);
-
+        }
+        else if (cells[playerIndex].getDistance(cells[index]) <= 1) {
+            entityManager[playerIndex]->causeDamage(entityManager[index]->getDamage());
         }
     }
 }
@@ -295,6 +297,12 @@ void GameField::enemyTurn() {
 
 void GameField::buildingsTurn() {
 
+}
+
+
+bool GameField::playerAlive() const {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    return entityManager[playerIndex]->alive();
 }
 
 
@@ -339,12 +347,6 @@ void GameField::show() {
             if (i / widthField == 8) {
                 std::cout << "\tEnemy count:\t" << enemyIndexes.size();
             }
-            // if (i / widthField == 9) {
-            //     std::cout << '\t';
-            //     for (int index : enemyIndexes) {
-            //         std::cout << index << ": " << entityManager[index]->getHealth().first << "|"  << entityManager[index]->getHealth().second << ' ';
-            //     }
-            // }
             std::cout << '\n';
         }
         else {

@@ -1,5 +1,4 @@
 #pragma once
-// #include <stdexcept>
 #include <vector>
 #include <unordered_map>
 #include <iostream>
@@ -36,11 +35,53 @@ private:
     int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
     int getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
 public:
+    GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
+
+    GameField(const GameField& other)
+        : cells(other.cells),
+          entityManager(other.entityManager),
+          widthField(other.widthField),
+          heightField(other.heightField),
+          gameLevel(other.gameLevel),
+          gameTurn(other.gameTurn) {}
+
+    GameField& operator=(const GameField& other) {
+        if (this == &other) return *this;
+        cells = other.cells;
+        entityManager = other.entityManager;
+        widthField = other.widthField;
+        heightField = other.heightField;
+        gameLevel = other.gameLevel;
+        gameTurn = other.gameTurn;
+        return *this;
+    }
+
+    GameField(GameField&& other) noexcept
+        : cells(std::move(other.cells)),
+          entityManager(std::move(other.entityManager)),
+          widthField(other.widthField),
+          heightField(other.heightField),
+          gameLevel(other.gameLevel),
+          gameTurn(other.gameTurn) {}
+
+    GameField& operator=(GameField&& other) noexcept {
+        if (this == &other) return *this;
+        cells = std::move(other.cells);
+        entityManager = std::move(other.entityManager);
+        widthField = other.widthField;
+        heightField = other.heightField;
+        gameLevel = other.gameLevel;
+        gameTurn = other.gameTurn;
+        return *this;
+    }
+    
+    bool playerAlive() const;
+
     void playerTurn();
-    void update();
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();
-    GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
+
+    void update();
     void show();
 };

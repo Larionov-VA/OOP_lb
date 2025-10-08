@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include <memory>
 
 class Entity {
 public:
@@ -9,7 +10,7 @@ public:
     virtual void causeDamage(int damage) = 0;
     virtual int getDamage() = 0;
     virtual std::pair<int, int> getHealth() = 0;
-    virtual bool alive() = 0;
+    virtual bool alive() const = 0;
 
     virtual void swapWeapon() {};
     virtual bool melle() { return true; };
@@ -17,4 +18,6 @@ public:
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };
     virtual int getStr() { return 0; };
+
+    virtual std::unique_ptr<Entity> clone() const = 0;
 };

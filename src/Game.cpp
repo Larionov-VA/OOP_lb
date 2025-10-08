@@ -18,7 +18,7 @@ Game::~Game() {
 
 
 void Game::startGameLoop() {
-    while (player.alive()) {
+    while (field->playerAlive()) {
         field->show();
         field->playerTurn();
         field->summonsTurn();
@@ -26,4 +26,6 @@ void Game::startGameLoop() {
         field->buildingsTurn();
         field->update();
     }
+    field->show();
+    std::cout << "YOU DIED\n";
 }

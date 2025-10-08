@@ -11,7 +11,7 @@ Player::Player() {
 }
 
 
-bool Player::alive() {
+bool Player::alive() const {
     return playerHealth.getCurrentHealth();
 }
 

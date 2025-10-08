@@ -5,6 +5,7 @@
 #include "ActorEquipment.hpp"
 #include "ActorHealth.hpp"
 #include <utility>
+#include <memory>
 
 class Player : public Entity {
 private:
@@ -18,7 +19,7 @@ public:
     }
     Player();
     Player(int playerAttack, int playerHealth);
-    bool alive() override;
+    bool alive() const override;
     bool melle() override;
     int getDamage() override;
     std::pair<int, int> getHealth() override;
@@ -27,4 +28,7 @@ public:
     int getInt() override;
     int getDex() override;
     int getStr() override;
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<Player>(*this);
+    }
 };

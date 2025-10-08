@@ -25,6 +25,6 @@ void Enemy::causeDamage(int damage) {
     enemyHealth.reduseCurrentHealth(damage);
 }
 
-bool Enemy::alive() {
+bool Enemy::alive() const {
     return enemyHealth.getCurrentHealth();
 }
