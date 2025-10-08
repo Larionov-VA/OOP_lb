@@ -131,36 +131,100 @@ void GameField::generateEnemy() {
 }
 
 
+int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
+    int totalCells = widthField * heightField;
+    int rowOld = oldIndex / widthField;
+    int rowNew = newIndex / widthField;
+
+
+    bool isHorizontal = (rowOld == rowNew);
+
+    if (isHorizontal) {
+        int dir = (newIndex > oldIndex) ? 1 : -1;
+        int current = oldIndex + dir;
+
+        while (current >= 0 && current < totalCells && (current / widthField) == rowOld) {
+            if (entityManager[current] &&
+                entityManager[current]->getType() == Entity::entityType::ENEMY)
+                return current;
+            current += dir;
+        }
+    } else {
+        int dir = (newIndex > oldIndex) ? widthField : -widthField;
+        int current = oldIndex + dir;
+
+        while (current >= 0 && current < totalCells) {
+            if (entityManager[current] &&
+                entityManager[current]->getType() == Entity::entityType::ENEMY)
+                return current;
+            current += dir;
+        }
+    }
+    return -1;
+}
+
+
 void GameField::playerTurn() {
     char command;
     std::cin >> command;
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     int newPlayerIndex;
+    int enemyIndex;
     switch (command) {
     case 'w':
         newPlayerIndex = playerIndex - widthField;
-        if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+        if (entityManager[newPlayerIndex]) {
+            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
+            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 'a':
         newPlayerIndex = playerIndex - 1;
-        if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+        if (entityManager[newPlayerIndex]) {
+            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
+            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 's':
         newPlayerIndex = playerIndex + widthField;
-        if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+        if (entityManager[newPlayerIndex]) {
+            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
+            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 'd':
         newPlayerIndex = playerIndex + 1;
-        if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+        if (entityManager[newPlayerIndex]) {
+            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
+            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+        }
+        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
+    case 'q':
+        entityManager[playerIndex]->swapWeapon();
     default:
         break;
     }
@@ -169,6 +233,16 @@ void GameField::playerTurn() {
 
 void GameField::summonsTurn() {
 
+}
+
+void GameField::update() {
+    std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    for (int index : enemyIndexes) {
+        if (!entityManager[index]->alive()) {
+            cells[index].setAvaible(true);
+            entityManager.killEntity(index);
+        }
+    }
 }
 
 
@@ -245,20 +319,36 @@ void GameField::show() {
         }
         else {
             std::cout << "X";
-            
         }
         if ((i + 1) % widthField == 0) {
-            if (i == 0) {
+            if (i / widthField == 0) {
                 std::cout << "\tPlayer stats:";
             }
-            if (i == 1) {
-                std::cout << "\tintelligence " << 10 << "\t dexterity" << 10 << "strength " << 10;
+            if (i / widthField == 1) {
+                std::cout << "\tint " << entityManager[playerIndex]->getInt() << "\tdex " << entityManager[playerIndex]->getDex() << "\tstr " << entityManager[playerIndex]->getStr();
             }
+            if (i / widthField == 3) {
+                std::cout << "\tLife\t" << entityManager[playerIndex]->getHealth().first << "|"  << entityManager[playerIndex]->getHealth().second;
+            }
+            if (i / widthField == 4) {
+                std::cout << "\tAttack\t" << entityManager[playerIndex]->getDamage();
+            }
+            if (i / widthField == 6) {
+                std::cout << "\tCurrent weapon:\t" << (entityManager[playerIndex]->melle() ? "Sword" : "Bow");
+            }
+            if (i / widthField == 8) {
+                std::cout << "\tEnemy count:\t" << enemyIndexes.size();
+            }
+            // if (i / widthField == 9) {
+            //     std::cout << '\t';
+            //     for (int index : enemyIndexes) {
+            //         std::cout << index << ": " << entityManager[index]->getHealth().first << "|"  << entityManager[index]->getHealth().second << ' ';
+            //     }
+            // }
             std::cout << '\n';
         }
         else {
             std::cout << "  ";
         }
     }
-
 }

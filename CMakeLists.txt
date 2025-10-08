@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-add_subdirectory(external/ftxui)
+# add_subdirectory(external/ftxui)
 
 
 set(SRCS
@@ -21,6 +21,7 @@ set(SRCS
     src/ActorAttack.cpp
     src/ActorAtributes.cpp
     src/EntityManager.cpp
+    # src/Visualizer.cpp
 )
 
 
@@ -31,8 +32,8 @@ target_compile_options(game PRIVATE -Wall -Wextra -g)
 target_include_directories(game PRIVATE src/)
 
 
-target_link_libraries(game
-    PRIVATE ftxui::screen
-    PRIVATE ftxui::dom
-    PRIVATE ftxui::component
-)
+# target_link_libraries(game
+#     PRIVATE ftxui::screen
+#     PRIVATE ftxui::dom
+#     PRIVATE ftxui::component
+# )

@@ -2,10 +2,15 @@
 
 class Health {
 private:
-    int health;
+    int currentHealth;
+    int maxHealth;
 public:
-    void setHealth(int attack);
-    int getHealth() const;
+    void regenerate(int amount);
+    void reduseCurrentHealth(int damage);
+    void restoreHealth();
+    void setMaxHealth(int newMaxHealth);
+    int getCurrentHealth() const;
+    int getMaxHealth() const;
     Health();
     Health(int health);
     ~Health();

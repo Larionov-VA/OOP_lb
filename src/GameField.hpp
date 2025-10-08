@@ -2,7 +2,6 @@
 // #include <stdexcept>
 #include <vector>
 #include <unordered_map>
-// #include <cstdlib>
 #include <iostream>
 #include <ctime>
 #include <iomanip>
@@ -13,6 +12,7 @@
 #include "FieldCell.hpp"
 #include "Entity.hpp"
 #include "Player.hpp"
+#include "Visualizer.hpp"
 #include "Enemy.hpp"
 
 #define MAX_FIELD_SIZE 25
@@ -31,12 +31,13 @@ private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
     bool isMoveCorrect(int oldIndex, int newIndex) const;
-    // int getCellWithEntity(Entity::entityType type);
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
+    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
     int getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
 public:
     void playerTurn();
+    void update();
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();

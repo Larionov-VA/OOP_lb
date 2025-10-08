@@ -4,6 +4,7 @@
 #include "ActorAttack.hpp"
 #include "ActorEquipment.hpp"
 #include "ActorHealth.hpp"
+#include <utility>
 
 class Enemy : public Entity {
 private:
@@ -14,13 +15,11 @@ public:
         return entityType::ENEMY;
     }
 
-    void getDamage(int damage) {
 
-    }
-
-    bool alive() {
-        return enemyHealth.getHealth();
-    }
+    int getDamage() override;
+    std::pair<int, int>  getHealth() override;
+    void causeDamage(int damage) override;
+    bool alive() override;
     Enemy();
     ~Enemy();
 };
