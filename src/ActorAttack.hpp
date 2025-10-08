@@ -1,3 +1,5 @@
+#pragma once
+
 class Attack {
 private:
     int attack;

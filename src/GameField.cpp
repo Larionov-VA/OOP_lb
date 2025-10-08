@@ -249,12 +249,10 @@ void GameField::show() {
         }
         if ((i + 1) % widthField == 0) {
             if (i == 0) {
-                std::cout << "\tPlayer stats:"
+                std::cout << "\tPlayer stats:";
             }
             if (i == 1) {
-                std::cout << "\tintelligence " << 10 << " "
-    int dexterity;
-    int strength;"
+                std::cout << "\tintelligence " << 10 << "\t dexterity" << 10 << "strength " << 10;
             }
             std::cout << '\n';
         }
