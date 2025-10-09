@@ -1,9 +1,12 @@
 #include "Enemy.hpp"
 
 
-Enemy::Enemy() {
-    enemyHealth.setMaxHealth(10);
+Enemy::Enemy() : Enemy(1) {}
+
+Enemy::Enemy(int enemyLevel) {
+    enemyHealth.setMaxHealth(10 * enemyLevel);
     enemyHealth.restoreHealth();
+    enemyAttack.setAttack(5 * enemyLevel);
 }
 
 Enemy::~Enemy() {

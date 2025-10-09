@@ -22,6 +22,7 @@ set(SRCS
     src/ActorAtributes.cpp
     src/EntityManager.cpp
     # src/Visualizer.cpp
+    src/EnemyBarracks.cpp
 )
 
 

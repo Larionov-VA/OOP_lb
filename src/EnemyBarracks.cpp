@@ -1,0 +1,42 @@
+#include "EnemyBarracks.hpp"
+#include <iostream>
+
+EnemyBarracks::EnemyBarracks(int barracksLevel, int spawnPeriod) {
+    barracksHealth.setMaxHealth(20 * barracksLevel);
+    barracksHealth.restoreHealth();
+    this->spawnPeriod = spawnPeriod;
+}
+
+
+EnemyBarracks::~EnemyBarracks() {
+}
+
+
+bool EnemyBarracks::timeToSpawn() {
+    ++counter;
+    if (spawnPeriod == counter) {
+        counter = 0;
+        return true;
+    }
+    return false;
+}
+
+
+int EnemyBarracks::getDamage() {
+    return 0;
+}
+
+
+std::pair<int, int> EnemyBarracks::getHealth() {
+    return {barracksHealth.getCurrentHealth(), barracksHealth.getMaxHealth()};
+}
+
+
+void EnemyBarracks::causeDamage(int damage) {
+    barracksHealth.reduseCurrentHealth(damage);
+}
+
+
+bool EnemyBarracks::alive() const {
+    return barracksHealth.getCurrentHealth();
+}

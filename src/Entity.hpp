@@ -4,7 +4,7 @@
 
 class Entity {
 public:
-    enum class entityType { UNDEFINED, PLAYER, ENEMY, OBJECT };
+    enum class entityType { UNDEFINED, PLAYER, ENEMY, BARRACKS };
     virtual ~Entity() = default;
     virtual entityType getType() const = 0;
     virtual void causeDamage(int damage) = 0;
@@ -14,6 +14,8 @@ public:
 
     virtual void swapWeapon() {};
     virtual bool melle() { return true; };
+
+    virtual bool timeToSpawn () { return false; };
 
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };

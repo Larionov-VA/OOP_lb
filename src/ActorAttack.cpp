@@ -13,3 +13,7 @@ Attack::~Attack() {
 int Attack::getAttack() const {
     return attack < 0 ? 0 : attack;
 }
+
+void Attack::setAttack(int attack) {
+    this->attack = attack;
+}

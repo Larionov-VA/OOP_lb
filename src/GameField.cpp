@@ -79,7 +79,8 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     activateAround(cell3, (widthField + heightField) / 4);
     activateLine(cell1, cell2);
     activateLine(cell1, cell3);
-    
+
+    spawnEntity(std::make_unique<EnemyBarracks>(), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
 }
 
@@ -145,7 +146,8 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 
         while (current >= 0 && current < totalCells && (current / widthField) == rowOld) {
             if (entityManager[current] &&
-                entityManager[current]->getType() == Entity::entityType::ENEMY)
+                (entityManager[current]->getType() == Entity::entityType::ENEMY ||
+                entityManager[current]->getType() == Entity::entityType::BARRACKS))
                 return current;
             current += dir;
         }
@@ -155,7 +157,8 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 
         while (current >= 0 && current < totalCells) {
             if (entityManager[current] &&
-                entityManager[current]->getType() == Entity::entityType::ENEMY)
+                (entityManager[current]->getType() == Entity::entityType::ENEMY ||
+                entityManager[current]->getType() == Entity::entityType::BARRACKS))
                 return current;
             current += dir;
         }
@@ -243,6 +246,16 @@ void GameField::update() {
             entityManager.killEntity(index);
         }
     }
+    std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+    if (!barrackIndexes.empty()) {
+        for (int index : barrackIndexes) {
+            std::cout << index << '\n';
+            if (!entityManager[index]->alive()) {
+                cells[index].setAvaible(true);
+                entityManager.killEntity(index);
+            }
+        }
+    }
 }
 
 
@@ -296,7 +309,33 @@ void GameField::enemyTurn() {
 
 
 void GameField::buildingsTurn() {
+    std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+    int index;
+    if (barrackIndexes.empty()) {
+        return;
+    }
+    else {
+        index = barrackIndexes[0];
+    }
+    if (entityManager[index]->timeToSpawn()) {
+        int up = index - widthField;
+        int down = index + widthField;
+        int left = index - 1;
+        int right = index + 1;
 
+        if (isMoveCorrect(index, up)) {
+            spawnEntity(std::make_unique<Enemy>(), up);
+        }
+        else if (isMoveCorrect(index, down)) {
+            spawnEntity(std::make_unique<Enemy>(), down);
+        }
+        else if (isMoveCorrect(index, left)) {
+            spawnEntity(std::make_unique<Enemy>(), left);
+        }
+        else if (isMoveCorrect(index, right)) {
+            spawnEntity(std::make_unique<Enemy>(), right);
+        }
+    }
 }
 
 
@@ -319,6 +358,9 @@ void GameField::show() {
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
                     std::cout << "E";
+                }
+                else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
+                    std::cout << "B";
                 }
             }
             else {

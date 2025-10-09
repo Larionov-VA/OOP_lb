@@ -21,6 +21,7 @@ public:
     void causeDamage(int damage) override;
     bool alive() const override;
     Enemy();
+    Enemy(int enemyLevel);
     ~Enemy();
     std::unique_ptr<Entity> clone() const override {
         return std::make_unique<Enemy>(*this);
