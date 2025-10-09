@@ -11,6 +11,20 @@ Player::Player() {
 }
 
 
+bool Player::checkDebaffState() {
+    if (slowed) {
+        slowed = false;
+        return true;
+    }
+    return false;
+}
+
+
+void Player::setDebaffState() {
+    slowed = true;
+}
+
+
 bool Player::alive() const {
     return playerHealth.getCurrentHealth();
 }

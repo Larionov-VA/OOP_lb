@@ -1,11 +1,12 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y, bool avaible) {
-    objectID = ID;
-    this->avaible = avaible;
+FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y, bool slow, bool avaible) {
+    this->objectID = ID;
     this->X = X;
     this->Y = Y;
+    this->slow = slow;
+    this->avaible = avaible;
 }
 
 unsigned FieldCell::getID() const {
@@ -25,6 +26,16 @@ void FieldCell::swap(FieldCell &cell) {
     cell.setID(objectID);
     this->setID(temp);
 }
+
+bool FieldCell::isCellSlow() const {
+    return slow;
+}
+
+
+void FieldCell::setSlow(bool slowState) {
+    this->slow = slowState;
+}
+
 
 int FieldCell::getDistance(FieldCell oth) const {
     auto othCoord = oth.getCoord();

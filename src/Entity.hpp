@@ -14,8 +14,11 @@ public:
 
     virtual void swapWeapon() {};
     virtual bool melle() { return true; };
+    virtual bool checkDebaffState() { return false; };
+    virtual void setDebaffState() {};
 
-    virtual bool timeToSpawn () { return false; };
+
+    virtual bool timeToSpawn() { return false; };
 
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };

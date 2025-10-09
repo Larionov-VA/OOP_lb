@@ -19,7 +19,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
-        cells.emplace_back(i, i % widthField, i / heightField);
+        cells.emplace_back(i, i % widthField, i / heightField, false);
     }
 
     std::random_device rd;
@@ -79,6 +79,17 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     activateAround(cell3, (widthField + heightField) / 4);
     activateLine(cell1, cell2);
     activateLine(cell1, cell3);
+
+    for (int i = widthField; i < widthField * heightField - widthField; ++i) {
+        int up = i - widthField;
+        int down = i + widthField;
+        int left = i - 1;
+        int right = i + 1;
+        if (cells[i].isCellAvaible() && (!cells[up].isCellAvaible() || !cells[down].isCellAvaible() ||
+            !cells[left].isCellAvaible() || !cells[right].isCellAvaible()) && (i % widthField)) {
+            cells[i].setSlow(true);
+        }
+    }
 
     spawnEntity(std::make_unique<EnemyBarracks>(), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
@@ -175,6 +186,9 @@ void GameField::playerTurn() {
     int enemyIndex;
     switch (command) {
     case 'w':
+        if (entityManager[playerIndex]->checkDebaffState()) {
+            break;
+        }
         newPlayerIndex = playerIndex - widthField;
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         if (entityManager[newPlayerIndex]) {
@@ -184,10 +198,16 @@ void GameField::playerTurn() {
             entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+            if (cells[newPlayerIndex].isCellSlow()) {
+                entityManager[playerIndex]->setDebaffState();
+            }
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 'a':
+        if (entityManager[playerIndex]->checkDebaffState()) {
+            break;
+        }
         newPlayerIndex = playerIndex - 1;
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         if (entityManager[newPlayerIndex]) {
@@ -197,10 +217,16 @@ void GameField::playerTurn() {
             entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+            if (cells[newPlayerIndex].isCellSlow()) {
+                entityManager[playerIndex]->setDebaffState();
+            }
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 's':
+        if (entityManager[playerIndex]->checkDebaffState()) {
+            break;
+        }
         newPlayerIndex = playerIndex + widthField;
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         if (entityManager[newPlayerIndex]) {
@@ -210,10 +236,16 @@ void GameField::playerTurn() {
             entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+            if (cells[newPlayerIndex].isCellSlow()) {
+                entityManager[playerIndex]->setDebaffState();
+            }
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
     case 'd':
+        if (entityManager[playerIndex]->checkDebaffState()) {
+            break;
+        }
         newPlayerIndex = playerIndex + 1;
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         if (entityManager[newPlayerIndex]) {
@@ -223,6 +255,9 @@ void GameField::playerTurn() {
             entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+            if (cells[newPlayerIndex].isCellSlow()) {
+                entityManager[playerIndex]->setDebaffState();
+            }
             moveEntity(playerIndex, newPlayerIndex);
         }
         break;
@@ -249,7 +284,6 @@ void GameField::update() {
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
     if (!barrackIndexes.empty()) {
         for (int index : barrackIndexes) {
-            std::cout << index << '\n';
             if (!entityManager[index]->alive()) {
                 cells[index].setAvaible(true);
                 entityManager.killEntity(index);
@@ -362,6 +396,9 @@ void GameField::show() {
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
                     std::cout << "B";
                 }
+            }
+            else if (cells[i].isCellSlow()) {
+                std::cout << "=";
             }
             else {
                 std::cout << "-";

@@ -13,12 +13,15 @@ private:
     Attack playerAttack;
     Equipment playerEquipment;
     Health playerHealth;
+    bool slowed = false;
 public:
     entityType getType() const override {
         return entityType::PLAYER;
     }
     Player();
     Player(int playerAttack, int playerHealth);
+    bool checkDebaffState() override;
+    void setDebaffState() override;
     bool alive() const override;
     bool melle() override;
     int getDamage() override;
