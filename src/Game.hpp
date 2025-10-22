@@ -2,15 +2,17 @@
 #include <unistd.h>
 #include "GameField.hpp"
 #include "Player.hpp"
+#include "IGameController.hpp"
+#include "Config.hpp"
 
-class Game {
+class Game : public IGameController{
 private:
     Player player;
     GameField* field;
-    unsigned gameLevel;
 public:
     Game();
-    Game(int width, int height, unsigned level);
     ~Game();
+    void startGame() override;
+    void stopGame() override;
     void startGameLoop();
 };

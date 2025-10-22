@@ -388,48 +388,54 @@ void GameField::show() {
             
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
-                    std::cout << "P";
+                    // std::cout << "P";
+                    fieldChars.push_back('P');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
-                    std::cout << "E";
+                    // std::cout << "E";
+                    fieldChars.push_back('E');
                 }
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
-                    std::cout << "B";
+                    // std::cout << "B";
+                    fieldChars.push_back('B');
                 }
             }
             else if (cells[i].isCellSlow()) {
-                std::cout << "=";
+                // std::cout << "=";
+                fieldChars.push_back('=');
             }
             else {
-                std::cout << "-";
+                // std::cout << "-";
+                fieldChars.push_back('-');
             }
         }
         else {
-            std::cout << "X";
+            // std::cout << "X";
+            fieldChars.push_back('X');
         }
-        if ((i + 1) % widthField == 0) {
-            if (i / widthField == 0) {
-                std::cout << "\tPlayer stats:";
-            }
-            if (i / widthField == 1) {
-                std::cout << "\tint " << entityManager[playerIndex]->getInt() << "\tdex " << entityManager[playerIndex]->getDex() << "\tstr " << entityManager[playerIndex]->getStr();
-            }
-            if (i / widthField == 3) {
-                std::cout << "\tLife\t" << entityManager[playerIndex]->getHealth().first << "|"  << entityManager[playerIndex]->getHealth().second;
-            }
-            if (i / widthField == 4) {
-                std::cout << "\tAttack\t" << entityManager[playerIndex]->getDamage();
-            }
-            if (i / widthField == 6) {
-                std::cout << "\tCurrent weapon:\t" << (entityManager[playerIndex]->melle() ? "Sword" : "Bow");
-            }
-            if (i / widthField == 8) {
-                std::cout << "\tEnemy count:\t" << enemyIndexes.size();
-            }
-            std::cout << '\n';
-        }
-        else {
-            std::cout << "  ";
-        }
+        // if ((i + 1) % widthField == 0) {
+        //     if (i / widthField == 0) {
+        //         std::cout << "\tPlayer stats:";
+        //     }
+        //     if (i / widthField == 1) {
+        //         std::cout << "\tint " << entityManager[playerIndex]->getInt() << "\tdex " << entityManager[playerIndex]->getDex() << "\tstr " << entityManager[playerIndex]->getStr();
+        //     }
+        //     if (i / widthField == 3) {
+        //         std::cout << "\tLife\t" << entityManager[playerIndex]->getHealth().first << "|"  << entityManager[playerIndex]->getHealth().second;
+        //     }
+        //     if (i / widthField == 4) {
+        //         std::cout << "\tAttack\t" << entityManager[playerIndex]->getDamage();
+        //     }
+        //     if (i / widthField == 6) {
+        //         std::cout << "\tCurrent weapon:\t" << (entityManager[playerIndex]->melle() ? "Sword" : "Bow");
+        //     }
+        //     if (i / widthField == 8) {
+        //         std::cout << "\tEnemy count:\t" << enemyIndexes.size();
+        //     }
+        //     std::cout << '\n';
+        // }
+        // else {
+        //     std::cout << "  ";
+        // }
     }
 }

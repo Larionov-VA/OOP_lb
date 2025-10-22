@@ -14,7 +14,7 @@
 #include "Visualizer.hpp"
 #include "Enemy.hpp"
 #include "EnemyBarracks.hpp"
-
+#include "Config.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
