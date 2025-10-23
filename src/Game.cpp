@@ -46,15 +46,6 @@ void Game::stopGame() {
 }
 
 
-void Game::startGameLoop() {
-    // while (field->playerAlive()) {
-    //     field->show();
-    //     field->playerTurn('s');
-    //     field->summonsTurn();
-    //     field->enemyTurn();
-    //     field->buildingsTurn();
-    //     field->update();
-    // }
-    // field->show();
-    // std::cout << "YOU DIED\n";
-}
+// void Game::startGameLoop() {
+
+// }
