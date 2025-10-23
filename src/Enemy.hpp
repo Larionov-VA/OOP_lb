@@ -4,6 +4,7 @@
 #include "ActorAttack.hpp"
 #include "ActorEquipment.hpp"
 #include "ActorHealth.hpp"
+#include "Config.hpp"
 #include <utility>
 #include <memory>
 
@@ -12,6 +13,7 @@ class Enemy : public Entity {
 private:
     Attack enemyAttack;
     Health enemyHealth;
+    bool iterative;
 public:
     entityType getType() const override {
         return entityType::ENEMY;

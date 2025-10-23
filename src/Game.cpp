@@ -26,6 +26,7 @@ bool Game::performAnAction(char playerAction) {
         return false;
     }
     field->playerTurn(playerAction);
+    field->update();
     field->summonsTurn();
     field->enemyTurn();
     field->buildingsTurn();
@@ -33,6 +34,11 @@ bool Game::performAnAction(char playerAction) {
     field->show();
     return true;
 }
+
+
+std::shared_ptr<PlayerData> Game::getPlayerData() {
+    return field->getPlayerData();
+};
 
 
 void Game::stopGame() {

@@ -16,7 +16,7 @@ public:
     unsigned getID() const;
     void setID(unsigned ID);
     void swap(FieldCell& cell);
-    int getDistance(FieldCell oth) const;
+    float getDistance(FieldCell oth) const;
     bool isCellAvaible() const;
     void setAvaible(bool avaible);
     bool isCellSlow() const;

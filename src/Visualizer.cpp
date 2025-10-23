@@ -71,6 +71,25 @@ void Visualizer::display() {
         cancel_button
     });
 
+    auto exit_and_save_button = Button("Save & Exit", [&] {
+        if (controller_) controller_->stopGame();
+        current_state_ = ScreenState::MainMenu;
+        screen_->PostEvent(Event::Custom);
+    });
+    auto player_info = Renderer([&] {
+        std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+        return vbox({
+            text("PLAYER INFO") | bold,
+            separator(),
+            text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
+            text("Attack: " + std::to_string(data->playerAttack))
+        }) | border;
+    });
+    auto in_game_container = Container::Vertical({
+        player_info,
+        exit_and_save_button
+    });
+
     // --- Разделяем области фокуса: 0 — настройки, 1 — кнопки ---
     int tab_focus = 0;
     auto options_tabs = Container::Tab({
@@ -99,7 +118,8 @@ void Visualizer::display() {
     // ---------- ROOT ----------
     Component root = Container::Tab({
         main_menu,
-        options_container
+        options_container,
+        in_game_container
     }, (int*)&current_state_);
 
     // ---------- RENDER ----------
@@ -143,19 +163,26 @@ void Visualizer::display() {
             }();
 
             // --- боковая панель ---
-            auto exit_and_save_button = Button("Save & Exit", [&] {
-                // if (controller_) controller_->saveAndQuit();
-                current_state_ = ScreenState::MainMenu;
-                screen_->PostEvent(Event::Custom);
-            });
+            // auto exit_and_save_button = Button("Save & Exit", [&] {
+            //     // if (controller_) controller_->saveAndQuit();
+            //     current_state_ = ScreenState::MainMenu;
+            //     screen_->PostEvent(Event::Custom);
+            // });
 
             auto side_panel = vbox({
                 text("PLAYER INFO") | bold,
-                separator(),
-                text("Level: " + std::to_string(GlobalGameConfig::gameLevel)),
-                separator(),
-                exit_and_save_button->Render()
+                in_game_container->Render()
             }) | border | size(WIDTH, EQUAL, 25);
+
+            // auto side_panel = [&] {
+            //     std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+            //     return vbox({
+            //         text("PLAYER INFO") | bold,
+            //         separator(),
+            //         text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
+            //         text("Attack: " + std::to_string(data->playerAttack))
+            //     }) | border;
+            // }();
 
             // --- финальный layout ---
             return hbox({
@@ -265,7 +292,6 @@ void Visualizer::display() {
             }
             return false;
         }
-
         return false;
     });
     

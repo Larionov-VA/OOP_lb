@@ -14,6 +14,7 @@ public:
     ~Game();
     void startGame() override;
     bool performAnAction(char playerAction) override;
+    std::shared_ptr<PlayerData> getPlayerData() override;
     void stopGame() override;
-    void startGameLoop();
+    // void startGameLoop();
 };

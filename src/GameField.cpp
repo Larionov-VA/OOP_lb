@@ -259,7 +259,31 @@ void GameField::update() {
 }
 
 
-int GameField::getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited) {
+int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
+    
+    std::vector<int> enemyTurns;
+    enemyTurns.push_back(indexEnemy - widthField);
+    enemyTurns.push_back(indexEnemy + widthField);
+    enemyTurns.push_back(indexEnemy - 1);
+    enemyTurns.push_back(indexEnemy + 1);
+    std::vector<std::pair<int, float>> enemyTurnsWithDist = getDistanceToPlayer(enemyTurns, playerIndex);
+    
+    std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy].getDistance(cells[playerIndex])};
+    for (const auto& [turn, dist] : enemyTurnsWithDist) {
+        if (isMoveCorrect(indexEnemy, turn) && dist < bestTurn.second) {
+            bestTurn.first = turn;
+            bestTurn.second = dist;
+        }
+    }
+    if (bestTurn.first != indexEnemy) {
+        return bestTurn.first;
+    }
+    std::unordered_map<int, int> visited{};
+    return getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
+}
+
+
+int GameField::getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited) {
     visited[playerIndex] = 1;
     
     int up = playerIndex - widthField;
@@ -272,32 +296,44 @@ int GameField::getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unorder
         return playerIndex;
     }
     if (isMoveCorrect(playerIndex, up) && !visited[up]) {
-        result = getBestTurnForEnemy(indexEnemy, up, visited);
+        result = getBestTurnForEnemyRecursive(indexEnemy, up, visited);
         if (result != -1) return result;
     }
     if (isMoveCorrect(playerIndex, down) && !visited[down]) {
-        result = getBestTurnForEnemy(indexEnemy, down, visited);
+        result = getBestTurnForEnemyRecursive(indexEnemy, down, visited);
         if (result != -1) return result;
     }
     if (isMoveCorrect(playerIndex, left) && !visited[left]) {
-        result = getBestTurnForEnemy(indexEnemy, left, visited);
+        result = getBestTurnForEnemyRecursive(indexEnemy, left, visited);
         if (result != -1) return result;
     }
     if (isMoveCorrect(playerIndex, right) && !visited[right]) {
-        result = getBestTurnForEnemy(indexEnemy, right, visited);
+        result = getBestTurnForEnemyRecursive(indexEnemy, right, visited);
         if (result != -1) return result;
     }
     return -1;
 }
 
 
+std::vector<std::pair<int, float>> 
+GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
+    std::vector<std::pair<int, float>> distances;
+    float distance;
+    for (long unsigned int i = 0; i < enemyIndexes.size(); ++i) {
+        distance = cells[playerIndex].getDistance(cells[enemyIndexes[i]]);
+        distances.push_back({enemyIndexes[i], distance});
+    }
+    return distances;
+}
+
 void GameField::enemyTurn() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    for (int index : enemyIndexes) {
-        std::unordered_map<int, int> visited{};
+    std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
 
-        int bestTurn = getBestTurnForEnemy(index, playerIndex, visited);
+    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
+    for (const auto&  [index , dist] : enemyIndexesWithDistances) {
+        int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
         if (isMoveCorrect(index, bestTurn)) {
             moveEntity(index, bestTurn);
         }
@@ -345,6 +381,41 @@ bool GameField::playerAlive() const {
 }
 
 
+std::shared_ptr<PlayerData> GameField::getPlayerData() {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    Player* player = dynamic_cast<Player*>(entityManager[playerIndex]);
+    std::pair<int, int> playerHealth = player->getHealth();
+    int playerAttack = player->getDamage();
+    int playerIntelligence = player->getInt();
+    int playerDexterity = player->getDex();
+    int playerStrength = player->getStr();
+    std::string playerWeapon;
+    std::string playerDebaff;
+    if (player->melle()) {
+        playerWeapon = "Sword";
+    }
+    else {
+        playerWeapon = "Bow";
+    }
+    if (player->checkDebaffState()) {
+        player->setDebaffState();
+        playerDebaff = "Slowed";
+    }
+    PlayerData* data = new PlayerData{
+        playerHealth.second, 
+        playerHealth.first, 
+        playerAttack, 
+        playerIntelligence,
+        playerDexterity,
+        playerStrength,
+        playerWeapon,
+        playerDebaff
+    };
+    std::shared_ptr<PlayerData> dataSharedPtr(data);
+    return dataSharedPtr;
+}
+
+
 void GameField::show() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     // int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
@@ -377,8 +448,6 @@ void GameField::show() {
             }
         }
         else {
-            // int randomRock = (int)std::hash<std::string>{}(std::to_string(i)) % 4;
-            // rand_r(i);
             int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
             switch (randomRock) {
             case 0:

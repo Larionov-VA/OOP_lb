@@ -4,9 +4,10 @@
 Enemy::Enemy() : Enemy(1) {}
 
 Enemy::Enemy(int enemyLevel) {
-    enemyHealth.setMaxHealth(10 * enemyLevel);
+    enemyHealth.setMaxHealth(GlobalGameConfig::enemyHealth * enemyLevel);
     enemyHealth.restoreHealth();
-    enemyAttack.setAttack(5 * enemyLevel);
+    enemyAttack.setAttack(GlobalGameConfig::enemyAttack * enemyLevel);
+    iterative = true;
 }
 
 Enemy::~Enemy() {

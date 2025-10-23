@@ -38,18 +38,19 @@ private:
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
     int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
-    int getBestTurnForEnemy(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
+    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
+    int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
+    std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
 public:
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
-
     GameField(const GameField& other)
         : cells(other.cells),
           entityManager(other.entityManager),
           widthField(other.widthField),
           heightField(other.heightField),
           gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn) {}
-
+          gameTurn(other.gameTurn) 
+          {}
     GameField& operator=(const GameField& other) {
         if (this == &other) return *this;
         cells = other.cells;
@@ -60,15 +61,14 @@ public:
         gameTurn = other.gameTurn;
         return *this;
     }
-
     GameField(GameField&& other) noexcept
         : cells(std::move(other.cells)),
           entityManager(std::move(other.entityManager)),
           widthField(other.widthField),
           heightField(other.heightField),
           gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn) {}
-
+          gameTurn(other.gameTurn) 
+          {}
     GameField& operator=(GameField&& other) noexcept {
         if (this == &other) return *this;
         cells = std::move(other.cells);
@@ -79,8 +79,9 @@ public:
         gameTurn = other.gameTurn;
         return *this;
     }
-    
+
     bool playerAlive() const;
+    std::shared_ptr<PlayerData> getPlayerData();
 
     void playerTurn(char command);
     void summonsTurn();
