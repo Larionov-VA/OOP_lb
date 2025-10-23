@@ -13,6 +13,7 @@ public:
     Game();
     ~Game();
     void startGame() override;
+    bool performAnAction(char playerAction) override;
     void stopGame() override;
     void startGameLoop();
 };

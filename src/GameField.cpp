@@ -178,75 +178,46 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 }
 
 
-void GameField::playerTurn() {
-    char command;
-    std::cin >> command;
+void GameField::playerTurn(char command) {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     int newPlayerIndex;
     int enemyIndex;
+    bool move = false;
     switch (command) {
     case 'w':
         if (entityManager[playerIndex]->checkDebaffState()) {
             break;
         }
         newPlayerIndex = playerIndex - widthField;
-        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
-        if (entityManager[newPlayerIndex]) {
-            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
-            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
-            if (cells[newPlayerIndex].isCellSlow()) {
-                entityManager[playerIndex]->setDebaffState();
-            }
-            moveEntity(playerIndex, newPlayerIndex);
-        }
+        move = true;
         break;
     case 'a':
         if (entityManager[playerIndex]->checkDebaffState()) {
             break;
         }
         newPlayerIndex = playerIndex - 1;
-        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
-        if (entityManager[newPlayerIndex]) {
-            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
-            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
-            if (cells[newPlayerIndex].isCellSlow()) {
-                entityManager[playerIndex]->setDebaffState();
-            }
-            moveEntity(playerIndex, newPlayerIndex);
-        }
+        move = true;
         break;
     case 's':
         if (entityManager[playerIndex]->checkDebaffState()) {
             break;
         }
         newPlayerIndex = playerIndex + widthField;
-        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
-        if (entityManager[newPlayerIndex]) {
-            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
-            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
-        }
-        else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
-            if (cells[newPlayerIndex].isCellSlow()) {
-                entityManager[playerIndex]->setDebaffState();
-            }
-            moveEntity(playerIndex, newPlayerIndex);
-        }
+        move = true;
         break;
     case 'd':
         if (entityManager[playerIndex]->checkDebaffState()) {
             break;
         }
         newPlayerIndex = playerIndex + 1;
+        move = true;
+        break;
+    case 'q':
+        entityManager[playerIndex]->swapWeapon();
+    default:
+        break;
+    }
+    if (move) {
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         if (entityManager[newPlayerIndex]) {
             entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
@@ -260,11 +231,6 @@ void GameField::playerTurn() {
             }
             moveEntity(playerIndex, newPlayerIndex);
         }
-        break;
-    case 'q':
-        entityManager[playerIndex]->swapWeapon();
-    default:
-        break;
     }
 }
 
@@ -381,7 +347,8 @@ bool GameField::playerAlive() const {
 
 void GameField::show() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    // int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    fieldChars.clear();
     for (int i = 0; i < widthField * heightField; ++i) {
         Entity* currentEntity = entityManager[i];
         if (cells[i].isCellAvaible() || currentEntity) {
@@ -389,20 +356,20 @@ void GameField::show() {
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
                     // std::cout << "P";
-                    fieldChars.push_back('P');
+                    fieldChars.push_back(L'𐇐');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
                     // std::cout << "E";
-                    fieldChars.push_back('E');
+                    fieldChars.push_back(L'𖨆');
                 }
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
                     // std::cout << "B";
-                    fieldChars.push_back('B');
+                    fieldChars.push_back(L'🏟');
                 }
             }
             else if (cells[i].isCellSlow()) {
                 // std::cout << "=";
-                fieldChars.push_back('=');
+                fieldChars.push_back(L'░');
             }
             else {
                 // std::cout << "-";
@@ -410,8 +377,26 @@ void GameField::show() {
             }
         }
         else {
-            // std::cout << "X";
-            fieldChars.push_back('X');
+            // int randomRock = (int)std::hash<std::string>{}(std::to_string(i)) % 4;
+            // rand_r(i);
+            int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
+            switch (randomRock) {
+            case 0:
+                fieldChars.push_back(L'⛰');
+                break;
+            case 1:
+                fieldChars.push_back(L'🏔');
+                break;
+            case 2:
+                fieldChars.push_back(L'🌳');
+                break;
+            case 3:
+                fieldChars.push_back(L'🌲');
+                break;
+            default:
+                fieldChars.push_back(L'🏔');
+                break;
+            }
         }
         // if ((i + 1) % widthField == 0) {
         //     if (i / widthField == 0) {

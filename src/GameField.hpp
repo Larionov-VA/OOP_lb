@@ -7,6 +7,8 @@
 #include <memory>
 #include <random>
 #include <algorithm>
+#include <string>
+#include <functional>
 #include "EntityManager.hpp"
 #include "FieldCell.hpp"
 #include "Entity.hpp"
@@ -15,6 +17,7 @@
 #include "Enemy.hpp"
 #include "EnemyBarracks.hpp"
 #include "Config.hpp"
+
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
@@ -79,7 +82,7 @@ public:
     
     bool playerAlive() const;
 
-    void playerTurn();
+    void playerTurn(char command);
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();

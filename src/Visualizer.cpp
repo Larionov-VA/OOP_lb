@@ -123,11 +123,19 @@ void Visualizer::display() {
             auto field_box = [&] {
                 std::vector<Element> rows;
                 for (int y = 0; y < GlobalGameConfig::fieldHeight; ++y) {
-                    std::string line;
+                    std::wstring line;
                     for (int x = 0; x < GlobalGameConfig::fieldWidth; ++x) {
                         int idx = y * GlobalGameConfig::fieldWidth + x;
-                        line += (idx < (int)fieldChars.size()) ? fieldChars[idx]: ' ';
-                        line += " ";
+                        wchar_t nextSymbol = L' ';
+                        
+                        line += (idx < (int)fieldChars.size()) ? fieldChars[idx]: L' ';
+                        if (line.back() == L'🌳' || line.back() == L'🌲') {
+                            nextSymbol = L'\0';
+                        }
+                        else if (line.back() == L'░') {
+                            nextSymbol = L'░';
+                        }
+                        line += nextSymbol;
                     }
                     rows.push_back(text(line) | center);
                 }
@@ -135,7 +143,7 @@ void Visualizer::display() {
             }();
 
             // --- боковая панель ---
-            auto quit_button = Button("Quit & Save", [&] {
+            auto exit_and_save_button = Button("Save & Exit", [&] {
                 // if (controller_) controller_->saveAndQuit();
                 current_state_ = ScreenState::MainMenu;
                 screen_->PostEvent(Event::Custom);
@@ -146,7 +154,7 @@ void Visualizer::display() {
                 separator(),
                 text("Level: " + std::to_string(GlobalGameConfig::gameLevel)),
                 separator(),
-                quit_button->Render()   // ✅ теперь Render() превращает компонент в Element
+                exit_and_save_button->Render()
             }) | border | size(WIDTH, EQUAL, 25);
 
             // --- финальный layout ---
@@ -184,40 +192,83 @@ void Visualizer::display() {
 
     // ---------- EVENT HANDLING ----------
     Component app = CatchEvent(renderer, [&](Event event) {
+        // MAIN MENU EVENTS
         if (current_state_ == ScreenState::MainMenu) {
             if (event == Event::Return) {
                 switch (main_selected) {
-                    case 0: 
+                    case 0: // NEW GAME
                         if (controller_) {
                             controller_->startGame();
                         }
                         current_state_ = ScreenState::InGame;
                         screen_->PostEvent(Event::Custom);
                         return true;
-                    case 1: 
+
+                    case 1: // CONTINUE GAME
                         if (controller_) {
                             controller_->startGame();
                         }
                         return true;
-                    case 2:
+
+                    case 2: // OPTIONS
                         current_state_ = ScreenState::OptionsMenu;
                         screen_->PostEvent(Event::Custom);
                         return true;
-                    case 3:
+
+                    case 3: // EXIT
                         current_state_ = ScreenState::Exit;
                         screen_->ExitLoopClosure()();
                         return true;
                 }
             }
-            if (event == Event::Character('q')) {
+
+            if (event == Event::Escape) {
                 current_state_ = ScreenState::Exit;
                 screen_->ExitLoopClosure()();
                 return true;
             }
         }
+
+        // IN GAME EVENTS
+        else if (current_state_ == ScreenState::InGame) {
+            if (event.is_mouse()) {
+                return true;
+            }
+            if (event == ftxui::Event::Special("resize")) {
+                return true;
+            }
+            if (event == Event::Escape) {
+                current_state_ = ScreenState::MainMenu;
+                controller_->stopGame();
+                screen_->PostEvent(Event::Custom);
+                return true;
+            }
+            if (event == Event::Character('w') || event == Event::ArrowUp) {
+                controller_->performAnAction('w');
+                return true;
+            }
+            else if (event == Event::Character('s') || event == Event::ArrowDown) {
+                controller_->performAnAction('s');
+                return true;
+            }
+            else if (event == Event::Character('a') || event == Event::ArrowLeft) {
+                controller_->performAnAction('a');
+                return true;
+            }
+            else if (event == Event::Character('d') || event == Event::ArrowRight) {
+                controller_->performAnAction('d');
+                return true;
+            }
+            else if (event == Event::Character('q')) {
+                controller_->performAnAction('q');
+                return true;
+            }
+            return false;
+        }
+
         return false;
     });
-
+    
     // ---------- MAIN LOOP ----------
     screen_->Loop(app);
 }

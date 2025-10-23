@@ -17,31 +17,38 @@ void Game::startGame() {
         GlobalGameConfig::fieldHeight,
         GlobalGameConfig::difficulty
     );
-    while (field->playerAlive()) {
-        field->show();
-        field->playerTurn();
-        field->summonsTurn();
-        field->enemyTurn();
-        field->buildingsTurn();
-        field->update();
+    field->show();
+}
+
+
+bool Game::performAnAction(char playerAction) {
+    if (!field->playerAlive()) {
+        return false;
     }
+    field->playerTurn(playerAction);
+    field->summonsTurn();
+    field->enemyTurn();
+    field->buildingsTurn();
+    field->update();
+    field->show();
+    return true;
 }
 
 
 void Game::stopGame() {
-
+    delete field;
 }
 
 
 void Game::startGameLoop() {
-    while (field->playerAlive()) {
-        field->show();
-        field->playerTurn();
-        field->summonsTurn();
-        field->enemyTurn();
-        field->buildingsTurn();
-        field->update();
-    }
-    field->show();
-    std::cout << "YOU DIED\n";
+    // while (field->playerAlive()) {
+    //     field->show();
+    //     field->playerTurn('s');
+    //     field->summonsTurn();
+    //     field->enemyTurn();
+    //     field->buildingsTurn();
+    //     field->update();
+    // }
+    // field->show();
+    // std::cout << "YOU DIED\n";
 }

@@ -9,4 +9,4 @@ int GlobalGameConfig::fieldHeight = 25;
 int GlobalGameConfig::gameLevel = 1;
 GlobalGameConfig::difficulties GlobalGameConfig::difficulty = GlobalGameConfig::MEDIUM;
 
-std::vector<char> fieldChars;
+std::vector<wchar_t> fieldChars;
