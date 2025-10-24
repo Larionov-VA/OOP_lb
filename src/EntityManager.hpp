@@ -13,7 +13,7 @@ public:
     void killEntity(int index);
     void changeEntityIndex(int oldIndex, int newIndex);
     std::vector<int> getIndexesWithEntity(Entity::entityType type) const;
-    std::unique_ptr<Entity> getEntity(int index);
+    Entity* getEntity(int index);
     EntityManager();
     ~EntityManager();
     EntityManager(const EntityManager& other) {

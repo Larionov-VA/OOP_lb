@@ -1,6 +1,6 @@
 #include "ActorHealth.hpp"
 
-Health::Health() : Health(100){}
+Health::Health() : Health(DEFAULT_HEALTH){}
 
 Health::Health(int health) {
     currentHealth = health;

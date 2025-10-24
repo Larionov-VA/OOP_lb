@@ -5,17 +5,17 @@
 
 class FieldCell {
 private:
-    unsigned objectID;
+    int index;
     bool avaible;
     bool slow;
     int X;
     int Y;
 public:
     std::pair<int, int> getCoord() const;
-    FieldCell(unsigned ID, unsigned X, unsigned Y, bool slow, bool avaible = false);
-    unsigned getID() const;
-    void setID(unsigned ID);
-    void swap(FieldCell& cell);
+    FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible = false);
+    int getIndex() const;
+    void setIndex(int index);
+    // void swap(FieldCell& cell);
     float getDistance(FieldCell oth) const;
     bool isCellAvaible() const;
     void setAvaible(bool avaible);

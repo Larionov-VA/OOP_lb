@@ -30,7 +30,8 @@ const Entity* EntityManager::operator[](int index) const {
 
 
 void EntityManager::createEntity(std::unique_ptr<Entity> entity, int index) {
-    if (!infoMap[index]) {
+    auto it = infoMap.find(index);
+    if (it == infoMap.end() || !it->second) {
         infoMap[index] = std::move(entity);
     }
 }
@@ -42,16 +43,21 @@ void EntityManager::killEntity(int index) {
 }
 
 void EntityManager::changeEntityIndex(int oldIndex, int newIndex) {
-    infoMap[newIndex] = std::move(infoMap[oldIndex]);
-    infoMap.erase(oldIndex);
+    if (infoMap.find(newIndex) != infoMap.end()) {
+        // кто-то уже стоит в newIndex — нельзя двигать туда
+        return;
+    }
+    auto it = infoMap.find(oldIndex);
+    if (it == infoMap.end()) return;
+    infoMap[newIndex] = std::move(it->second);
+    infoMap.erase(it);
 }
 
 
-std::unique_ptr<Entity> EntityManager::getEntity(int index){
-    if (infoMap.empty() || !infoMap[index]) {
-        return nullptr;
-    }
-    return std::move(infoMap[index]);
+Entity* EntityManager::getEntity(int index) {
+    auto it = infoMap.find(index);
+    if (it == infoMap.end()) return nullptr;
+    return it->second.get();
 }
 
 

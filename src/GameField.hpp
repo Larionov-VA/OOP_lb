@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <iostream>
 #include <ctime>
 #include <iomanip>
@@ -17,7 +18,6 @@
 #include "Enemy.hpp"
 #include "EnemyBarracks.hpp"
 #include "Config.hpp"
-
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10

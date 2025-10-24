@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include <string>
+#define DEFAULT_ATTACK 5
+#define DEFAULT_HEALTH 100
+
 
 struct GlobalGameConfig {
     static int fieldWidth;
@@ -32,4 +35,3 @@ typedef struct {
     int enemyHealth;
     int enemyAttack;
 }EnemyData;
-// extern std::vector<wchar_t> fieldChars;

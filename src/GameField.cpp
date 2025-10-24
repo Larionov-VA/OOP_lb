@@ -19,7 +19,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
-        cells.emplace_back(i, i % widthField, i / heightField, false);
+        cells.emplace_back(i, i % widthField, i / widthField, false);
     }
 
     std::random_device rd;
@@ -259,7 +259,15 @@ void GameField::update() {
 
 
 int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
-    Enemy* enemy = dynamic_cast<Enemy*>(entityManager[indexEnemy]);
+    Entity* ent = entityManager[indexEnemy];
+    if (!ent) {
+        return indexEnemy;
+    }
+    Enemy* enemy = dynamic_cast<Enemy*>(ent);
+    if (!enemy) {
+        return indexEnemy;
+    }
+
     if (enemy->getIterative()) {
         std::vector<int> enemyTurns;
         enemyTurns.push_back(indexEnemy - widthField);
@@ -274,13 +282,16 @@ int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
                 bestTurn.second = dist;
             }
         }
-        if (bestTurn.first != indexEnemy) {
-            return bestTurn.first;
+        if (bestTurn.first == indexEnemy) {
+            enemy->setIterative(false);
         }
-    }
-    else {
+        return bestTurn.first;
+    } else {
+
         std::unordered_map<int, int> visited{};
-        return getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);        
+        int res = getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
+        
+        return (res == -1) ? indexEnemy : res;
     }
 }
 
@@ -327,23 +338,46 @@ GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
 }
 
 void GameField::enemyTurn() {
-    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
-    std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
-    
-    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), 
-    [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
+    auto playerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER);
+    if (playerIndexes.empty()) return;
+    int playerIndex = playerIndexes[0];
 
-    for (const auto&  [index , dist] : enemyIndexesWithDistances) {
-        int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
-        if (isMoveCorrect(index, bestTurn)) {
-            moveEntity(index, bestTurn);
+    auto enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    if (enemyIndexes.empty()) return;
+
+    auto enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
+    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
+              [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+                  return a.second > b.second; // можно поменять порядок, если нужно
+              });
+
+    std::unordered_set<int> occupiedNewIndices;
+
+    for (const auto& [index, dist] : enemyIndexesWithDistances) {
+        Entity* e = entityManager[index];
+        if (!e) continue;
+        if (!e->alive()) continue;
+        if (cells[playerIndex].getDistance(cells[index]) <= 1) {
+            Entity* playerEnt = entityManager[playerIndex];
+            if (playerEnt) {
+                playerEnt->causeDamage(e->getDamage());
+            }
+            continue;
         }
-        else if (cells[playerIndex].getDistance(cells[index]) <= 1) {
-            entityManager[playerIndex]->causeDamage(entityManager[index]->getDamage());
+
+        int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
+        if (bestTurn == index) continue;
+        if (occupiedNewIndices.count(bestTurn)) continue;
+
+        if (isMoveCorrect(index, bestTurn)) {
+            if (!entityManager[bestTurn] && cells[bestTurn].isCellAvaible()) {
+                moveEntity(index, bestTurn);
+                occupiedNewIndices.insert(bestTurn);
+            }
         }
     }
 }
+
 
 
 void GameField::buildingsTurn() {
@@ -419,20 +453,30 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
 
 
 std::vector<EnemyData> GameField::getEnemyData() {
-    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    std::vector<int> playerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER);
+    int playerIndex = playerIndexes[0];
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    if (enemyIndexes.empty()) {
+        return {};
+    }
     std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
-    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), 
-    [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
-
+    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
+              [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+                  return a.second < b.second;
+              });
     std::vector<EnemyData> data;
-    for (const auto&  [index , dist] : enemyIndexesWithDistances) {
-        EnemyData enemyData;
-        Enemy* enemy = dynamic_cast<Enemy*>(entityManager[playerIndex]);
+    data.reserve(enemyIndexesWithDistances.size());
+
+    for (const auto& [index, dist] : enemyIndexesWithDistances) {
+        Entity* ent = entityManager[index];
+        if (!ent) continue;
+        Enemy* enemy = dynamic_cast<Enemy*>(ent);
+        if (!enemy) continue;
+        EnemyData enemyData{};
         enemyData.enemyAttack = enemy->getDamage();
         std::pair<int, int> enemyHealth = enemy->getHealth();
+        enemyData.enemyHealth = enemyHealth.first;
         enemyData.enemyMaxHealth = enemyHealth.second;
-        enemyData.enemyMaxHealth = enemyHealth.first;
         data.push_back(enemyData);
     }
     return data;

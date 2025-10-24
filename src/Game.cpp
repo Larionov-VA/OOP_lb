@@ -17,7 +17,7 @@ void Game::startGame() {
         GlobalGameConfig::fieldHeight,
         GlobalGameConfig::difficulty
     );
-    field->show();
+    // field->show();
 }
 
 
@@ -31,7 +31,7 @@ bool Game::performAnAction(char playerAction) {
     field->enemyTurn();
     field->buildingsTurn();
     field->update();
-    field->show();
+    // field->show();
     return true;
 }
 
@@ -41,7 +41,7 @@ std::shared_ptr<PlayerData> Game::getPlayerData() {
 };
 
 
-std::shared_ptr<std::vector<EnemyData>> Game::getEnemyData() {
+std::vector<EnemyData> Game::getEnemyData() {
     return field->getEnemyData();
 };
 

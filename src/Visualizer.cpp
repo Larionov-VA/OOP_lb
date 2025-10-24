@@ -25,9 +25,9 @@ void Visualizer::display() {
     // ---------- MAIN MENU ----------
     int main_selected = 0;
     std::vector<std::string> main_entries = {"NEW GAME", "CONTINUE GAME", "OPTIONS", "EXIT"};
-    Component main_menu = Menu(&main_entries, &main_selected);
-
+    Component main_menu = Menu(&main_entries, &main_selected) | size(WIDTH, EQUAL, 35);
     // ---------- OPTIONS MENU ----------
+
     int temp_width = options_.field_width;
     int temp_height = options_.field_height;
     int diff_selected = find_difficulty_index(options_.difficulties, options_.difficulty);
@@ -79,7 +79,7 @@ void Visualizer::display() {
     auto player_info = Renderer([&] {
         std::shared_ptr<PlayerData> data = controller_->getPlayerData();
         return vbox({
-            text("PLAYER INFO") | bold | center,
+            text("PLAYER INFO") | bold | center | color(Color::Green),
             separator(),
             text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
             text("Attack: " + std::to_string(data->playerAttack)),
@@ -93,24 +93,45 @@ void Visualizer::display() {
             text("Debaff: " + data->playerDebaff)
         }) | border;
     });
-    auto enemy_info = Renderer([&] {
-        std::vector<EnemyData> data = controller_->getEnemyData();
-        std::vector<Element> rows;
-        for (int i = 0; i < data.size(); ++i) {
-            std::string line;
-            line += "Enemy " + std::to_string(i);
-            rows.push_back(text(line) | center);
-        }
-        return vbox({
-            text("ENEMY INFO") | bold | center,
-            separator(),
-            text("Health: " + std::to_string(data[0].) + "|" + std::to_string(data->playerMaxHealth)),
-            text("Attack: " + std::to_string(data->playerAttack)),
+    auto player_hand = Renderer([&] {
+        int countOfCarts = 0;
+        int maxCount = 4;
+        auto hand = [&] {
 
+            return hbox(vbox(),
+                        vbox(),
+                        vbox(),
+                        vbox()) | flex;
+        }();
+        return vbox({
+            text("HAND" + std::to_string(countOfCarts) + " | " + std::to_string(maxCount)) | bold | center,
+            separator(),
+            hand
+        }) | border;
+    });
+    auto enemy_info = Renderer([&] {
+        auto enemy_box = [&] {
+            std::vector<EnemyData> data = controller_->getEnemyData();
+            std::vector<Element> rows;
+            for (size_t i = 0; i < data.size(); ++i) {
+                std::string line;
+                line += "| Enemy " + std::to_string(i) + " | ";
+                line += std::to_string(data[i].enemyHealth) + "|"+ std::to_string(data[i].enemyMaxHealth) + " | ";
+                line += std::to_string(data[i].enemyAttack);
+                rows.push_back(text(line) | center);
+            }
+            return vbox(std::move(rows)) | flex;
+        }();
+
+        return vbox({
+            text("ENEMY INFO") | bold | center | color(Color::Red),
+            separator(),
+            enemy_box
         }) | border;
     });
     auto in_game_container = Container::Vertical({
         player_info,
+        player_hand,
         enemy_info,
         exit_and_save_button | bold | center
     });
@@ -127,11 +148,6 @@ void Visualizer::display() {
             tab_focus = (tab_focus + 1) % 2;
             return true;
         }
-        // // Shift+Tab (обычно генерируется как ESC [ Z)
-        // if (event.is_character() && event.character() == "\033[Z") {
-        //     tab_focus = (tab_focus + 1) % 2;
-        //     return true;
-        // }
         if (event == Event::Escape) {
             current_state_ = ScreenState::MainMenu;
             screen_->PostEvent(Event::Custom);
@@ -160,7 +176,7 @@ void Visualizer::display() {
                 separator(),
                 main_menu->Render(),
                 separator(),
-                text(settings) | color(Color::Green) | dim
+                text(settings) | dim
             }) | border | center;
         }
         else if (current_state_ == ScreenState::InGame) {
@@ -173,7 +189,7 @@ void Visualizer::display() {
                         int idx = y * GlobalGameConfig::fieldWidth + x;
                         wchar_t nextSymbol = L' ';
                         
-                        line += (idx < (int)fieldChars.size()) ? fieldChars[idx]: L' ';
+                        line += (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
                         if (line.back() == L'🌳' || line.back() == L'🌲') {
                             nextSymbol = L'\0';
                         }
@@ -187,28 +203,10 @@ void Visualizer::display() {
                 return vbox(std::move(rows)) | border;
             }();
 
-            // --- боковая панель ---
-            // auto exit_and_save_button = Button("Save & Exit", [&] {
-            //     // if (controller_) controller_->saveAndQuit();
-            //     current_state_ = ScreenState::MainMenu;
-            //     screen_->PostEvent(Event::Custom);
-            // });
-
             auto side_panel = vbox({
                 in_game_container->Render()
-            }) | border | size(WIDTH, EQUAL, 25);
+            }) | border | size(WIDTH, EQUAL, 35);
 
-            // auto side_panel = [&] {
-            //     std::shared_ptr<PlayerData> data = controller_->getPlayerData();
-            //     return vbox({
-            //         text("PLAYER INFO") | bold,
-            //         separator(),
-            //         text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
-            //         text("Attack: " + std::to_string(data->playerAttack))
-            //     }) | border;
-            // }();
-
-            // --- финальный layout ---
             return hbox({
                 field_box | flex,
                 side_panel

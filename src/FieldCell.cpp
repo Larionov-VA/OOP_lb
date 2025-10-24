@@ -1,8 +1,8 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y, bool slow, bool avaible) {
-    this->objectID = ID;
+FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible) {
+    this->index = index;
     this->X = X;
     this->Y = Y;
     this->slow = slow;
@@ -10,8 +10,8 @@ FieldCell::FieldCell(unsigned ID, unsigned X, unsigned Y, bool slow, bool avaibl
 }
 
 
-unsigned FieldCell::getID() const {
-    return objectID;
+int FieldCell::getIndex() const {
+    return index;
 }
 
 
@@ -20,16 +20,16 @@ std::pair<int, int> FieldCell::getCoord() const {
 }
 
 
-void FieldCell::setID(unsigned ID) {
-    objectID = ID;
+void FieldCell::setIndex(int index) {
+    this->index = index;
 }
 
 
-void FieldCell::swap(FieldCell &cell) {
-    unsigned temp = cell.getID();
-    cell.setID(objectID);
-    this->setID(temp);
-}
+// void FieldCell::swap(FieldCell &cell) {
+//     int temp = cell.getIndex();
+//     cell.setIndex(index);
+//     this->setIndex(temp);
+// }
 
 
 bool FieldCell::isCellSlow() const {

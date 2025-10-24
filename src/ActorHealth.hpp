@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Config.hpp"
 class Health {
 private:
     int currentHealth;
