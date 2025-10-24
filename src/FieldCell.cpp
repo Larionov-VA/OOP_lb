@@ -1,12 +1,13 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible) {
+FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible, bool dead) {
     this->index = index;
     this->X = X;
     this->Y = Y;
     this->slow = slow;
     this->avaible = avaible;
+    this->dead = dead;
 }
 
 
@@ -58,4 +59,16 @@ bool FieldCell::isCellAvaible() const {
 
 void FieldCell::setAvaible(bool avaible) {
     this->avaible = avaible;
+}
+
+bool FieldCell::checkCellDead() {
+    if (dead) {
+        dead = false;
+        return true;
+    }
+    return false;
+}
+
+void FieldCell::setCellDead() {
+    dead = true;
 }

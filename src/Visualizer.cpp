@@ -78,10 +78,12 @@ void Visualizer::display() {
     });
     auto player_info = Renderer([&] {
         std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+        float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
         return vbox({
             text("PLAYER INFO") | bold | center | color(Color::Green),
             separator(),
-            text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
+            gauge(lifeIndicator) | color(Color::Red),
+            text("Health: " + std::to_string(data->playerHealth) + "/" + std::to_string(data->playerMaxHealth)),
             text("Attack: " + std::to_string(data->playerAttack)),
             text("Weapon: " + data->playerWeapon),
             separator(),
@@ -98,13 +100,16 @@ void Visualizer::display() {
         int maxCount = 4;
         auto hand = [&] {
 
-            return hbox(vbox(),
-                        vbox(),
-                        vbox(),
-                        vbox()) | flex;
+            return hbox(vbox(text("")) | border | flex,
+
+                        vbox(text("")) | border | flex,
+
+                        vbox(text("")) | border | flex,
+
+                        vbox(text("")) | border | flex) | flex;
         }();
         return vbox({
-            text("HAND" + std::to_string(countOfCarts) + " | " + std::to_string(maxCount)) | bold | center,
+            text("HAND " + std::to_string(countOfCarts) + "/" + std::to_string(maxCount)) | bold | center,
             separator(),
             hand
         }) | border;
@@ -116,7 +121,7 @@ void Visualizer::display() {
             for (size_t i = 0; i < data.size(); ++i) {
                 std::string line;
                 line += "| Enemy " + std::to_string(i) + " | ";
-                line += std::to_string(data[i].enemyHealth) + "|"+ std::to_string(data[i].enemyMaxHealth) + " | ";
+                line += std::to_string(data[i].enemyHealth) + "/"+ std::to_string(data[i].enemyMaxHealth) + " | ";
                 line += std::to_string(data[i].enemyAttack);
                 rows.push_back(text(line) | center);
             }
@@ -196,16 +201,19 @@ void Visualizer::display() {
                         else if (line.back() == L'░') {
                             nextSymbol = L'░';
                         }
+                        else if (line.back() == L'🔥') {
+                            nextSymbol = '\0';
+                        }
                         line += nextSymbol;
                     }
-                    rows.push_back(text(line) | center);
+                    rows.push_back(text(line) | center | color(Color::GrayLight));
                 }
                 return vbox(std::move(rows)) | border;
             }();
 
             auto side_panel = vbox({
                 in_game_container->Render()
-            }) | border | size(WIDTH, EQUAL, 35);
+            }) | border | size(WIDTH, EQUAL, 45);
 
             return hbox({
                 field_box | flex,

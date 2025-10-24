@@ -243,6 +243,7 @@ void GameField::update() {
     for (int index : enemyIndexes) {
         if (!entityManager[index]->alive()) {
             cells[index].setAvaible(true);
+            cells[index].setCellDead();
             entityManager.killEntity(index);
         }
     }
@@ -251,6 +252,7 @@ void GameField::update() {
         for (int index : barrackIndexes) {
             if (!entityManager[index]->alive()) {
                 cells[index].setAvaible(true);
+                cells[index].setCellDead();
                 entityManager.killEntity(index);
             }
         }
@@ -348,7 +350,7 @@ void GameField::enemyTurn() {
     auto enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
     std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
               [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-                  return a.second > b.second; // можно поменять порядок, если нужно
+                  return a.second > b.second;
               });
 
     std::unordered_set<int> occupiedNewIndices;
@@ -503,6 +505,9 @@ std::vector<wchar_t> GameField::show() {
             }
             else if (cells[i].isCellSlow()) {
                 data.push_back(L'░');
+            }
+            else if (cells[i].checkCellDead()) {
+                data.push_back(L'🔥');
             }
             else {
                 data.push_back('-');
