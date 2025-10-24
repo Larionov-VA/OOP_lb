@@ -82,12 +82,12 @@ public:
 
     bool playerAlive() const;
     std::shared_ptr<PlayerData> getPlayerData();
-
+    std::vector<EnemyData> getEnemyData();
     void playerTurn(char command);
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();
 
     void update();
-    void show();
+    std::vector<wchar_t> show();
 };

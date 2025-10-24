@@ -19,6 +19,9 @@ int Enemy::getDamage() {
     return enemyAttack.getAttack();
 }
 
+bool Enemy::getIterative() {
+    return iterative;
+}
 
 std::pair<int, int> Enemy::getHealth() {
     return std::make_pair(enemyHealth.getCurrentHealth(), enemyHealth.getMaxHealth());

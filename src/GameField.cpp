@@ -147,8 +147,6 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
     int totalCells = widthField * heightField;
     int rowOld = oldIndex / widthField;
     int rowNew = newIndex / widthField;
-
-
     bool isHorizontal = (rowOld == rowNew);
 
     if (isHorizontal) {
@@ -239,6 +237,7 @@ void GameField::summonsTurn() {
 
 }
 
+
 void GameField::update() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     for (int index : enemyIndexes) {
@@ -260,38 +259,39 @@ void GameField::update() {
 
 
 int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
-    
-    std::vector<int> enemyTurns;
-    enemyTurns.push_back(indexEnemy - widthField);
-    enemyTurns.push_back(indexEnemy + widthField);
-    enemyTurns.push_back(indexEnemy - 1);
-    enemyTurns.push_back(indexEnemy + 1);
-    std::vector<std::pair<int, float>> enemyTurnsWithDist = getDistanceToPlayer(enemyTurns, playerIndex);
-    
-    std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy].getDistance(cells[playerIndex])};
-    for (const auto& [turn, dist] : enemyTurnsWithDist) {
-        if (isMoveCorrect(indexEnemy, turn) && dist < bestTurn.second) {
-            bestTurn.first = turn;
-            bestTurn.second = dist;
+    Enemy* enemy = dynamic_cast<Enemy*>(entityManager[indexEnemy]);
+    if (enemy->getIterative()) {
+        std::vector<int> enemyTurns;
+        enemyTurns.push_back(indexEnemy - widthField);
+        enemyTurns.push_back(indexEnemy + widthField);
+        enemyTurns.push_back(indexEnemy - 1);
+        enemyTurns.push_back(indexEnemy + 1);
+        std::vector<std::pair<int, float>> enemyTurnsWithDist = getDistanceToPlayer(enemyTurns, playerIndex);
+        std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy].getDistance(cells[playerIndex])};
+        for (const auto& [turn, dist] : enemyTurnsWithDist) {
+            if (isMoveCorrect(indexEnemy, turn) && dist < bestTurn.second) {
+                bestTurn.first = turn;
+                bestTurn.second = dist;
+            }
+        }
+        if (bestTurn.first != indexEnemy) {
+            return bestTurn.first;
         }
     }
-    if (bestTurn.first != indexEnemy) {
-        return bestTurn.first;
+    else {
+        std::unordered_map<int, int> visited{};
+        return getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);        
     }
-    std::unordered_map<int, int> visited{};
-    return getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
 }
 
 
 int GameField::getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited) {
     visited[playerIndex] = 1;
-    
     int up = playerIndex - widthField;
     int down = playerIndex + widthField;
     int left = playerIndex - 1;
     int right = playerIndex + 1;
     int result = -1;
-
     if (up == indexEnemy || down == indexEnemy || left == indexEnemy || right == indexEnemy) {
         return playerIndex;
     }
@@ -330,8 +330,10 @@ void GameField::enemyTurn() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
+    
+    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), 
+    [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
 
-    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
     for (const auto&  [index , dist] : enemyIndexesWithDistances) {
         int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
         if (isMoveCorrect(index, bestTurn)) {
@@ -416,80 +418,72 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
 }
 
 
-void GameField::show() {
+std::vector<EnemyData> GameField::getEnemyData() {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    // int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
-    fieldChars.clear();
+    std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
+    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(), 
+    [](std::pair<int, float> a, std::pair<int, float> b) { return a.second > b.second; });
+
+    std::vector<EnemyData> data;
+    for (const auto&  [index , dist] : enemyIndexesWithDistances) {
+        EnemyData enemyData;
+        Enemy* enemy = dynamic_cast<Enemy*>(entityManager[playerIndex]);
+        enemyData.enemyAttack = enemy->getDamage();
+        std::pair<int, int> enemyHealth = enemy->getHealth();
+        enemyData.enemyMaxHealth = enemyHealth.second;
+        enemyData.enemyMaxHealth = enemyHealth.first;
+        data.push_back(enemyData);
+    }
+    return data;
+}
+
+
+std::vector<wchar_t> GameField::show() {
+    std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    std::vector<wchar_t> data;
     for (int i = 0; i < widthField * heightField; ++i) {
         Entity* currentEntity = entityManager[i];
         if (cells[i].isCellAvaible() || currentEntity) {
             
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
-                    // std::cout << "P";
-                    fieldChars.push_back(L'𐇐');
+                    data.push_back(L'𐇐');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
-                    // std::cout << "E";
-                    fieldChars.push_back(L'𖨆');
+                    data.push_back(L'𖨆');
                 }
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
-                    // std::cout << "B";
-                    fieldChars.push_back(L'🏟');
+                    data.push_back(L'🏟');
                 }
             }
             else if (cells[i].isCellSlow()) {
-                // std::cout << "=";
-                fieldChars.push_back(L'░');
+                data.push_back(L'░');
             }
             else {
-                // std::cout << "-";
-                fieldChars.push_back('-');
+                data.push_back('-');
             }
         }
         else {
             int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
             switch (randomRock) {
             case 0:
-                fieldChars.push_back(L'⛰');
+                data.push_back(L'⛰');
                 break;
             case 1:
-                fieldChars.push_back(L'🏔');
+                data.push_back(L'🏔');
                 break;
             case 2:
-                fieldChars.push_back(L'🌳');
+                data.push_back(L'🌳');
                 break;
             case 3:
-                fieldChars.push_back(L'🌲');
+                data.push_back(L'🌲');
                 break;
             default:
-                fieldChars.push_back(L'🏔');
+                data.push_back(L'🏔');
                 break;
             }
         }
-        // if ((i + 1) % widthField == 0) {
-        //     if (i / widthField == 0) {
-        //         std::cout << "\tPlayer stats:";
-        //     }
-        //     if (i / widthField == 1) {
-        //         std::cout << "\tint " << entityManager[playerIndex]->getInt() << "\tdex " << entityManager[playerIndex]->getDex() << "\tstr " << entityManager[playerIndex]->getStr();
-        //     }
-        //     if (i / widthField == 3) {
-        //         std::cout << "\tLife\t" << entityManager[playerIndex]->getHealth().first << "|"  << entityManager[playerIndex]->getHealth().second;
-        //     }
-        //     if (i / widthField == 4) {
-        //         std::cout << "\tAttack\t" << entityManager[playerIndex]->getDamage();
-        //     }
-        //     if (i / widthField == 6) {
-        //         std::cout << "\tCurrent weapon:\t" << (entityManager[playerIndex]->melle() ? "Sword" : "Bow");
-        //     }
-        //     if (i / widthField == 8) {
-        //         std::cout << "\tEnemy count:\t" << enemyIndexes.size();
-        //     }
-        //     std::cout << '\n';
-        // }
-        // else {
-        //     std::cout << "  ";
-        // }
     }
+    return data;
 }

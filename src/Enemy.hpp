@@ -21,6 +21,7 @@ public:
     int getDamage() override;
     std::pair<int, int>  getHealth() override;
     void causeDamage(int damage) override;
+    bool getIterative();
     bool alive() const override;
     Enemy();
     Enemy(int enemyLevel);

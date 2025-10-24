@@ -41,6 +41,16 @@ std::shared_ptr<PlayerData> Game::getPlayerData() {
 };
 
 
+std::shared_ptr<std::vector<EnemyData>> Game::getEnemyData() {
+    return field->getEnemyData();
+};
+
+
+std::vector<wchar_t> Game::getFieldData() {
+    return field->show();
+}
+
+
 void Game::stopGame() {
     delete field;
 }

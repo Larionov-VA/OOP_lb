@@ -11,4 +11,4 @@ const int GlobalGameConfig::enemyAttack = 5;
 const int GlobalGameConfig::enemyHealth = 10;
 GlobalGameConfig::difficulties GlobalGameConfig::difficulty = GlobalGameConfig::MEDIUM;
 
-std::vector<wchar_t> fieldChars;
+// std::vector<wchar_t> fieldChars;

@@ -15,6 +15,7 @@ public:
     void startGame() override;
     bool performAnAction(char playerAction) override;
     std::shared_ptr<PlayerData> getPlayerData() override;
+    std::shared_ptr<std::vector<EnemyData>> getEnemyData() override;
+    std::vector<wchar_t> getFieldData() override;
     void stopGame() override;
-    // void startGameLoop();
 };

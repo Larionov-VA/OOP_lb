@@ -26,4 +26,10 @@ typedef struct {
 }PlayerData;
 
 
-extern std::vector<wchar_t> fieldChars;
+
+typedef struct {
+    int enemyMaxHealth;
+    int enemyHealth;
+    int enemyAttack;
+}EnemyData;
+// extern std::vector<wchar_t> fieldChars;

@@ -79,15 +79,40 @@ void Visualizer::display() {
     auto player_info = Renderer([&] {
         std::shared_ptr<PlayerData> data = controller_->getPlayerData();
         return vbox({
-            text("PLAYER INFO") | bold,
+            text("PLAYER INFO") | bold | center,
             separator(),
             text("Health: " + std::to_string(data->playerHealth) + "|" + std::to_string(data->playerMaxHealth)),
-            text("Attack: " + std::to_string(data->playerAttack))
+            text("Attack: " + std::to_string(data->playerAttack)),
+            text("Weapon: " + data->playerWeapon),
+            separator(),
+            text("Atribures"),
+            text("int: " + std::to_string(data->playerIntelligence)),
+            text("str: " + std::to_string(data->playerStrength)),
+            text("dex: " + std::to_string(data->playerDexterity)),
+            separator(),
+            text("Debaff: " + data->playerDebaff)
+        }) | border;
+    });
+    auto enemy_info = Renderer([&] {
+        std::vector<EnemyData> data = controller_->getEnemyData();
+        std::vector<Element> rows;
+        for (int i = 0; i < data.size(); ++i) {
+            std::string line;
+            line += "Enemy " + std::to_string(i);
+            rows.push_back(text(line) | center);
+        }
+        return vbox({
+            text("ENEMY INFO") | bold | center,
+            separator(),
+            text("Health: " + std::to_string(data[0].) + "|" + std::to_string(data->playerMaxHealth)),
+            text("Attack: " + std::to_string(data->playerAttack)),
+
         }) | border;
     });
     auto in_game_container = Container::Vertical({
         player_info,
-        exit_and_save_button
+        enemy_info,
+        exit_and_save_button | bold | center
     });
 
     // --- Разделяем области фокуса: 0 — настройки, 1 — кнопки ---
@@ -102,11 +127,11 @@ void Visualizer::display() {
             tab_focus = (tab_focus + 1) % 2;
             return true;
         }
-        // Shift+Tab (обычно генерируется как ESC [ Z)
-        if (event.is_character() && event.character() == "\033[Z") {
-            tab_focus = (tab_focus + 1) % 2;
-            return true;
-        }
+        // // Shift+Tab (обычно генерируется как ESC [ Z)
+        // if (event.is_character() && event.character() == "\033[Z") {
+        //     tab_focus = (tab_focus + 1) % 2;
+        //     return true;
+        // }
         if (event == Event::Escape) {
             current_state_ = ScreenState::MainMenu;
             screen_->PostEvent(Event::Custom);
@@ -139,8 +164,8 @@ void Visualizer::display() {
             }) | border | center;
         }
         else if (current_state_ == ScreenState::InGame) {
-            // --- поле ---
             auto field_box = [&] {
+                std::vector<wchar_t> fieldChars = controller_->getFieldData();
                 std::vector<Element> rows;
                 for (int y = 0; y < GlobalGameConfig::fieldHeight; ++y) {
                     std::wstring line;
@@ -170,7 +195,6 @@ void Visualizer::display() {
             // });
 
             auto side_panel = vbox({
-                text("PLAYER INFO") | bold,
                 in_game_container->Render()
             }) | border | size(WIDTH, EQUAL, 25);
 
