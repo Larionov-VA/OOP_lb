@@ -79,15 +79,15 @@ public:
         gameTurn = other.gameTurn;
         return *this;
     }
-
+    std::unique_ptr<Entity> returnPlayer();
     bool playerAlive() const;
     std::shared_ptr<PlayerData> getPlayerData();
     std::vector<EnemyData> getEnemyData();
-    void playerTurn(char command);
+    bool playerTurn(char command);
     void summonsTurn();
     void enemyTurn();
     void buildingsTurn();
-
+    int getCountOfEnemy();
     void update();
     std::vector<wchar_t> show();
 };

@@ -1,0 +1,16 @@
+#pragma once
+#include <string>
+
+const std::string fireballScrollASCII = R"(
+         ▓░▓▓▓░       
+       ▒████ ▓▒  █▒▒  
+       ▓▓▒▓█░ ▓▓▓▓▓█▒ 
+     ░▓██████░   ▓▓▓  
+    ▓██████████       
+   ▓████████████      
+   █████████████░     
+   ▓█▓██████████      
+    ▓▓░▓███████       
+      ███████░        
+    DIRECT DAMAGE     
+)";

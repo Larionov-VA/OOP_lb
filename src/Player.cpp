@@ -1,8 +1,20 @@
 #include "Player.hpp"
 
-Player::Player(int playerAttack, int playerHealth) {
+Player::Player(
+    int playerAttack, 
+    int playerHealth, 
+    int playerLevel,
+    long long prevLevelUpExperience,
+    long long playerExperience, 
+    long long levelUpExperience,
+    int playerIntelligence,
+    int playerDexterity,
+    int playerStrength
+) {
     this->playerAttack = Attack{playerAttack};
     this->playerHealth = Health{playerHealth};
+    this->playerStats = Stats{prevLevelUpExperience, playerExperience, levelUpExperience, playerLevel};
+    this->playerAttributes = Atributes{playerIntelligence, playerDexterity, playerStrength};
 }
 
 
@@ -75,4 +87,16 @@ int Player::getStr() {
 
 bool Player::melle() {
     return playerEquipment.melle();
+}
+
+std::vector<long long> Player::getExperience() {
+    return playerStats.getExperience();
+}
+
+int Player::getLevel() {
+    return playerStats.getLevel();
+}
+
+void Player::addExperience(int exp) {
+    playerStats.addExperience(exp);
 }

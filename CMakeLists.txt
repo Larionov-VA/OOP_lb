@@ -21,6 +21,7 @@ set(SRCS
     src/ActorEquipment.cpp
     src/ActorAttack.cpp
     src/ActorAtributes.cpp
+    src/ActorStats.cpp
     src/EntityManager.cpp
     src/Visualizer.cpp
     src/EnemyBarracks.cpp

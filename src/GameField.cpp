@@ -91,7 +91,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         }
     }
 
-    spawnEntity(std::make_unique<EnemyBarracks>(), randomPoint2);
+    spawnEntity(std::make_unique<EnemyBarracks>(gameLevel), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
 }
 
@@ -135,7 +135,7 @@ void GameField::generateEnemy() {
     do {
         int randomIndex = dist(gen);
         if (cells[randomIndex].isCellAvaible() && (cells[playerIndex].getDistance(cells[randomIndex]) > ((widthField + heightField) / 3))) {
-            std::unique_ptr<Entity> enemy = std::make_unique<Enemy>();
+            std::unique_ptr<Entity> enemy = std::make_unique<Enemy>(gameLevel);
             spawnEntity(std::move(enemy), randomIndex);
             --countEnemy;
         }
@@ -176,7 +176,7 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 }
 
 
-void GameField::playerTurn(char command) {
+bool GameField::playerTurn(char command) {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     int newPlayerIndex;
     int enemyIndex;
@@ -212,24 +212,31 @@ void GameField::playerTurn(char command) {
         break;
     case 'q':
         entityManager[playerIndex]->swapWeapon();
+        return true;
     default:
         break;
     }
     if (move) {
         enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+        int playerDamage = entityManager[playerIndex]->getDamage();
         if (entityManager[newPlayerIndex]) {
-            entityManager[newPlayerIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+            /*newPlayerIndex == enemyIndex если entityManager[newPlayerIndex] занят*/
+            entityManager[newPlayerIndex]->causeDamage(playerDamage);
         }
         else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
-            entityManager[enemyIndex]->causeDamage(entityManager[playerIndex]->getDamage());
+            /*дальний бой*/
+            entityManager[enemyIndex]->causeDamage(playerDamage);
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+            /*наложение дебафа*/
             if (cells[newPlayerIndex].isCellSlow()) {
                 entityManager[playerIndex]->setDebaffState();
             }
+            /*передвижение*/
             moveEntity(playerIndex, newPlayerIndex);
         }
     }
+    return move;
 }
 
 
@@ -238,23 +245,31 @@ void GameField::summonsTurn() {
 }
 
 
+int GameField::getCountOfEnemy() {
+    std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+    return enemyIndexes.size() + barrackIndexes.size();
+}
+
+
 void GameField::update() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     for (int index : enemyIndexes) {
         if (!entityManager[index]->alive()) {
             cells[index].setAvaible(true);
             cells[index].setCellDead();
+            entityManager[playerIndex]->addExperience(entityManager[index]->getLevel() * 10 + 10);
             entityManager.killEntity(index);
         }
     }
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
-    if (!barrackIndexes.empty()) {
-        for (int index : barrackIndexes) {
-            if (!entityManager[index]->alive()) {
-                cells[index].setAvaible(true);
-                cells[index].setCellDead();
-                entityManager.killEntity(index);
-            }
+    for (int index : barrackIndexes) {
+        if (!entityManager[index]->alive()) {
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
+            entityManager[playerIndex]->addExperience(entityManager[index]->getLevel() * 50 + 10);
+            entityManager.killEntity(index);
         }
     }
 }
@@ -398,18 +413,24 @@ void GameField::buildingsTurn() {
         int right = index + 1;
 
         if (isMoveCorrect(index, up)) {
-            spawnEntity(std::make_unique<Enemy>(), up);
+            spawnEntity(std::make_unique<Enemy>(gameLevel), up);
         }
         else if (isMoveCorrect(index, down)) {
-            spawnEntity(std::make_unique<Enemy>(), down);
+            spawnEntity(std::make_unique<Enemy>(gameLevel), down);
         }
         else if (isMoveCorrect(index, left)) {
-            spawnEntity(std::make_unique<Enemy>(), left);
+            spawnEntity(std::make_unique<Enemy>(gameLevel), left);
         }
         else if (isMoveCorrect(index, right)) {
-            spawnEntity(std::make_unique<Enemy>(), right);
+            spawnEntity(std::make_unique<Enemy>(gameLevel), right);
         }
     }
+}
+
+
+std::unique_ptr<Entity> GameField::returnPlayer() {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    return entityManager.returnEntity(playerIndex);
 }
 
 
@@ -422,6 +443,9 @@ bool GameField::playerAlive() const {
 std::shared_ptr<PlayerData> GameField::getPlayerData() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     Player* player = dynamic_cast<Player*>(entityManager[playerIndex]);
+    
+    std::vector<long long> playerExperience = player->getExperience();
+    int playerLevel = player->getLevel();
     std::pair<int, int> playerHealth = player->getHealth();
     int playerAttack = player->getDamage();
     int playerIntelligence = player->getInt();
@@ -440,6 +464,10 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
         playerDebaff = "Slowed";
     }
     PlayerData* data = new PlayerData{
+        playerExperience[0],
+        playerExperience[1],
+        playerExperience[2],
+        playerLevel,
         playerHealth.second, 
         playerHealth.first, 
         playerAttack, 
@@ -507,7 +535,7 @@ std::vector<wchar_t> GameField::show() {
                 data.push_back(L'░');
             }
             else if (cells[i].checkCellDead()) {
-                data.push_back(L'🔥');
+                data.push_back(L'☠');
             }
             else {
                 data.push_back('-');

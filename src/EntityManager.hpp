@@ -14,6 +14,7 @@ public:
     void changeEntityIndex(int oldIndex, int newIndex);
     std::vector<int> getIndexesWithEntity(Entity::entityType type) const;
     Entity* getEntity(int index);
+    std::unique_ptr<Entity> returnEntity(int index);
     EntityManager();
     ~EntityManager();
     EntityManager(const EntityManager& other) {

@@ -4,6 +4,7 @@
 #include "ActorAttack.hpp"
 #include "ActorEquipment.hpp"
 #include "ActorHealth.hpp"
+#include "ActorStats.hpp"
 #include <utility>
 #include <memory>
 
@@ -12,6 +13,7 @@ private:
     Atributes playerAttributes;
     Attack playerAttack;
     Equipment playerEquipment;
+    Stats playerStats;
     Health playerHealth;
     bool slowed = false;
 public:
@@ -19,7 +21,11 @@ public:
         return entityType::PLAYER;
     }
     Player();
-    Player(int playerAttack, int playerHealth);
+    Player(
+        int playerAttack, int playerHealth, int playerLevel,
+        long long prevLevelUpExperience, long long playerExperience, 
+        long long levelUpExperience, int intelligence, int dexterity, int strength
+    );
     bool checkDebaffState() override;
     void setDebaffState() override;
     bool alive() const override;
@@ -34,4 +40,7 @@ public:
     std::unique_ptr<Entity> clone() const override {
         return std::make_unique<Player>(*this);
     }
+    std::vector<long long> getExperience() override;
+    int getLevel() override;
+    void addExperience(int exp) override;
 };

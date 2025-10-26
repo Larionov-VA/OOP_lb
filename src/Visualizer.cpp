@@ -1,7 +1,7 @@
 #include "Visualizer.hpp"
 using namespace ftxui;
 
-static int find_difficulty_index(const std::vector<std::string>& list, const std::string& value) {
+static int findDifficultyIndex(const std::vector<std::string>& list, const std::string& value) {
     for (size_t i = 0; i < list.size(); ++i)
         if (list[i] == value)
             return static_cast<int>(i);
@@ -12,7 +12,7 @@ Visualizer::Visualizer() {
     screen_ = std::shared_ptr<ftxui::ScreenInteractive>(
         new ftxui::ScreenInteractive(ftxui::ScreenInteractive::Fullscreen())
     );
-    current_state_ = ScreenState::MainMenu;
+    currentState = ScreenState::MainMenu;
 }
 
 Visualizer::~Visualizer() {}
@@ -23,67 +23,72 @@ void Visualizer::setController(IGameController* controller) {
 
 void Visualizer::display() {
     // ---------- MAIN MENU ----------
-    int main_selected = 0;
-    std::vector<std::string> main_entries = {"NEW GAME", "CONTINUE GAME", "OPTIONS", "EXIT"};
-    Component main_menu = Menu(&main_entries, &main_selected) | size(WIDTH, EQUAL, 35);
+    int mainSelected = 0;
+    std::vector<std::string> mainEntries = {"NEW GAME", "CONTINUE GAME", "OPTIONS", "EXIT"};
+    Component mainMenu = Menu(&mainEntries, &mainSelected) | size(WIDTH, EQUAL, 35);
     // ---------- OPTIONS MENU ----------
 
-    int temp_width = options_.field_width;
-    int temp_height = options_.field_height;
-    int diff_selected = find_difficulty_index(options_.difficulties, options_.difficulty);
+    int tempWidth = gameOptions.fieldWidth;
+    int tempHeight = gameOptions.fieldHeight;
+    int diffSelected = findDifficultyIndex(gameOptions.difficulties, gameOptions.difficulty);
 
-    auto width_slider = Slider("Width:  ", &temp_width, 10, 25, 1);
-    auto height_slider = Slider("Height: ", &temp_height, 10, 25, 1);
-    auto diff_menu = Menu(&options_.difficulties, &diff_selected);
+    auto widthSlider = Slider("Width:  ", &tempWidth, 10, 25, 1);
+    auto heightSlider = Slider("Height: ", &tempHeight, 10, 25, 1);
+    auto diffMenu = Menu(&gameOptions.difficulties, &diffSelected);
 
-    bool options_changed = false;
+    bool optionsChanged = false;
 
-    auto apply_button = Button("Apply", [&] {
-        options_.field_width = temp_width;
-        options_.field_height = temp_height;
-        options_.difficulty = options_.difficulties[diff_selected];
-        options_changed = true;
-        GlobalGameConfig::fieldWidth = options_.field_width;
-        GlobalGameConfig::fieldHeight = options_.field_height;
-        GlobalGameConfig::difficulty = (GlobalGameConfig::difficulties)find_difficulty_index(options_.difficulties, options_.difficulty);
-        current_state_ = ScreenState::MainMenu;
+    auto applyButton = Button("Apply", [&] {
+        gameOptions.fieldWidth = tempWidth;
+        gameOptions.fieldHeight = tempHeight;
+        gameOptions.difficulty = gameOptions.difficulties[diffSelected];
+        optionsChanged = true;
+        GlobalGameConfig::fieldWidth = gameOptions.fieldWidth;
+        GlobalGameConfig::fieldHeight = gameOptions.fieldHeight;
+        GlobalGameConfig::difficulty = (GlobalGameConfig::difficulties)findDifficultyIndex(gameOptions.difficulties, gameOptions.difficulty);
+        currentState = ScreenState::MainMenu;
         screen_->PostEvent(Event::Custom);
     });
 
     auto cancel_button = Button("Cancel", [&] {
-        temp_width = options_.field_width;
-        temp_height = options_.field_height;
-        diff_selected = find_difficulty_index(options_.difficulties, options_.difficulty);
-        current_state_ = ScreenState::MainMenu;
+        tempWidth = gameOptions.fieldWidth;
+        tempHeight = gameOptions.fieldHeight;
+        diffSelected = findDifficultyIndex(gameOptions.difficulties, gameOptions.difficulty);
+        currentState = ScreenState::MainMenu;
         screen_->PostEvent(Event::Custom);
     });
 
     // --- Группа элементов настроек ---
     auto controls = Container::Vertical({
-        width_slider,
-        height_slider,
-        diff_menu
+        widthSlider,
+        heightSlider,
+        diffMenu
     });
 
     // --- Группа кнопок ---
     auto buttons = Container::Horizontal({
-        apply_button,
+        applyButton,
         cancel_button
     });
 
-    auto exit_and_save_button = Button("Save & Exit", [&] {
+    auto exitAndSaveButton = Button("Save & Exit", [&] {
         if (controller_) controller_->stopGame();
-        current_state_ = ScreenState::MainMenu;
+        currentState = ScreenState::MainMenu;
         screen_->PostEvent(Event::Custom);
     });
-    auto player_info = Renderer([&] {
+
+    auto playerInfo = Renderer([&] {
         std::shared_ptr<PlayerData> data = controller_->getPlayerData();
         float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
+        float expIndicator = (float)(data->playerCurrentExperience - data->playerPrevLevelUpExperience)/(data->playerLevelUpExperience - data->playerPrevLevelUpExperience);
         return vbox({
             text("PLAYER INFO") | bold | center | color(Color::Green),
             separator(),
-            gauge(lifeIndicator) | color(Color::Red),
+            gauge(lifeIndicator) | color(Color::Red) | border | flex,
             text("Health: " + std::to_string(data->playerHealth) + "/" + std::to_string(data->playerMaxHealth)),
+            gauge(expIndicator) | color(Color::Blue) | border | flex,
+            text("Experience: " + std::to_string(data->playerCurrentExperience) + "/" + std::to_string(data->playerLevelUpExperience)),
+            text("Level " + std::to_string(data->playerLevel)),
             text("Attack: " + std::to_string(data->playerAttack)),
             text("Weapon: " + data->playerWeapon),
             separator(),
@@ -95,26 +100,41 @@ void Visualizer::display() {
             text("Debaff: " + data->playerDebaff)
         }) | border;
     });
-    auto player_hand = Renderer([&] {
-        int countOfCarts = 0;
-        int maxCount = 4;
-        auto hand = [&] {
 
-            return hbox(vbox(text("")) | border | flex,
-
-                        vbox(text("")) | border | flex,
-
-                        vbox(text("")) | border | flex,
-
-                        vbox(text("")) | border | flex) | flex;
-        }();
+    auto playerInventory = Renderer([&] {
+        // std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+        // float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
         return vbox({
-            text("HAND " + std::to_string(countOfCarts) + "/" + std::to_string(maxCount)) | bold | center,
+            text("INVENTORY") | bold | center,
+            separator(),
+            hbox(
+                paragraph(healthPotionASCII) | border,
+                paragraph(healthPotionASCII) | border 
+            ),
+            hbox(
+                paragraph(healthPotionASCII) | border,
+                paragraph(healthPotionASCII) | border
+            )
+        });
+    });
+
+    auto playerHand = Renderer([&] {
+        // int countOfCarts = 0;
+        // int maxCount = 4;
+        auto hand = [&] {
+            // return paragraph(healthPotionASCII) | center | border | flex;
+            // return paragraph(firestormScrollASCII) | center | border | flex;
+            return paragraph(fireballScrollASCII) | center | border | flex;
+        }();
+
+        return vbox({
+            text("HAND") | bold | center,
             separator(),
             hand
-        }) | border;
+        });
     });
-    auto enemy_info = Renderer([&] {
+
+    auto enemyInfo = Renderer([&] {
         auto enemy_box = [&] {
             std::vector<EnemyData> data = controller_->getEnemyData();
             std::vector<Element> rows;
@@ -127,35 +147,40 @@ void Visualizer::display() {
             }
             return vbox(std::move(rows)) | flex;
         }();
-
         return vbox({
             text("ENEMY INFO") | bold | center | color(Color::Red),
             separator(),
             enemy_box
         }) | border;
     });
-    auto in_game_container = Container::Vertical({
-        player_info,
-        player_hand,
-        enemy_info,
-        exit_and_save_button | bold | center
+
+    auto leftInGameContainer = Container::Vertical({
+        playerInfo,
+        enemyInfo
     });
 
-    // --- Разделяем области фокуса: 0 — настройки, 1 — кнопки ---
-    int tab_focus = 0;
-    auto options_tabs = Container::Tab({
+    auto rigthInGameContainer = Container::Vertical({
+        playerHand,
+        exitAndSaveButton | bold | center
+    });
+
+    int tabFocus = 0;
+    auto optionsTabs = Container::Tab({
         controls,
         buttons
-    }, &tab_focus);
+    }, &tabFocus);
 
-    Component options_container = CatchEvent(options_tabs, [&](Event event) {
+    Component optionsContainer = CatchEvent(optionsTabs, [&](Event event) {
         if (event == Event::Tab) {
-            tab_focus = (tab_focus + 1) % 2;
+            tabFocus = (tabFocus + 1) % 2;
             return true;
         }
         if (event == Event::Escape) {
-            current_state_ = ScreenState::MainMenu;
+            currentState = ScreenState::MainMenu;
             screen_->PostEvent(Event::Custom);
+            return true;
+        }
+        if (event.is_mouse()) {
             return true;
         }
         return false;
@@ -163,28 +188,28 @@ void Visualizer::display() {
 
     // ---------- ROOT ----------
     Component root = Container::Tab({
-        main_menu,
-        options_container,
-        in_game_container
-    }, (int*)&current_state_);
+        mainMenu,
+        optionsContainer,
+        rigthInGameContainer,
+        leftInGameContainer
+    }, (int*)&currentState);
 
     // ---------- RENDER ----------
     Component renderer = Renderer(root, [&] {
-        if (current_state_ == ScreenState::MainMenu) {
+        if (currentState == ScreenState::MainMenu) {
             std::string settings = "Settings: " +
-                std::to_string(options_.field_width) + "x" +
-                std::to_string(options_.field_height) + " - " +
-                options_.difficulty;
-
+                std::to_string(gameOptions.fieldWidth) + "x" +
+                std::to_string(gameOptions.fieldHeight) + " - " +
+                gameOptions.difficulty;
             return vbox({
                 text("MAIN MENU") | bold | center,
                 separator(),
-                main_menu->Render(),
+                mainMenu->Render(),
                 separator(),
                 text(settings) | dim
             }) | border | center;
         }
-        else if (current_state_ == ScreenState::InGame) {
+        else if (currentState == ScreenState::InGame) {
             auto field_box = [&] {
                 std::vector<wchar_t> fieldChars = controller_->getFieldData();
                 std::vector<Element> rows;
@@ -193,7 +218,6 @@ void Visualizer::display() {
                     for (int x = 0; x < GlobalGameConfig::fieldWidth; ++x) {
                         int idx = y * GlobalGameConfig::fieldWidth + x;
                         wchar_t nextSymbol = L' ';
-                        
                         line += (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
                         if (line.back() == L'🌳' || line.back() == L'🌲') {
                             nextSymbol = L'\0';
@@ -208,34 +232,40 @@ void Visualizer::display() {
                     }
                     rows.push_back(text(line) | center | color(Color::GrayLight));
                 }
-                return vbox(std::move(rows)) | border;
+                return vbox(std::move(rows)) | border | flex;
             }();
-
-            auto side_panel = vbox({
-                in_game_container->Render()
+            auto leftSidePanel = vbox({
+                leftInGameContainer->Render()
             }) | border | size(WIDTH, EQUAL, 45);
-
+            auto rigthSidePanel = vbox({
+                rigthInGameContainer->Render()
+            }) | border | size(WIDTH, EQUAL, 45);
             return hbox({
-                field_box | flex,
-                side_panel
+                rigthSidePanel,
+                field_box,
+                leftSidePanel
             });
         }
-        else if (current_state_ == ScreenState::OptionsMenu) {
-            auto info = (tab_focus == 0)
+        else if (currentState == ScreenState::Inventory) {
+            return vbox({
+                playerInventory->Render()
+            }) | border | center;
+        }
+        else if (currentState == ScreenState::OptionsMenu) {
+            auto info = (tabFocus == 0)
                 ? text("Focus: Controls (TAB to switch)") | color(Color::Yellow)
                 : text("Focus: Buttons (TAB to switch)") | color(Color::Cyan);
-
             return vbox({
                 text("OPTIONS") | bold | center,
                 separator(),
-                hbox({ width_slider->Render(), text(std::to_string(temp_width)) | bold }),
-                hbox({ height_slider->Render(), text(std::to_string(temp_height)) | bold }),
+                hbox({ widthSlider->Render(), text(std::to_string(tempWidth)) | bold }),
+                hbox({ heightSlider->Render(), text(std::to_string(tempHeight)) | bold }),
                 separator(),
                 text("Difficulty:"),
-                diff_menu->Render(),
+                diffMenu->Render(),
                 separator(),
                 hbox({
-                    apply_button->Render() | flex,
+                    applyButton->Render() | flex,
                     cancel_button->Render() | flex
                 }) | center,
                 separator(),
@@ -247,17 +277,15 @@ void Visualizer::display() {
         }
     });
 
-    // ---------- EVENT HANDLING ----------
     Component app = CatchEvent(renderer, [&](Event event) {
-        // MAIN MENU EVENTS
-        if (current_state_ == ScreenState::MainMenu) {
+        if (currentState == ScreenState::MainMenu) {
             if (event == Event::Return) {
-                switch (main_selected) {
+                switch (mainSelected) {
                     case 0: // NEW GAME
                         if (controller_) {
                             controller_->startGame();
                         }
-                        current_state_ = ScreenState::InGame;
+                        currentState = ScreenState::InGame;
                         screen_->PostEvent(Event::Custom);
                         return true;
 
@@ -268,52 +296,73 @@ void Visualizer::display() {
                         return true;
 
                     case 2: // OPTIONS
-                        current_state_ = ScreenState::OptionsMenu;
+                        currentState = ScreenState::OptionsMenu;
                         screen_->PostEvent(Event::Custom);
                         return true;
 
                     case 3: // EXIT
-                        current_state_ = ScreenState::Exit;
+                        currentState = ScreenState::Exit;
                         screen_->ExitLoopClosure()();
                         return true;
                 }
             }
-
+            if (event.is_mouse()) {
+                return true;
+            }
             if (event == Event::Escape) {
-                current_state_ = ScreenState::Exit;
+                currentState = ScreenState::Exit;
                 screen_->ExitLoopClosure()();
                 return true;
             }
         }
-
-        // IN GAME EVENTS
-        else if (current_state_ == ScreenState::InGame) {
+        else if (currentState == ScreenState::InGame) {
             if (event.is_mouse()) {
                 return true;
             }
             if (event == ftxui::Event::Special("resize")) {
                 return true;
             }
+            if (event == Event::Character('i') || event == Event::Character('I')) {
+                currentState = ScreenState::Inventory;
+                screen_->PostEvent(Event::Custom);
+                return true;
+            }
             if (event == Event::Escape) {
-                current_state_ = ScreenState::MainMenu;
+                currentState = ScreenState::MainMenu;
                 controller_->stopGame();
                 screen_->PostEvent(Event::Custom);
                 return true;
             }
             if (event == Event::Character('w') || event == Event::ArrowUp) {
-                controller_->performAnAction('w');
+                if (controller_->performAnAction('w')) {
+                    currentState = ScreenState::MainMenu;
+                    controller_->stopGame();
+                    screen_->PostEvent(Event::Custom);
+                }
                 return true;
             }
             else if (event == Event::Character('s') || event == Event::ArrowDown) {
-                controller_->performAnAction('s');
+                if (controller_->performAnAction('s')) {
+                    currentState = ScreenState::MainMenu;
+                    controller_->stopGame();
+                    screen_->PostEvent(Event::Custom);
+                }
                 return true;
             }
             else if (event == Event::Character('a') || event == Event::ArrowLeft) {
-                controller_->performAnAction('a');
+                if (controller_->performAnAction('a')) {
+                    currentState = ScreenState::MainMenu;
+                    controller_->stopGame();
+                    screen_->PostEvent(Event::Custom);
+                }
                 return true;
             }
             else if (event == Event::Character('d') || event == Event::ArrowRight) {
-                controller_->performAnAction('d');
+                if (controller_->performAnAction('d')) {
+                    currentState = ScreenState::MainMenu;
+                    controller_->stopGame();
+                    screen_->PostEvent(Event::Custom);
+                }
                 return true;
             }
             else if (event == Event::Character('q')) {
@@ -322,10 +371,16 @@ void Visualizer::display() {
             }
             return false;
         }
+        else if (currentState == ScreenState::Inventory) {
+            if (event == Event::Escape) {
+                currentState = ScreenState::InGame;
+                screen_->PostEvent(Event::Custom);
+                return true;
+            }
+        }
         return false;
     });
-    
-    // ---------- MAIN LOOP ----------
+
     screen_->Loop(app);
 }
 

@@ -3,6 +3,7 @@
 
 struct IGameController {
     virtual void startGame() = 0;
+    virtual void nextLevel() = 0;
     virtual bool performAnAction(char playerAction) = 0;
     virtual std::shared_ptr<PlayerData> getPlayerData() = 0;
     virtual std::vector<EnemyData> getEnemyData() = 0;

@@ -1,7 +1,8 @@
 #pragma once
 #include "Entity.hpp"
 #include "ActorHealth.hpp"
-
+#include "Config.hpp"
+#include <iostream>
 
 class EnemyBarracks : public Entity {
 private:
@@ -10,7 +11,7 @@ private:
     int counter = 0;
 public:
     EnemyBarracks() : EnemyBarracks(1, 5) {};
-    EnemyBarracks(int barracksLevel, int spawnPeriod);
+    EnemyBarracks(int barracksLevel, int spawnPeriod = 5);
     ~EnemyBarracks();
     bool timeToSpawn() override;
     entityType getType() const override {

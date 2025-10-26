@@ -10,6 +10,11 @@
 #include "ftxui/component/event.hpp"
 #include "IGameController.hpp"
 #include "Config.hpp"
+
+#include "ASCIIAssets/HealthPotionAsset.hpp"
+#include "ASCIIAssets/FireballScrollAsset.hpp"
+#include "ASCIIAssets/FirestormScrollAsset.hpp"
+
 #include <iostream>
 #include <thread>
 #include <future>
@@ -24,15 +29,16 @@ private:
         MainMenu,
         OptionsMenu,
         InGame,
+        Inventory,
         Exit
-    } current_state_;
+    } currentState;
     IGameController* controller_ = nullptr;
     struct GameOptions {
-        int field_width = 25;
-        int field_height = 25;
+        int fieldWidth = 25;
+        int fieldHeight = 25;
         std::string difficulty = "MEDIUM";
         std::vector<std::string> difficulties = {"EASY", "MEDIUM", "HARD"};
-    } options_;
+    } gameOptions;
 
 public:
     Visualizer();

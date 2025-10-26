@@ -13,6 +13,7 @@ public:
     Game();
     ~Game();
     void startGame() override;
+    void nextLevel() override;
     bool performAnAction(char playerAction) override;
     std::shared_ptr<PlayerData> getPlayerData() override;
     std::vector<EnemyData> getEnemyData() override;

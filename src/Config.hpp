@@ -14,10 +14,15 @@ struct GlobalGameConfig {
     } difficulty;
     const static int enemyAttack;
     const static int enemyHealth;
+    const static int barracksHealth;
 };
 
 
 typedef struct {
+    long long playerPrevLevelUpExperience;
+    long long playerCurrentExperience;
+    long long playerLevelUpExperience;
+    int playerLevel;
     int playerMaxHealth;
     int playerHealth;
     int playerAttack;

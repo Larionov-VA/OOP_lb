@@ -36,11 +36,13 @@ void EntityManager::createEntity(std::unique_ptr<Entity> entity, int index) {
     }
 }
 
+
 void EntityManager::killEntity(int index) {
     if (infoMap[index]) {
         infoMap.erase(index);
     }
 }
+
 
 void EntityManager::changeEntityIndex(int oldIndex, int newIndex) {
     if (infoMap.find(newIndex) != infoMap.end()) {
@@ -58,6 +60,11 @@ Entity* EntityManager::getEntity(int index) {
     auto it = infoMap.find(index);
     if (it == infoMap.end()) return nullptr;
     return it->second.get();
+}
+
+
+std::unique_ptr<Entity> EntityManager::returnEntity(int index) {
+    return std::move(infoMap[index]);
 }
 
 

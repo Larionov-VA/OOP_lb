@@ -1,6 +1,8 @@
 #pragma once
 #include <utility>
 #include <memory>
+#include <vector>
+
 
 class Entity {
 public:
@@ -23,6 +25,9 @@ public:
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };
     virtual int getStr() { return 0; };
+    virtual int getLevel() { return 1; };
+    virtual void addExperience(int exp) { exp++; };
+    virtual std::vector<long long> getExperience() { return {0,0,0}; };
 
     virtual std::unique_ptr<Entity> clone() const = 0;
 };

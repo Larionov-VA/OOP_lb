@@ -15,24 +15,43 @@ void Game::startGame() {
         std::move(player),
         GlobalGameConfig::fieldWidth,
         GlobalGameConfig::fieldHeight,
-        GlobalGameConfig::difficulty
+        GlobalGameConfig::gameLevel
     );
-    // field->show();
+}
+
+
+void Game::nextLevel() {
+    std::unique_ptr<Entity> player = field->returnPlayer();
+    GlobalGameConfig::gameLevel++;
+    this->stopGame();
+    field = new GameField(
+        std::move(player),
+        GlobalGameConfig::fieldWidth,
+        GlobalGameConfig::fieldHeight,
+        GlobalGameConfig::gameLevel
+    );
 }
 
 
 bool Game::performAnAction(char playerAction) {
-    if (!field->playerAlive()) {
-        return false;
+    if (!field) {
+        return true;
     }
-    field->playerTurn(playerAction);
-    field->update();
-    field->summonsTurn();
-    field->enemyTurn();
-    field->buildingsTurn();
-    field->update();
-    // field->show();
-    return true;
+    if (!field->playerAlive()) {
+        return true;
+    }
+    bool nextTurnAction = true;
+    nextTurnAction = field->playerTurn(playerAction);
+    if (!field->getCountOfEnemy()) {
+        this->nextLevel();
+    }
+    if (nextTurnAction) {
+        field->update();
+        field->summonsTurn();
+        field->enemyTurn();
+        field->buildingsTurn();
+    }
+    return false;
 }
 
 
@@ -53,6 +72,7 @@ std::vector<wchar_t> Game::getFieldData() {
 
 void Game::stopGame() {
     delete field;
+    field = nullptr;
 }
 
 
