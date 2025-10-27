@@ -167,7 +167,7 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
         while (current >= 0 && current < totalCells) {
             if (entityManager[current] &&
                 (entityManager[current]->getType() == Entity::entityType::ENEMY ||
-                entityManager[current]->getType() == Entity::entityType::BARRACKS))
+                 entityManager[current]->getType() == Entity::entityType::BARRACKS))
                 return current;
             current += dir;
         }
