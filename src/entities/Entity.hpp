@@ -3,6 +3,11 @@
 #include <memory>
 #include <vector>
 
+// #include "../core/GameContext.hpp"
+// #include "../core/Config.hpp"
+// #include "../core/EntityManager.hpp"
+// #include "../core/FieldCell.hpp"
+struct GameContext;
 
 class Entity {
 public:
@@ -21,7 +26,7 @@ public:
 
 
     virtual bool timeToSpawn() { return false; };
-
+    virtual void useItem(GameContext& ctx) { (void)ctx; };
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };
     virtual int getStr() { return 0; };

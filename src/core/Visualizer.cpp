@@ -386,6 +386,14 @@ void Visualizer::display() {
                 }
                 return true;
             }
+            else if (event == Event::Character('e')) {
+                if (!controller_->performAnAction('e')) {
+                    currentState = ScreenState::MainMenu;
+                    controller_->stopGame();
+                    screen_->PostEvent(Event::Custom);
+                }
+                return true;
+            }
             else if (event == Event::Character('q')) {
                 controller_->performAnAction('q');
                 return true;

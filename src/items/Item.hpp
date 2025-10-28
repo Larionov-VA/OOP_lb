@@ -1,9 +1,16 @@
 #pragma once
 
+struct GameContext;
+
 class Item {
-private:
+protected:
     int countOfItem;
 public:
-    virtual int getCountOfItem() = 0;
-    virtual bool useItem() = 0;
+    Item() : Item(0) {};
+    Item(int count) { countOfItem = count; };
+    int getCountOfItem() { return countOfItem; };
+    void decCountOfItem() { --countOfItem; };
+    void incCountOfItem() { ++countOfItem; };
+    virtual void useItem(GameContext& ctx) = 0;
+    virtual ~Item() = default;
 };

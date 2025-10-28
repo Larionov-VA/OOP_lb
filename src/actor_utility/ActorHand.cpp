@@ -1,11 +1,20 @@
 #include "ActorHand.hpp"
+#include "../core/GameContext.hpp"
+#include "../items/Item.hpp"
+#include "../items/DirectDamageSpell.hpp"
 
-ActorHand::ActorHand(std::unique_ptr<Item> randomSpell) {
+Hand::Hand(std::shared_ptr<Item> randomSpell) {
+    itemInHand = randomSpell;
 }
 
-ActorHand::~ActorHand() {
+Hand::Hand() {
+    itemInHand = std::make_shared<DirectDamageSpell>();
 }
 
-bool ActorHand::useItem() {
-    this->itemInHand->useItem();
+bool Hand::useItem(GameContext &ctx) {
+    if (itemInHand) {
+        itemInHand->useItem(ctx);
+        return true;
+    }
+    return false;
 }

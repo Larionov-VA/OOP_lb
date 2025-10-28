@@ -1,13 +1,14 @@
 #pragma once
-#include "../items/Item.hpp"
 #include <memory>
 
+struct GameContext;
+class Item;
 
-class ActorHand {
+class Hand {
 private:
-    std::unique_ptr<Item> itemInHand;
+    std::shared_ptr<Item> itemInHand;
 public:
-    ActorHand(std::unique_ptr<Item> randomSpell);
-    ~ActorHand();
-    bool useItem();
+    Hand(std::shared_ptr<Item> randomSpell);
+    Hand();
+    bool useItem(GameContext &ctx);
 };

@@ -10,7 +10,7 @@ Equipment::~Equipment() {
 
 
 int Equipment::getAttackBonus() {
-    if (equippedWeapon == Equipment::equippedWeapon::RANGE) {
+    if (currentWeapon == Equipment::equippedWeapon::RANGE) {
         return getRangeAttackBonus();
     }
     else {
@@ -29,30 +29,30 @@ int Equipment::getRangeAttackBonus() {
 
 
 void Equipment::setMeleeWeapon(int newMulti) {
-    rangeWeaponMulti = newMulti;
-}
-
-
-void Equipment::setRangeWeapon(int newMulti) {
     meleeWeaponMulti = newMulti;
 }
 
 
+void Equipment::setRangeWeapon(int newMulti) {
+    rangeWeaponMulti = newMulti;
+}
+
+
 bool Equipment::melle() const{
-    return equippedWeapon == Equipment::equippedWeapon::MELEE;
+    return currentWeapon == Equipment::equippedWeapon::MELEE;
 }
 
 
 bool Equipment::range() const {
-    return equippedWeapon == Equipment::equippedWeapon::RANGE;
+    return currentWeapon == Equipment::equippedWeapon::RANGE;
 }
 
 
 void Equipment::swapWeapon() {
-    if (equippedWeapon == Equipment::equippedWeapon::RANGE) {
-        equippedWeapon = Equipment::equippedWeapon::MELEE;
+    if (currentWeapon == Equipment::equippedWeapon::RANGE) {
+        currentWeapon = Equipment::equippedWeapon::MELEE;
     }
     else {
-        equippedWeapon = Equipment::equippedWeapon::RANGE;
+        currentWeapon = Equipment::equippedWeapon::RANGE;
     }
 }

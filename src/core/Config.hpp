@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include <string>
+#include "EntityManager.hpp"
+#include "FieldCell.hpp"
+#include "../entities/Entity.hpp"
 #define DEFAULT_ATTACK 5
 #define DEFAULT_HEALTH 100
 
@@ -34,7 +37,6 @@ typedef struct {
     std::string playerWeapon;
     std::string playerDebaff;
 }PlayerData;
-
 
 
 typedef struct {

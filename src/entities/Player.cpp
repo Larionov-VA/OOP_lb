@@ -9,10 +9,13 @@ Player::Player(
     long long levelUpExperience,
     int playerIntelligence,
     int playerDexterity,
-    int playerStrength
+    int playerStrength,
+    std::shared_ptr<Item> playerItemInHand
 ) {
+    
     this->playerAttack = Attack{playerAttack};
     this->playerHealth = Health{playerHealth};
+    this->playerHand = Hand{playerItemInHand};
     this->playerStats = Stats{prevLevelUpExperience, playerExperience, levelUpExperience, playerLevel};
     this->playerAttributes = Atributes{playerIntelligence, playerDexterity, playerStrength};
 }
@@ -121,4 +124,8 @@ bool Player::isLevelIncreased() {
 
 void Player::addExperience(int exp) {
     playerStats.addExperience(exp);
+}
+
+void Player::useItem(GameContext &ctx) {
+    playerHand.useItem(ctx);
 }

@@ -1,7 +1,9 @@
+#pragma once
 #include <unordered_map>
 #include <memory>
 #include <vector>
 #include "entities/Entity.hpp"
+#include "../core/GameContext.hpp"
 
 class EntityManager {
 private:

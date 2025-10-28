@@ -6,7 +6,7 @@
 
 class Inventory {
 private:
-    std::vector<std::unique_ptr<Item>> inventory;
+    std::vector<std::pair<bool, std::shared_ptr<Item>>> inventory;
 public:
     Inventory();
     ~Inventory();

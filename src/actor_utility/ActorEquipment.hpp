@@ -2,7 +2,7 @@
 
 class Equipment {
 private:
-    enum class equippedWeapon { MELEE, RANGE } equippedWeapon;
+    enum class equippedWeapon { MELEE, RANGE } currentWeapon;
     int meleeWeaponMulti = 3;
     int rangeWeaponMulti = 2;
     int getMeleeAttackBonus();

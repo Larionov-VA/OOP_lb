@@ -1,5 +1,5 @@
 #include "GameField.hpp"
-
+#include "GameContext.hpp" 
 
 GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
     if (width > MAX_FIELD_SIZE || height > MAX_FIELD_SIZE) {
@@ -178,6 +178,7 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 
 bool GameField::playerTurn(char command) {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    GameContext ctx{cells, entityManager};
     int newPlayerIndex;
     int enemyIndex;
     bool move = false;
@@ -209,6 +210,10 @@ bool GameField::playerTurn(char command) {
         }
         newPlayerIndex = playerIndex + 1;
         move = true;
+        break;
+    case 'e':
+        entityManager[playerIndex]->useItem(ctx);
+        return true;
         break;
     case '0':
         break;
@@ -298,18 +303,20 @@ void GameField::update() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     for (int index : enemyIndexes) {
         if (!entityManager[index]->alive()) {
+            int enemyLevel = entityManager[index]->getLevel();
             cells[index].setAvaible(true);
             cells[index].setCellDead();
-            entityManager[playerIndex]->addExperience(entityManager[index]->getLevel() * 10 + 10);
+            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 10 + 10);
             entityManager.killEntity(index);
         }
     }
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
     for (int index : barrackIndexes) {
         if (!entityManager[index]->alive()) {
+            int enemyLevel = entityManager[index]->getLevel();
             cells[index].setAvaible(true);
             cells[index].setCellDead();
-            entityManager[playerIndex]->addExperience(entityManager[index]->getLevel() * 50 + 10);
+            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
             entityManager.killEntity(index);
         }
     }
