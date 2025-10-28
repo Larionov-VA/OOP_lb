@@ -1,4 +1,4 @@
-#include "ActorAtributes.hpp"
+#include "ActorAttributes.hpp"
 
 
 Atributes::Atributes(int intelligence, int dexterity, int strength) {
@@ -27,4 +27,16 @@ int Atributes::getDexterity() const {
 
 int Atributes::getStrength() const {
     return strength;
+}
+
+void Atributes::setIntelligence(int newInt) {
+    intelligence = newInt;
+}
+
+void Atributes::setDexterity(int newDex) {
+    dexterity = newDex;
+}
+
+void Atributes::setStrength(int newStr) {
+    strength = newStr;
 }

@@ -7,4 +7,4 @@ int GlobalGameConfig::gameLevel = 1;
 const int GlobalGameConfig::enemyAttack = 10;
 const int GlobalGameConfig::enemyHealth = 25;
 const int GlobalGameConfig::barracksHealth = 100;
-GlobalGameConfig::difficulties GlobalGameConfig::difficulty = GlobalGameConfig::MEDIUM;
+int GlobalGameConfig::difficulty = GlobalGameConfig::EASY;

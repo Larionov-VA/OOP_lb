@@ -30,6 +30,7 @@ private:
         OptionsMenu,
         InGame,
         Inventory,
+        LevelUp,
         Exit
     } currentState;
     IGameController* controller_ = nullptr;

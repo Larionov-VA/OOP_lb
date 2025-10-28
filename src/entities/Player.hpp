@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "../actor_utility/ActorAtributes.hpp"
+#include "../actor_utility/ActorAttributes.hpp"
 #include "../actor_utility/ActorAttack.hpp"
 #include "../actor_utility/ActorEquipment.hpp"
 #include "../actor_utility/ActorHealth.hpp"
@@ -16,6 +16,7 @@ private:
     Stats playerStats;
     Health playerHealth;
     bool slowed = false;
+
 public:
     entityType getType() const override {
         return entityType::PLAYER;
@@ -37,10 +38,14 @@ public:
     int getInt() override;
     int getDex() override;
     int getStr() override;
+    void setInt(int newInt) override;
+    void setDex(int newDex) override;
+    void setStr(int newStr) override;
     std::unique_ptr<Entity> clone() const override {
         return std::make_unique<Player>(*this);
     }
     std::vector<long long> getExperience() override;
     int getLevel() override;
+    bool isLevelIncreased() override;
     void addExperience(int exp) override;
 };

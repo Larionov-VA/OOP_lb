@@ -25,7 +25,11 @@ public:
     virtual int getInt() { return 0; };
     virtual int getDex() { return 0; };
     virtual int getStr() { return 0; };
+    virtual void setInt(int newInt) {newInt++;};
+    virtual void setDex(int newDex) {newDex++;};
+    virtual void setStr(int newStr) {newStr++;};
     virtual int getLevel() { return 1; };
+    virtual bool isLevelIncreased() { return false; };
     virtual void addExperience(int exp) { exp++; };
     virtual std::vector<long long> getExperience() { return {0,0,0}; };
 

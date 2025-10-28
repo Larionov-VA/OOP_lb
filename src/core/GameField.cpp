@@ -210,6 +210,26 @@ bool GameField::playerTurn(char command) {
         newPlayerIndex = playerIndex + 1;
         move = true;
         break;
+    case '0':
+        break;
+    case '1':
+        break;
+    case '2':
+        break;
+    case '3':
+        break;
+    case '4':
+        break;
+    case '5':
+        break;
+    case '6':
+        break;
+    case '7':
+        break;
+    case '8':
+        break;
+    case '9':
+        break;
     case 'q':
         entityManager[playerIndex]->swapWeapon();
         return true;
@@ -249,6 +269,27 @@ int GameField::getCountOfEnemy() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
     return enemyIndexes.size() + barrackIndexes.size();
+}
+
+
+void GameField::playerLevelUp(char attribute) {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    int prevInt = entityManager[playerIndex]->getInt();
+    int prevStr = entityManager[playerIndex]->getStr();
+    int prevDex = entityManager[playerIndex]->getDex();
+    switch (attribute) {
+    case '1':
+        entityManager[playerIndex]->setInt(prevInt + 10);
+        break;
+    case '2':
+        entityManager[playerIndex]->setStr(prevStr + 10);
+        break;
+    case '3':
+        entityManager[playerIndex]->setDex(prevDex + 10);
+        break;
+    default:
+        break;
+    }
 }
 
 
@@ -446,6 +487,7 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
     
     std::vector<long long> playerExperience = player->getExperience();
     int playerLevel = player->getLevel();
+    bool playerLevelIncreased = player->isLevelIncreased();
     std::pair<int, int> playerHealth = player->getHealth();
     int playerAttack = player->getDamage();
     int playerIntelligence = player->getInt();
@@ -468,6 +510,7 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
         playerExperience[1],
         playerExperience[2],
         playerLevel,
+        playerLevelIncreased,
         playerHealth.second, 
         playerHealth.first, 
         playerAttack, 

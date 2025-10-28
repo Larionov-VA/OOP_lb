@@ -22,7 +22,7 @@ set(SRCS
     src/entities/Enemy.cpp
     src/entities/EnemyBarracks.cpp
 
-    src/actor_utility/ActorAtributes.cpp
+    src/actor_utility/ActorAttributes.cpp
     src/actor_utility/ActorAttack.cpp
     src/actor_utility/ActorEquipment.cpp
     src/actor_utility/ActorHand.cpp
@@ -35,7 +35,7 @@ set(SRCS
 add_executable(game ${SRCS})
 
 
-target_compile_options(game PRIVATE -Wall -Wextra -g)
+target_compile_options(game PRIVATE -Wall -Wextra)
 target_include_directories(game PRIVATE src/)
 
 

@@ -90,6 +90,7 @@ public:
     void enemyTurn();
     void buildingsTurn();
     int getCountOfEnemy();
+    void playerLevelUp(char attribute);
     void update();
     std::vector<wchar_t> show();
 };

@@ -79,6 +79,9 @@ void Visualizer::display() {
 
     auto playerInfo = Renderer([&] {
         std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+        if (data->levelIncreased) {
+            currentState = ScreenState::LevelUp;
+        }
         float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
         float expIndicator = (float)(data->playerCurrentExperience - data->playerPrevLevelUpExperience)/(data->playerLevelUpExperience - data->playerPrevLevelUpExperience);
         return vbox({
@@ -108,12 +111,25 @@ void Visualizer::display() {
             text("INVENTORY") | bold | center,
             separator(),
             hbox(
-                paragraph(healthPotionASCII) | border,
-                paragraph(healthPotionASCII) | border 
+                vbox(paragraph(healthPotionASCII), text("1/4") | center) | border,
+                vbox(paragraph(fireballScrollASCII), text("0/4") | center) | border
             ),
             hbox(
-                paragraph(healthPotionASCII) | border,
-                paragraph(healthPotionASCII) | border
+                vbox(paragraph(firestormScrollASCII), text("0/4") | center) | border
+                // vbox(paragraph(healthPotionASCII), text("0/4") | center) | border
+            )
+        });
+    });
+
+    auto levelUpChoice = Renderer([&] {
+        std::shared_ptr<PlayerData> data = controller_->getPlayerData();
+        return vbox({
+            text("Level Up! " + std::to_string(data->playerLevel) + " Level") | bold | center,
+            separator(),
+            hbox(
+                vbox(text("int: " + std::to_string(data->playerIntelligence) + " + 10") | color(Color::Blue), text("to choice PRESS '1'") | center) | border,
+                vbox(text("str: " + std::to_string(data->playerStrength) + " + 10") | color(Color::Red), text("to choice PRESS '2'") | center) | border,
+                vbox(text("int: " + std::to_string(data->playerDexterity) + " + 10") | color(Color::Green), text("to choice PRESS '3'") | center) | border
             )
         });
     });
@@ -251,6 +267,11 @@ void Visualizer::display() {
                 playerInventory->Render()
             }) | border | center;
         }
+        else if (currentState == ScreenState::LevelUp) {
+            return vbox({
+                levelUpChoice->Render()
+            }) | border | center;
+        }
         else if (currentState == ScreenState::OptionsMenu) {
             auto info = (tabFocus == 0)
                 ? text("Focus: Controls (TAB to switch)") | color(Color::Yellow)
@@ -334,7 +355,7 @@ void Visualizer::display() {
                 return true;
             }
             if (event == Event::Character('w') || event == Event::ArrowUp) {
-                if (controller_->performAnAction('w')) {
+                if (!controller_->performAnAction('w')) {
                     currentState = ScreenState::MainMenu;
                     controller_->stopGame();
                     screen_->PostEvent(Event::Custom);
@@ -342,7 +363,7 @@ void Visualizer::display() {
                 return true;
             }
             else if (event == Event::Character('s') || event == Event::ArrowDown) {
-                if (controller_->performAnAction('s')) {
+                if (!controller_->performAnAction('s')) {
                     currentState = ScreenState::MainMenu;
                     controller_->stopGame();
                     screen_->PostEvent(Event::Custom);
@@ -350,7 +371,7 @@ void Visualizer::display() {
                 return true;
             }
             else if (event == Event::Character('a') || event == Event::ArrowLeft) {
-                if (controller_->performAnAction('a')) {
+                if (!controller_->performAnAction('a')) {
                     currentState = ScreenState::MainMenu;
                     controller_->stopGame();
                     screen_->PostEvent(Event::Custom);
@@ -358,7 +379,7 @@ void Visualizer::display() {
                 return true;
             }
             else if (event == Event::Character('d') || event == Event::ArrowRight) {
-                if (controller_->performAnAction('d')) {
+                if (!controller_->performAnAction('d')) {
                     currentState = ScreenState::MainMenu;
                     controller_->stopGame();
                     screen_->PostEvent(Event::Custom);
@@ -375,6 +396,28 @@ void Visualizer::display() {
             if (event == Event::Escape) {
                 currentState = ScreenState::InGame;
                 screen_->PostEvent(Event::Custom);
+                return true;
+            }
+        }
+        else if (currentState == ScreenState::LevelUp) {
+            if (event == Event::Escape) {
+                currentState = ScreenState::InGame;
+                screen_->PostEvent(Event::Custom);
+                return true;
+            }
+            if (event == Event::Character('1')) {
+                controller_->playerLevelUp('1');
+                currentState = ScreenState::InGame;
+                return true;
+            }
+            if (event == Event::Character('2')) {
+                controller_->playerLevelUp('2');
+                currentState = ScreenState::InGame;
+                return true;
+            }
+            if (event == Event::Character('3')) {
+                controller_->playerLevelUp('3');
+                currentState = ScreenState::InGame;
                 return true;
             }
         }

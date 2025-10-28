@@ -4,9 +4,10 @@
 Enemy::Enemy() : Enemy(1) {}
 
 Enemy::Enemy(int enemyLevel) {
-    enemyHealth.setMaxHealth(GlobalGameConfig::enemyHealth * enemyLevel);
+    this->enemyLevel = enemyLevel;
+    enemyHealth.setMaxHealth(GlobalGameConfig::enemyHealth * enemyLevel * GlobalGameConfig::difficulty);
     enemyHealth.restoreHealth();
-    enemyAttack.setAttack(GlobalGameConfig::enemyAttack * enemyLevel);
+    enemyAttack.setAttack(GlobalGameConfig::enemyAttack * enemyLevel * GlobalGameConfig::difficulty);
     iterative = true;
 }
 
@@ -18,6 +19,11 @@ Enemy::~Enemy() {
 int Enemy::getDamage() {
     return enemyAttack.getAttack();
 }
+
+int Enemy::getLevel() {
+    return this->enemyLevel;
+}
+
 
 bool Enemy::getIterative() {
     return iterative;

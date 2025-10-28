@@ -14,6 +14,7 @@ public:
     ~Game();
     void startGame() override;
     void nextLevel() override;
+    void playerLevelUp(char attribute) override;
     bool performAnAction(char playerAction) override;
     std::shared_ptr<PlayerData> getPlayerData() override;
     std::vector<EnemyData> getEnemyData() override;

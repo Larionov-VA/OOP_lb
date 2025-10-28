@@ -11,6 +11,7 @@ public:
     void reduseCurrentHealth(int damage);
     void restoreHealth();
     void setMaxHealth(int newMaxHealth);
+    void updateHealth(int str);
     int getCurrentHealth() const;
     int getMaxHealth() const;
     Health();

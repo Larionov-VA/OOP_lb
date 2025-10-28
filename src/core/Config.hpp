@@ -9,9 +9,10 @@ struct GlobalGameConfig {
     static int fieldWidth;
     static int fieldHeight;
     static int gameLevel;
-    static enum difficulties {
-        EASY, MEDIUM, HARD
-    } difficulty;
+    enum difficulties {
+        DEAFAULT, EASY, MEDIUM, HARD
+    };
+    static int difficulty;
     const static int enemyAttack;
     const static int enemyHealth;
     const static int barracksHealth;
@@ -23,6 +24,7 @@ typedef struct {
     long long playerCurrentExperience;
     long long playerLevelUpExperience;
     int playerLevel;
+    bool levelIncreased;
     int playerMaxHealth;
     int playerHealth;
     int playerAttack;

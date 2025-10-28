@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "../actor_utility/ActorAtributes.hpp"
+#include "../actor_utility/ActorAttributes.hpp"
 #include "../actor_utility/ActorAttack.hpp"
 #include "../actor_utility/ActorEquipment.hpp"
 #include "../actor_utility/ActorHealth.hpp"
@@ -13,12 +13,14 @@ class Enemy : public Entity {
 private:
     Attack enemyAttack;
     Health enemyHealth;
+    int enemyLevel;
     bool iterative;
 public:
     entityType getType() const override {
         return entityType::ENEMY;
     }
     int getDamage() override;
+    int getLevel() override;
     std::pair<int, int>  getHealth() override;
     void causeDamage(int damage) override;
     bool getIterative();

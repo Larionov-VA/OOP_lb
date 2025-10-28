@@ -1,7 +1,7 @@
 #include "EnemyBarracks.hpp"
 
 EnemyBarracks::EnemyBarracks(int barracksLevel, int spawnPeriod) {
-    barracksHealth.setMaxHealth(GlobalGameConfig::barracksHealth * barracksLevel);
+    barracksHealth.setMaxHealth(GlobalGameConfig::barracksHealth * barracksLevel * GlobalGameConfig::difficulty);
     barracksHealth.restoreHealth();
     this->spawnPeriod = spawnPeriod;
 }

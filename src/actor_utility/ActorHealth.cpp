@@ -18,7 +18,12 @@ void Health::reduseCurrentHealth(int damage) {
 
 
 void Health::regenerate(int regenerateAmount) {
-    currentHealth = currentHealth + regenerateAmount;
+    if (currentHealth + regenerateAmount < maxHealth) {
+        currentHealth = currentHealth + regenerateAmount;
+    }
+    else {
+    currentHealth = maxHealth;
+    }
 }
 
 
@@ -29,6 +34,14 @@ void Health::restoreHealth() {
 
 void Health::setMaxHealth(int newMaxHealth) {
     maxHealth = newMaxHealth;
+}
+
+
+void Health::updateHealth(int str) {
+    int prevMaxHealth = maxHealth;
+    int newMaxHealth = prevMaxHealth + str * 10;
+    setMaxHealth(newMaxHealth);
+    restoreHealth();
 }
 
 

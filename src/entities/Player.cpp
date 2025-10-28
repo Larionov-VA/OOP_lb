@@ -85,9 +85,27 @@ int Player::getStr() {
     return playerAttributes.getStrength();
 }
 
+
+void Player::setInt(int newInt) {
+    playerAttributes.setIntelligence(newInt);
+}
+
+
+void Player::setDex(int newDex) {
+    playerAttributes.setDexterity(newDex);
+}
+
+
+void Player::setStr(int newStr) {
+    playerAttributes.setStrength(newStr);
+    playerHealth.updateHealth(newStr);
+}
+
+
 bool Player::melle() {
     return playerEquipment.melle();
 }
+
 
 std::vector<long long> Player::getExperience() {
     return playerStats.getExperience();
@@ -95,6 +113,10 @@ std::vector<long long> Player::getExperience() {
 
 int Player::getLevel() {
     return playerStats.getLevel();
+}
+
+bool Player::isLevelIncreased() {
+    return playerStats.checkAndSwitchLevelIncreased();
 }
 
 void Player::addExperience(int exp) {

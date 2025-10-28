@@ -33,12 +33,17 @@ void Game::nextLevel() {
 }
 
 
+void Game::playerLevelUp(char attribute) {
+    field->playerLevelUp(attribute);
+}
+
+
 bool Game::performAnAction(char playerAction) {
     if (!field) {
-        return true;
+        return false;
     }
     if (!field->playerAlive()) {
-        return true;
+        return false;
     }
     bool nextTurnAction = true;
     nextTurnAction = field->playerTurn(playerAction);
@@ -51,7 +56,7 @@ bool Game::performAnAction(char playerAction) {
         field->enemyTurn();
         field->buildingsTurn();
     }
-    return false;
+    return true;
 }
 
 
