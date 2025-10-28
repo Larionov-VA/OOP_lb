@@ -1,5 +1,5 @@
 #pragma once
-#include "Config.hpp"
+#include "../core/Config.hpp"
 
 class Attack {
 private:

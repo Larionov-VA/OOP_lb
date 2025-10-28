@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.hpp"
-#include "ActorHealth.hpp"
-#include "Config.hpp"
+#include "../actor_utility/ActorHealth.hpp"
+#include "../core/Config.hpp"
 #include <iostream>
 
 class EnemyBarracks : public Entity {

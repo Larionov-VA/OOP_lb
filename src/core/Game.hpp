@@ -1,7 +1,7 @@
 #pragma once
 #include <unistd.h>
 #include "GameField.hpp"
-#include "Player.hpp"
+#include "entities/Player.hpp"
 #include "IGameController.hpp"
 #include "Config.hpp"
 

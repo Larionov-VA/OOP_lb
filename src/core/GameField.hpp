@@ -12,12 +12,14 @@
 #include <functional>
 #include "EntityManager.hpp"
 #include "FieldCell.hpp"
-#include "Entity.hpp"
-#include "Player.hpp"
-#include "Visualizer.hpp"
-#include "Enemy.hpp"
-#include "EnemyBarracks.hpp"
+
+#include "entities/Entity.hpp"
+#include "entities/Player.hpp"
+#include "entities/Enemy.hpp"
+#include "entities/EnemyBarracks.hpp"
+
 #include "Config.hpp"
+#include "Visualizer.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10

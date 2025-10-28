@@ -1,7 +1,7 @@
 #include <unordered_map>
 #include <memory>
 #include <vector>
-#include "Entity.hpp"
+#include "entities/Entity.hpp"
 
 class EntityManager {
 private:

@@ -9,22 +9,26 @@ add_subdirectory(external/ftxui)
 
 
 set(SRCS
-    src/main.cpp
-    src/Game.cpp
-    src/GameField.cpp
-    src/FieldCell.cpp
-    src/Entity.cpp
-    src/Player.cpp
-    src/Enemy.cpp
-    src/Config.cpp
-    src/ActorHealth.cpp
-    src/ActorEquipment.cpp
-    src/ActorAttack.cpp
-    src/ActorAtributes.cpp
-    src/ActorStats.cpp
-    src/EntityManager.cpp
-    src/Visualizer.cpp
-    src/EnemyBarracks.cpp
+    src/core/main.cpp
+    src/core/Game.cpp
+    src/core/GameField.cpp
+    src/core/FieldCell.cpp
+    src/core/EntityManager.cpp
+    src/core/Visualizer.cpp    
+    src/core/Config.cpp
+
+    src/entities/Entity.cpp
+    src/entities/Player.cpp
+    src/entities/Enemy.cpp
+    src/entities/EnemyBarracks.cpp
+
+    src/actor_utility/ActorAtributes.cpp
+    src/actor_utility/ActorAttack.cpp
+    src/actor_utility/ActorEquipment.cpp
+    src/actor_utility/ActorHand.cpp
+    src/actor_utility/ActorHealth.cpp
+    src/actor_utility/ActorInventory.cpp
+    src/actor_utility/ActorStats.cpp
 )
 
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "Entity.hpp"
-#include "ActorAtributes.hpp"
-#include "ActorAttack.hpp"
-#include "ActorEquipment.hpp"
-#include "ActorHealth.hpp"
-#include "ActorStats.hpp"
+#include "../actor_utility/ActorAtributes.hpp"
+#include "../actor_utility/ActorAttack.hpp"
+#include "../actor_utility/ActorEquipment.hpp"
+#include "../actor_utility/ActorHealth.hpp"
+#include "../actor_utility/ActorStats.hpp"
 #include <utility>
 #include <memory>
 
