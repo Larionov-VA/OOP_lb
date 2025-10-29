@@ -14,6 +14,9 @@
 #include "ASCIIAssets/HealthPotionAsset.hpp"
 #include "ASCIIAssets/FireballScrollAsset.hpp"
 #include "ASCIIAssets/FirestormScrollAsset.hpp"
+#include "ASCIIAssets/SummonScrollAsset.hpp"
+#include "ASCIIAssets/TrapScrollAsset.hpp"
+#include "ASCIIAssets/UpgradeScrollAsset.hpp"
 
 #include <iostream>
 #include <thread>

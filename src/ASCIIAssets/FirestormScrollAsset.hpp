@@ -12,5 +12,4 @@ const std::string firestormScrollASCII = R"(
    ▓████░  ░▒░███▒  
     ▓▓▓      ░▓▓▒   
                     
-   FIRESTORM SPELL  
 )";

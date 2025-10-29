@@ -23,7 +23,7 @@ private:
     Hand playerHand;
     Stats playerStats;
     Health playerHealth;
-    Inventory playerInventory;
+    // Inventory playerInventory;
     bool slowed = false;
 public:
     entityType getType() const override {
@@ -34,7 +34,7 @@ public:
         int playerAttack, int playerHealth, int playerLevel,
         long long prevLevelUpExperience, long long playerExperience, 
         long long levelUpExperience, int intelligence, int dexterity, int strength,
-        std::shared_ptr<Item> playerItemInHand
+        int playerHandSize
     );
     bool checkDebaffState() override;
     void setDebaffState() override;
@@ -57,7 +57,9 @@ public:
     int getLevel() override;
     bool isLevelIncreased() override;
     void addExperience(int exp) override;
-    void useItem(GameContext &ctx) override;
+    void useItem(GameContext &ctx, int userIndex) override;
     void regenerateLife() override;
-    // void swapItem() override;
+    void swapItemInHand(int itemIndexInHand) override;
+    std::vector<std::pair<bool, int>> getHandItems();
+    std::pair<int, int> getHandSize();
 };

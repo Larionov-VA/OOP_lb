@@ -10,12 +10,12 @@ Player::Player(
     int playerIntelligence,
     int playerDexterity,
     int playerStrength,
-    std::shared_ptr<Item> playerItemInHand
+    int playerHandSize
 ) {
     
     this->playerAttack = Attack{playerAttack};
     this->playerHealth = Health{playerHealth};
-    this->playerHand = Hand{playerItemInHand};
+    this->playerHand = Hand{playerHandSize};
     this->playerStats = Stats{prevLevelUpExperience, playerExperience, levelUpExperience, playerLevel};
     this->playerAttributes = Atributes{playerIntelligence, playerDexterity, playerStrength};
 }
@@ -126,8 +126,8 @@ void Player::addExperience(int exp) {
     playerStats.addExperience(exp);
 }
 
-void Player::useItem(GameContext &ctx) {
-    playerHand.useItem(ctx);
+void Player::useItem(GameContext &ctx, int userIndex) {
+    playerHand.useItem(ctx, userIndex);
 }
 
 void Player::regenerateLife() {
@@ -135,7 +135,14 @@ void Player::regenerateLife() {
     playerHealth.regenerate(currentMaxHealth/2);
 }
 
-// void Player::swapItem(int itemIndexInInventory) {
-//     std::shared_ptr<Item> item = playerInventory.getItem(itemIndexInInventory);
-//     playerHand.takeItem(item);
-// }
+void Player::swapItemInHand(int itemIndexInHand) {
+    playerHand.swapItem(itemIndexInHand);
+}
+
+std::vector<std::pair<bool, int>> Player::getHandItems() {
+    return playerHand.getHandData();
+}
+
+std::pair<int, int> Player::getHandSize() {
+    return {playerHand.getCurrentHandSize(), playerHand.getMaxHandSize()};
+}

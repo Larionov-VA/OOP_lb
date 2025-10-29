@@ -12,5 +12,4 @@ const std::string healthPotionASCII = R"(
     ▓▓▓▓▓▓▓▓▓▓█▓    
     ░▒▓▓▓▓▓▓▓█▓     
      ░▒▓▓███▓▒░     
-   HEALTH  POTION   
 )";

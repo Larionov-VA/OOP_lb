@@ -4,17 +4,16 @@
 #include "../core/FieldCell.hpp"
 #include "../entities/Entity.hpp"
 
-bool DirectDamageSpell::cast(GameContext& ctx) {
+bool DirectDamageSpell::cast(GameContext& ctx, int userIndex) {
     if (!countOfItem) {
         return false;
     }
-    int playerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> enemyIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     for (int enemyIndex : enemyIndexes) {
-        if (ctx.cells[playerIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {
-            Entity* player = ctx.entityManager[playerIndex];
-            int playerInt = player->getInt();
-            ctx.entityManager[enemyIndex]->causeDamage((playerInt + baseDamage) * (powerOfSpell + playerInt/10));
+        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {
+            Entity* user = ctx.entityManager[userIndex];
+            int userInt = user->getInt();
+            ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));
             return true;
         }
     }

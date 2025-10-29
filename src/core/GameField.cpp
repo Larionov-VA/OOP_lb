@@ -212,28 +212,15 @@ bool GameField::playerTurn(char command) {
         move = true;
         break;
     case 'e':
-        entityManager[playerIndex]->useItem(ctx);
+        entityManager[playerIndex]->useItem(ctx, playerIndex);
         return true;
         break;
     case '0':
-        break;
     case '1':
-        break;
     case '2':
-        break;
     case '3':
-        break;
     case '4':
-        break;
-    case '5':
-        break;
-    case '6':
-        break;
-    case '7':
-        break;
-    case '8':
-        break;
-    case '9':
+        entityManager[playerIndex]->swapItemInHand(command-'0');
         break;
     case 'q':
         entityManager[playerIndex]->swapWeapon();
@@ -500,6 +487,8 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
     int playerIntelligence = player->getInt();
     int playerDexterity = player->getDex();
     int playerStrength = player->getStr();
+    std::pair<int, int> playerHandSize = player->getHandSize();
+    std::vector<std::pair<bool, int>> playerHandInfo = player->getHandItems();
     std::string playerWeapon;
     std::string playerDebaff;
     if (player->melle()) {
@@ -524,6 +513,9 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
         playerIntelligence,
         playerDexterity,
         playerStrength,
+        playerHandSize.first,
+        playerHandSize.second,
+        playerHandInfo,
         playerWeapon,
         playerDebaff
     };

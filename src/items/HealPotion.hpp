@@ -8,5 +8,5 @@ private:
 public:
     HealPotion(int level) { levelOfPotion = level; };
     HealPotion() : HealPotion(1) {};
-    void useItem(GameContext& ctx) override;
+    void useItem(GameContext& ctx, int userIndex) override;
 };

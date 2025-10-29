@@ -7,8 +7,9 @@ class DirectDamageSpell : public SpellScroll {
 private:
     int baseDamage;
     int baseDistance;
+    
 public:
-    DirectDamageSpell() : DirectDamageSpell(10, 7, 1, 1) {}
+    DirectDamageSpell() : DirectDamageSpell(10, 7, 1, 0) {}
     DirectDamageSpell(int damage, int distance, int power, int count) {
         this->baseDamage = damage;
         this->baseDistance = distance;
@@ -16,5 +17,5 @@ public:
         this->countOfItem = count;
     }
     ~DirectDamageSpell() override = default;
-    bool cast(GameContext& ctx) override;
+    bool cast(GameContext& ctx, int userIndex) override;
 };

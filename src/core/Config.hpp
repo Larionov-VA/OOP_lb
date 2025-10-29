@@ -34,6 +34,9 @@ typedef struct {
     int playerIntelligence;
     int playerDexterity;
     int playerStrength;
+    int playerCurrentHandSize;
+    int playerMaxHandSize;
+    std::vector<std::pair<bool, int>> playerHandItem;
     std::string playerWeapon;
     std::string playerDebaff;
 }PlayerData;

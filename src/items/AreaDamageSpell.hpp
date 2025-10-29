@@ -8,7 +8,7 @@ private:
     int baseDamage;
     int baseDistance;
 public:
-    AreaDamageSpell() : AreaDamageSpell(6, 4, 1, 1) {}
+    AreaDamageSpell() : AreaDamageSpell(6, 4, 1, 0) {}
     AreaDamageSpell(int damage, int distance, int power, int count) {
         this->baseDamage = damage;
         this->baseDistance = distance;
@@ -16,5 +16,5 @@ public:
         this->countOfItem = count;
     }
     ~AreaDamageSpell() override = default;
-    bool cast(GameContext& ctx) override;
+    bool cast(GameContext& ctx, int userIndex) override;
 };
