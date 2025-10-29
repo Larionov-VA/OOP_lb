@@ -135,7 +135,7 @@ void Player::regenerateLife() {
     playerHealth.regenerate(currentMaxHealth/2);
 }
 
-void Player::swapItem(int itemIndexInInventory) {
-    std::shared_ptr<Item> item = playerInventory.getItem(itemIndexInInventory);
-    playerHand.takeItem(item);
-}
+// void Player::swapItem(int itemIndexInInventory) {
+//     std::shared_ptr<Item> item = playerInventory.getItem(itemIndexInInventory);
+//     playerHand.takeItem(item);
+// }

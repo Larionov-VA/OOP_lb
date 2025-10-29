@@ -59,5 +59,5 @@ public:
     void addExperience(int exp) override;
     void useItem(GameContext &ctx) override;
     void regenerateLife() override;
-    void swapItem() override;
+    // void swapItem() override;
 };

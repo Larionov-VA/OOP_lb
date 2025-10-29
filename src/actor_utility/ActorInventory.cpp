@@ -14,7 +14,13 @@ std::shared_ptr<Item> Inventory::getItem(int itemIndexInInventory) {
 }
 
 
-Inventory::Inventory() {
+Inventory::Inventory() : Inventory(10) {}
+
+
+Inventory::Inventory(int inventorySize) {
+    for (int i = 0; i < inventorySize; ++i) {
+        
+    }
 }
 
 

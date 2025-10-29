@@ -9,7 +9,8 @@ private:
     std::vector<std::pair<bool, std::shared_ptr<Item>>> inventory;
 public:
     Inventory();
+    Inventory(int inventorySize);
     ~Inventory();
-    void addItem();
+    void addItem(std::shared_ptr<Item> item);
     std::shared_ptr<Item> getItem(int itemIndexInInventory);
 };
