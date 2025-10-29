@@ -16,7 +16,6 @@ set(SRCS
     src/core/EntityManager.cpp
     src/core/Visualizer.cpp    
     src/core/Config.cpp
-    # src/core/GameContext.hpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp
@@ -32,6 +31,8 @@ set(SRCS
     src/actor_utility/ActorStats.cpp
 
     src/items/DirectDamageSpell.cpp
+    src/items/AreaDamageSpell.cpp
+    src/items/HealPotion.cpp
 )
 
 

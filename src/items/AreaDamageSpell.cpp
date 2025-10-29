@@ -1,22 +1,23 @@
-#include "DirectDamageSpell.hpp"
+#include "AreaDamageSpell.hpp"
 #include "../core/GameContext.hpp"
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
 #include "../entities/Entity.hpp"
 
-bool DirectDamageSpell::cast(GameContext& ctx) {
+bool AreaDamageSpell::cast(GameContext& ctx) {
     if (!countOfItem) {
         return false;
     }
-    int playerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    auto playerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> enemyIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    bool hit = false;
     for (int enemyIndex : enemyIndexes) {
         if (ctx.cells[playerIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {
             Entity* player = ctx.entityManager[playerIndex];
             int playerInt = player->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((playerInt + baseDamage) * (powerOfSpell + playerInt/10));
-            return true;
+            hit = true;
         }
     }
-    return false;
+    return hit;
 }

@@ -15,7 +15,7 @@ public:
     }
     void useItem(GameContext& ctx) override {
         if (cast(ctx)) {
-            incCountOfItem();
+            this->decCountOfItem();
         }
     }
 };

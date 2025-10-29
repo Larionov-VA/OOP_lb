@@ -3,18 +3,18 @@
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
 
-class DirectDamageSpell : public SpellScroll {
+class AreaDamageSpell : public SpellScroll {
 private:
     int baseDamage;
     int baseDistance;
 public:
-    DirectDamageSpell() : DirectDamageSpell(10, 7, 1, 1) {}
-    DirectDamageSpell(int damage, int distance, int power, int count) {
+    AreaDamageSpell() : AreaDamageSpell(6, 4, 1, 1) {}
+    AreaDamageSpell(int damage, int distance, int power, int count) {
         this->baseDamage = damage;
         this->baseDistance = distance;
         this->powerOfSpell = power;
         this->countOfItem = count;
     }
-    ~DirectDamageSpell() override = default;
+    ~AreaDamageSpell() override = default;
     bool cast(GameContext& ctx) override;
 };

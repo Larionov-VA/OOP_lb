@@ -58,4 +58,6 @@ public:
     bool isLevelIncreased() override;
     void addExperience(int exp) override;
     void useItem(GameContext &ctx) override;
+    void regenerateLife() override;
+    void swapItem() override;
 };

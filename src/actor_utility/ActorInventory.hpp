@@ -11,4 +11,5 @@ public:
     Inventory();
     ~Inventory();
     void addItem();
+    std::shared_ptr<Item> getItem(int itemIndexInInventory);
 };

@@ -20,10 +20,11 @@ public:
     virtual bool alive() const = 0;
 
     virtual void swapWeapon() {};
+    virtual void swapItem() {};
     virtual bool melle() { return true; };
     virtual bool checkDebaffState() { return false; };
     virtual void setDebaffState() {};
-
+    virtual void regenerateLife() {};
 
     virtual bool timeToSpawn() { return false; };
     virtual void useItem(GameContext& ctx) { (void)ctx; };

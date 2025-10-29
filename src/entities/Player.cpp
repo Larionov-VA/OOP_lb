@@ -129,3 +129,13 @@ void Player::addExperience(int exp) {
 void Player::useItem(GameContext &ctx) {
     playerHand.useItem(ctx);
 }
+
+void Player::regenerateLife() {
+    int currentMaxHealth = playerHealth.getMaxHealth();
+    playerHealth.regenerate(currentMaxHealth/2);
+}
+
+void Player::swapItem(int itemIndexInInventory) {
+    std::shared_ptr<Item> item = playerInventory.getItem(itemIndexInInventory);
+    playerHand.takeItem(item);
+}

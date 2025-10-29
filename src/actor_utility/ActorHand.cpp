@@ -11,8 +11,10 @@ Hand::Hand() {
     itemInHand = std::make_shared<DirectDamageSpell>();
 }
 
+
+
 bool Hand::useItem(GameContext &ctx) {
-    if (itemInHand) {
+    if (itemInHand->getCountOfItem()) {
         itemInHand->useItem(ctx);
         return true;
     }
