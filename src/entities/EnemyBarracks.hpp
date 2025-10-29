@@ -8,6 +8,7 @@ class EnemyBarracks : public Entity {
 private:
     Health barracksHealth{};
     int spawnPeriod;
+    int barracksLevel;
     int counter = 0;
 public:
     EnemyBarracks() : EnemyBarracks(1, 5) {};
@@ -24,4 +25,5 @@ public:
     std::unique_ptr<Entity> clone() const override {
         return std::make_unique<EnemyBarracks>(*this);
     }
+    int getLevel() override;
 };

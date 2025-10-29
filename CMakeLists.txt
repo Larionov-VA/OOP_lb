@@ -21,6 +21,7 @@ set(SRCS
     src/entities/Player.cpp
     src/entities/Enemy.cpp
     src/entities/EnemyBarracks.cpp
+    src/entities/EnemyTower.cpp
 
     src/actor_utility/ActorAttributes.cpp
     src/actor_utility/ActorAttack.cpp

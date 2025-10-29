@@ -17,6 +17,7 @@
 #include "entities/Player.hpp"
 #include "entities/Enemy.hpp"
 #include "entities/EnemyBarracks.hpp"
+#include "entities/EnemyTower.hpp"
 
 #include "Config.hpp"
 #include "Visualizer.hpp"

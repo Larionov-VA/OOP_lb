@@ -5,7 +5,11 @@
 class SpellScroll : public Item {
 protected:
     int powerOfSpell;
-    virtual bool cast(GameContext& context, int userIndex) = 0;
+    virtual bool cast(GameContext& context, int userIndex) {
+        (void)context;
+        (void)userIndex;
+        return false;
+    };
 public:
     SpellScroll(int power) { powerOfSpell = power; }
     SpellScroll() : SpellScroll(1) {}

@@ -90,7 +90,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
             cells[i].setSlow(true);
         }
     }
-
+    spawnEntity(std::make_unique<EnemyTower>(gameLevel), cell3.getIndex());
     spawnEntity(std::make_unique<EnemyBarracks>(gameLevel), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
 }
@@ -156,7 +156,8 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
         while (current >= 0 && current < totalCells && (current / widthField) == rowOld) {
             if (entityManager[current] &&
                 (entityManager[current]->getType() == Entity::entityType::ENEMY ||
-                entityManager[current]->getType() == Entity::entityType::BARRACKS))
+                entityManager[current]->getType() == Entity::entityType::BARRACKS ||
+                entityManager[current]->getType() == Entity::entityType::TOWER))
                 return current;
             current += dir;
         }
@@ -167,7 +168,8 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
         while (current >= 0 && current < totalCells) {
             if (entityManager[current] &&
                 (entityManager[current]->getType() == Entity::entityType::ENEMY ||
-                 entityManager[current]->getType() == Entity::entityType::BARRACKS))
+                 entityManager[current]->getType() == Entity::entityType::BARRACKS ||
+                entityManager[current]->getType() == Entity::entityType::TOWER))
                 return current;
             current += dir;
         }
@@ -260,7 +262,8 @@ void GameField::summonsTurn() {
 int GameField::getCountOfEnemy() {
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
-    return enemyIndexes.size() + barrackIndexes.size();
+    std::vector<int> towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+    return enemyIndexes.size() + barrackIndexes.size() + towerIndexes.size();
 }
 
 
@@ -299,6 +302,16 @@ void GameField::update() {
     }
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
     for (int index : barrackIndexes) {
+        if (!entityManager[index]->alive()) {
+            int enemyLevel = entityManager[index]->getLevel();
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
+            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
+            entityManager.killEntity(index);
+        }
+    }
+    std::vector<int> towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+    for (int index : towerIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
             cells[index].setAvaible(true);
@@ -433,31 +446,39 @@ void GameField::enemyTurn() {
 
 
 void GameField::buildingsTurn() {
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
     int index;
-    if (barrackIndexes.empty()) {
-        return;
-    }
-    else {
+    if (!barrackIndexes.empty()) {
         index = barrackIndexes[0];
-    }
-    if (entityManager[index]->timeToSpawn()) {
-        int up = index - widthField;
-        int down = index + widthField;
-        int left = index - 1;
-        int right = index + 1;
+        if (entityManager[index]->timeToSpawn()) {
+            int up = index - widthField;
+            int down = index + widthField;
+            int left = index - 1;
+            int right = index + 1;
 
-        if (isMoveCorrect(index, up)) {
-            spawnEntity(std::make_unique<Enemy>(gameLevel), up);
+            if (isMoveCorrect(index, up)) {
+                spawnEntity(std::make_unique<Enemy>(gameLevel), up);
+            }
+            else if (isMoveCorrect(index, down)) {
+                spawnEntity(std::make_unique<Enemy>(gameLevel), down);
+            }
+            else if (isMoveCorrect(index, left)) {
+                spawnEntity(std::make_unique<Enemy>(gameLevel), left);
+            }
+            else if (isMoveCorrect(index, right)) {
+                spawnEntity(std::make_unique<Enemy>(gameLevel), right);
+            }
         }
-        else if (isMoveCorrect(index, down)) {
-            spawnEntity(std::make_unique<Enemy>(gameLevel), down);
-        }
-        else if (isMoveCorrect(index, left)) {
-            spawnEntity(std::make_unique<Enemy>(gameLevel), left);
-        }
-        else if (isMoveCorrect(index, right)) {
-            spawnEntity(std::make_unique<Enemy>(gameLevel), right);
+    }
+    std::vector<int> towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+    int towerIndex;
+    GameContext ctx{cells, entityManager};
+    if (!towerIndexes.empty()) {
+        towerIndex = towerIndexes[0];
+        EnemyTower* tower = dynamic_cast<EnemyTower*>(entityManager[towerIndex]);
+        if (cells[playerIndex].getDistance(cells[towerIndex]) <= tower->getSpellDistance()) {
+            tower->towerAttack(ctx, towerIndex);
         }
     }
 }
@@ -549,7 +570,38 @@ std::vector<EnemyData> GameField::getEnemyData() {
         std::pair<int, int> enemyHealth = enemy->getHealth();
         enemyData.enemyHealth = enemyHealth.first;
         enemyData.enemyMaxHealth = enemyHealth.second;
+        enemyData.name = "Enemy";
         data.push_back(enemyData);
+    }
+    {
+        std::vector<int> barracksIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+        if (!barracksIndexes.empty()) {
+            int barracksIndex = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS)[0];
+            Entity* ent = entityManager[barracksIndex];
+            EnemyBarracks* baracks = dynamic_cast<EnemyBarracks*>(ent);
+            EnemyData barracksData{};
+            barracksData.enemyAttack = baracks->getDamage();
+            std::pair<int, int> baracksHealth = baracks->getHealth();
+            barracksData.enemyHealth = baracksHealth.first;
+            barracksData.enemyMaxHealth = baracksHealth.second;
+            barracksData.name = "Barrack";
+            data.push_back(barracksData);
+        }
+    }
+    {
+        std::vector<int> towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+        if (!towerIndexes.empty()) {
+            int towerIndex = entityManager.getIndexesWithEntity(Entity::entityType::TOWER)[0];
+            Entity* ent = entityManager[towerIndex];
+            EnemyTower* tower = dynamic_cast<EnemyTower*>(ent);
+            EnemyData towerData{};
+            towerData.enemyAttack = tower->getDamage();
+            std::pair<int, int> towerHealth = tower->getHealth();
+            towerData.enemyHealth = towerHealth.first;
+            towerData.enemyMaxHealth = towerHealth.second;
+            towerData.name = "Tower";
+            data.push_back(towerData);
+        }
     }
     return data;
 }
@@ -571,6 +623,9 @@ std::vector<wchar_t> GameField::show() {
                 }
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
                     data.push_back(L'🏟');
+                }
+                else if (currentEntity->getType() == Entity::entityType::TOWER) {
+                    data.push_back(L'⛫');
                 }
             }
             else if (cells[i].isCellSlow()) {

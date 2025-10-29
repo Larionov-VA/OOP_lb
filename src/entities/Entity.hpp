@@ -11,7 +11,7 @@ struct GameContext;
 
 class Entity {
 public:
-    enum class entityType { UNDEFINED, PLAYER, ENEMY, BARRACKS };
+    enum class entityType { UNDEFINED, PLAYER, ENEMY, BARRACKS, TOWER };
     virtual ~Entity() = default;
     virtual entityType getType() const = 0;
     virtual void causeDamage(int damage) = 0;

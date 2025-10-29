@@ -3,6 +3,7 @@
 EnemyBarracks::EnemyBarracks(int barracksLevel, int spawnPeriod) {
     barracksHealth.setMaxHealth(GlobalGameConfig::barracksHealth * barracksLevel * GlobalGameConfig::difficulty);
     barracksHealth.restoreHealth();
+    this->barracksLevel = barracksLevel;
     this->spawnPeriod = spawnPeriod;
 }
 
@@ -38,4 +39,8 @@ void EnemyBarracks::causeDamage(int damage) {
 
 bool EnemyBarracks::alive() const {
     return barracksHealth.getCurrentHealth();
+}
+
+int EnemyBarracks::getLevel() {
+    return barracksLevel;
 }

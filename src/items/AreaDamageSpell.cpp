@@ -9,6 +9,10 @@ bool AreaDamageSpell::cast(GameContext& ctx, int userIndex) {
         return false;
     }
     std::vector<int> enemyIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    int barracksIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS)[0];
+    int towerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::TOWER)[0];
+    enemyIndexes.push_back(barracksIndex);
+    enemyIndexes.push_back(towerIndex);
     bool hit = false;
     for (int enemyIndex : enemyIndexes) {
         if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {

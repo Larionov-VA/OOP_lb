@@ -46,4 +46,5 @@ typedef struct {
     int enemyMaxHealth;
     int enemyHealth;
     int enemyAttack;
+    std::string name;
 }EnemyData;
