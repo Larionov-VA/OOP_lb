@@ -183,6 +183,7 @@ bool GameField::playerTurn(char command) {
     GameContext ctx{cells, entityManager};
     int newPlayerIndex;
     int enemyIndex;
+    int powerOfSpells;
     bool move = false;
     switch (command) {
     case 'w':
@@ -214,7 +215,8 @@ bool GameField::playerTurn(char command) {
         move = true;
         break;
     case 'e':
-        entityManager[playerIndex]->useItem(ctx, playerIndex);
+        powerOfSpells = entityManager[playerIndex]->getPowerOfSpell();
+        entityManager[playerIndex]->useItem(ctx, playerIndex, powerOfSpells);
         return true;
         break;
     case '0':
@@ -275,6 +277,11 @@ void GameField::playerLevelUp(char attribute) {
     switch (attribute) {
     case '1':
         entityManager[playerIndex]->setInt(prevInt + 10);
+        entityManager[playerIndex]->addSpells(0, prevInt);
+        entityManager[playerIndex]->addSpells(1, prevInt);
+        entityManager[playerIndex]->addSpells(2, 2);
+        entityManager[playerIndex]->addSpells(3, 1);
+        entityManager[playerIndex]->addSpells(4, prevInt);
         break;
     case '2':
         entityManager[playerIndex]->setStr(prevStr + 10);
@@ -403,9 +410,7 @@ GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
 }
 
 void GameField::enemyTurn() {
-    auto playerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER);
-    if (playerIndexes.empty()) return;
-    int playerIndex = playerIndexes[0];
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
 
     auto enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     if (enemyIndexes.empty()) return;
@@ -431,6 +436,12 @@ void GameField::enemyTurn() {
         }
 
         int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
+        bool isTrapped = cells[bestTurn].isTrapped();
+        
+        if (isTrapped) {
+            int trapDamage = cells[bestTurn].checkAndSwitchTrap();
+            e->causeDamage(trapDamage);
+        }
         if (bestTurn == index) continue;
         if (occupiedNewIndices.count(bestTurn)) continue;
 
@@ -478,7 +489,7 @@ void GameField::buildingsTurn() {
         towerIndex = towerIndexes[0];
         EnemyTower* tower = dynamic_cast<EnemyTower*>(entityManager[towerIndex]);
         if (cells[playerIndex].getDistance(cells[towerIndex]) <= tower->getSpellDistance()) {
-            tower->towerAttack(ctx, towerIndex);
+            tower->towerAttack(ctx, towerIndex, 0);
         }
     }
 }
@@ -633,6 +644,9 @@ std::vector<wchar_t> GameField::show() {
             }
             else if (cells[i].checkCellDead()) {
                 data.push_back(L'☠');
+            }
+            else if (cells[i].isTrapped()) {
+                data.push_back(L'᪠');
             }
             else {
                 data.push_back('-');

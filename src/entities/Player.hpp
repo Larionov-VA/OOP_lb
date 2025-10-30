@@ -47,6 +47,8 @@ public:
     int getInt() override;
     int getDex() override;
     int getStr() override;
+    int getPowerOfSpell() override;
+    void setPowerOfSpell(int newPower) override;
     void setInt(int newInt) override;
     void setDex(int newDex) override;
     void setStr(int newStr) override;
@@ -57,7 +59,8 @@ public:
     int getLevel() override;
     bool isLevelIncreased() override;
     void addExperience(int exp) override;
-    void useItem(GameContext &ctx, int userIndex) override;
+    void addSpells(int indexInHand, int count) override;
+    void useItem(GameContext &ctx, int userIndex, int power) override;
     void regenerateLife() override;
     void swapItemInHand(int itemIndexInHand) override;
     std::vector<std::pair<bool, int>> getHandItems();

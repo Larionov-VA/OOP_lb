@@ -16,5 +16,5 @@ public:
         this->countOfItem = count;
     }
     ~AreaDamageSpell() override = default;
-    bool cast(GameContext& ctx, int userIndex) override;
+    bool cast(GameContext& ctx, int userIndex, int power) override;
 };

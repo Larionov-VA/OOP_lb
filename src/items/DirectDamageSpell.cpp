@@ -4,7 +4,7 @@
 #include "../core/FieldCell.hpp"
 #include "../entities/Entity.hpp"
 
-bool DirectDamageSpell::cast(GameContext& ctx, int userIndex) {
+bool DirectDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
     if (!countOfItem) {
         return false;
     }
@@ -17,7 +17,7 @@ bool DirectDamageSpell::cast(GameContext& ctx, int userIndex) {
     }
     std::vector<int> towerIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
     int towerIndex = -1;
-    if (!barracksIndexes.empty()) {
+    if (!towerIndexes.empty()) {
         towerIndex = towerIndexes[0];
     }
     int playerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
@@ -26,14 +26,14 @@ bool DirectDamageSpell::cast(GameContext& ctx, int userIndex) {
         if (barracksIndex != -1) {
             allEnemy.push_back(barracksIndex);
         }
-        if (towerIndex) {
+        if (towerIndex != -1) {
             allEnemy.push_back(towerIndex);
         }
     } else {
         allEnemy.push_back(playerIndex);
     }
     for (int enemyIndex : allEnemy) {
-        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {
+        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 4) {
             Entity* user = ctx.entityManager[userIndex];
             int userInt = user->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));

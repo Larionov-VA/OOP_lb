@@ -5,9 +5,10 @@
 class SpellScroll : public Item {
 protected:
     int powerOfSpell;
-    virtual bool cast(GameContext& context, int userIndex) {
+    virtual bool cast(GameContext& context, int userIndex, int power) {
         (void)context;
         (void)userIndex;
+        (void)power;
         return false;
     };
 public:
@@ -17,8 +18,8 @@ public:
     void upgrade() {
         powerOfSpell++;
     }
-    void useItem(GameContext& context, int userIndex) override {
-        if (cast(context, userIndex)) {
+    void useItem(GameContext& context, int userIndex, int power) override {
+        if (cast(context, userIndex, power)) {
             this->decCountOfItem();
         }
     }

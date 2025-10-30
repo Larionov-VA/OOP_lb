@@ -4,23 +4,35 @@
 #include "../core/FieldCell.hpp"
 #include "../entities/Entity.hpp"
 
-bool AreaDamageSpell::cast(GameContext& ctx, int userIndex) {
+bool AreaDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
     if (!countOfItem) {
         return false;
     }
+    std::vector<int> allEnemy;
     std::vector<int> enemyIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    int barracksIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS)[0];
-    int towerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::TOWER)[0];
-    enemyIndexes.push_back(barracksIndex);
-    enemyIndexes.push_back(towerIndex);
-    bool hit = false;
-    for (int enemyIndex : enemyIndexes) {
-        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell) {
+    std::vector<int> barracksIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+    int barracksIndex = -1;
+    if (!barracksIndexes.empty()) {
+        barracksIndex = barracksIndexes[0];
+    }
+    std::vector<int> towerIndexes = ctx.entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+    int towerIndex = -1;
+    if (!towerIndexes.empty()) {
+        towerIndex = towerIndexes[0];
+    }
+    allEnemy = enemyIndexes;
+    if (barracksIndex != -1) {
+        allEnemy.push_back(barracksIndex);
+    }
+    if (towerIndex != -1) {
+        allEnemy.push_back(towerIndex);
+    }
+    for (int enemyIndex : allEnemy) {
+        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 3) {
             Entity* user = ctx.entityManager[userIndex];
             int userInt = user->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));
-            hit = true;
         }
     }
-    return hit;
+    return true;
 }

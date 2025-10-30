@@ -105,19 +105,9 @@ void Visualizer::display() {
     });
 
     auto playerInventory = Renderer([&] {
-        // std::shared_ptr<PlayerData> data = controller_->getPlayerData();
-        // float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
         return vbox({
             text("INVENTORY") | bold | center,
             separator(),
-            // hbox(
-            //     vbox(paragraph(healthPotionASCII), text("1/4") | center) | border,
-            //     vbox(paragraph(fireballScrollASCII), text("0/4") | center) | border
-            // ),
-            // hbox(
-            //     vbox(paragraph(firestormScrollASCII), text("0/4") | center) | border
-            //     // vbox(paragraph(healthPotionASCII), text("0/4") | center) | border
-            // )
         });
     });
 
@@ -146,13 +136,13 @@ void Visualizer::display() {
                     if (data->playerHandItem[i].first == false){
                         inHand = firestormScrollASCII;
                         inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "AOE Spell\t";
                         line += "| " + std::to_string(inHandCount);
                         rows.push_back(text(line) | center | dim);
                     }
                     else {
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "AOE Spell\t";
                         line += "| " + std::to_string(data->playerHandItem[i].second);
                         rows.push_back(text(line) | center);
@@ -162,13 +152,13 @@ void Visualizer::display() {
                     if (data->playerHandItem[i].first == false){
                         inHand = fireballScrollASCII;
                         inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Fireball Spell\t";
                         line += "| " + std::to_string(inHandCount);
                         rows.push_back(text(line) | center | dim);
                     }
                     else {
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Fireball Spell\t";
                         line += "| " + std::to_string(data->playerHandItem[i].second);
                         rows.push_back(text(line) | center);
@@ -178,13 +168,13 @@ void Visualizer::display() {
                     if (data->playerHandItem[i].first == false){
                         inHand = upgradeSpellASCII;
                         inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Upgrade Spell\t";
                         line += "| " + std::to_string(inHandCount);
                         rows.push_back(text(line) | center | dim);
                     }
                     else {
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Upgrade Spell\t";
                         line += "| " + std::to_string(data->playerHandItem[i].second);
                         rows.push_back(text(line) | center);
@@ -194,13 +184,13 @@ void Visualizer::display() {
                     if (data->playerHandItem[i].first == false){
                         inHand = summonSpellASCII;
                         inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Summon Spell\t";
                         line += "| " + std::to_string(inHandCount);
                         rows.push_back(text(line) | center | dim);
                     }
                     else {
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Summon Spell\t";
                         line += "| " + std::to_string(data->playerHandItem[i].second);
                         rows.push_back(text(line) | center);
@@ -210,13 +200,13 @@ void Visualizer::display() {
                     if (data->playerHandItem[i].first == false){
                         inHand = trapSpellASCII;
                         inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Trap Spell\t";
                         line += "| " + std::to_string(inHandCount);
                         rows.push_back(text(line) | center | dim);
                     }
                     else {
-                        line += std::to_string(i) + ": ";
+                        line += std::to_string(i+1) + ": ";
                         line += "Trap Spell\t";
                         line += "| " + std::to_string(data->playerHandItem[i].second);
                         rows.push_back(text(line) | center);
@@ -224,8 +214,6 @@ void Visualizer::display() {
                 }
 
             }
-            // return paragraph(healthPotionASCII) | center | border | flex;
-            // return paragraph(firestormScrollASCII) | center | border | flex;
             return vbox({
                 paragraph(inHand) | center | border | flex,
                 text("amount: " + std::to_string(inHandCount)),

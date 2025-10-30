@@ -3,27 +3,40 @@
 #include "../items/Item.hpp"
 #include "../items/DirectDamageSpell.hpp"
 #include "../items/AreaDamageSpell.hpp"
-#include "../items/UpdateSpell.hpp"
+#include "../items/UpgradeSpell.hpp"
 #include "../items/SummonSpell.hpp"
 #include "../items/TrapSpell.hpp"
 
 
-Hand::Hand() : Hand(10) {}
+Hand::Hand() : Hand(50) {}
 
 
 Hand::Hand(int sizeOfHand) {
     setAvailableSpells();
     itemInHand = nullptr;
     setRandomSpell();
+    this->powerUp = 0;
     this->maxSize = sizeOfHand;
     this->currentSize = 1;
 }
 
 
-bool Hand::useItem(GameContext &ctx, int userIndex) {
+void Hand::updateSize() {
+    int currentSize = 0;
+    for (auto& item : allItems) {
+        currentSize += item.second->getCountOfItem();
+    }
+    this->currentSize = currentSize;
+}
+
+
+bool Hand::useItem(GameContext &ctx, int userIndex, int power) {
     if (itemInHand->getCountOfItem()) {
-        itemInHand->useItem(ctx, userIndex);
-        --currentSize;
+        itemInHand->useItem(ctx, userIndex, power);
+        if (power != 0) {
+            powerUp = 0;
+        }
+        updateSize();
         return true;
     }
     return false;
@@ -93,8 +106,27 @@ int Hand::getMaxHandSize() {
 }
 
 
+int Hand::getPowerOfSpell() {
+    return powerUp;
+}
+
+
+void Hand::setPowerOfSpell(int newPower) {
+    powerUp = newPower;
+}
+
+
+void Hand::incPowerOfSpell() {
+    ++powerUp;
+}
+
+
 void Hand::addSpells(int indexInHand, int count) {
+    if (count + currentSize > maxSize) {
+        count = maxSize - currentSize;
+    }
     for (int i = 0; i < count; ++i) {
         allItems[indexInHand].second->incCountOfItem();
     }
+    updateSize();
 }

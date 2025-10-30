@@ -89,6 +89,16 @@ int Player::getStr() {
 }
 
 
+int Player::getPowerOfSpell() {
+    return playerHand.getPowerOfSpell();
+}
+
+
+void Player::setPowerOfSpell(int newPower) {
+    playerHand.setPowerOfSpell(newPower);
+}
+
+
 void Player::setInt(int newInt) {
     playerAttributes.setIntelligence(newInt);
 }
@@ -126,8 +136,13 @@ void Player::addExperience(int exp) {
     playerStats.addExperience(exp);
 }
 
-void Player::useItem(GameContext &ctx, int userIndex) {
-    playerHand.useItem(ctx, userIndex);
+void Player::addSpells(int indexInHand, int count) {
+    playerHand.addSpells(indexInHand, count);
+}
+
+
+void Player::useItem(GameContext &ctx, int userIndex, int power) {
+    playerHand.useItem(ctx, userIndex, power);
 }
 
 void Player::regenerateLife() {

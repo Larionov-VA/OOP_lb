@@ -32,10 +32,10 @@ bool EnemyTower::alive() const {
 }
 
 
-void EnemyTower::towerAttack(GameContext &ctx, int userIndex) {
+void EnemyTower::towerAttack(GameContext &ctx, int userIndex, int power) {
     if (attackCooldown == 0) {
         towerSpell.incCountOfItem();
-        towerSpell.cast(ctx, userIndex);
+        towerSpell.cast(ctx, userIndex, power);
         attackCooldown = attackPeriod;
     }
     else {

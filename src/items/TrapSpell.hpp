@@ -4,15 +4,12 @@
 #include "../core/FieldCell.hpp"
 
 
-class TrapSpell : public Item {
+class TrapSpell : public SpellScroll {
 private:
-    
+    int trapLevel;
+    int trapDamage;
 public:
-    bool cast(GameContext& ctx, int userIndex);
-    TrapSpell() {};
-    ~TrapSpell() {};
-    void useItem(GameContext& ctx, int userIndex) override {
-        (void)ctx;
-        (void)userIndex;
-    }
+    bool cast(GameContext& ctx, int userIndex, int power) override;
+    TrapSpell() : TrapSpell(1, 50){};
+    TrapSpell(int trapLevel, int trapDamage) : trapLevel(trapLevel), trapDamage(trapDamage) {};
 };

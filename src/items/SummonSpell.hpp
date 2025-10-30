@@ -4,16 +4,12 @@
 #include "../core/FieldCell.hpp"
 
 
-class SummonSpell : public Item {
+class SummonSpell : public SpellScroll {
 private:
     int summonLevel;
 public:
-    bool cast(GameContext& ctx, int userIndex);
+    bool cast(GameContext& ctx, int userIndex, int power) override;
     SummonSpell(int level) {summonLevel = level;};
     SummonSpell() : SummonSpell(1) {};
     ~SummonSpell() {};
-    void useItem(GameContext& ctx, int userIndex) override {
-        (void)ctx;
-        (void)userIndex;
-    }
 };

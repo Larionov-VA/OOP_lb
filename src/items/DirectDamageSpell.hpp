@@ -16,7 +16,7 @@ public:
         this->countOfItem = count;
     }
     ~DirectDamageSpell() override = default;
-    bool cast(GameContext& ctx, int userIndex) override;
+    bool cast(GameContext& ctx, int userIndex, int power) override;
     void setBaseDamage(int newDamage);
     void setBaseDistance(int newDistance);
     int getBaseDistance();

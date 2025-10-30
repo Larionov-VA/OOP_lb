@@ -22,6 +22,7 @@ set(SRCS
     src/entities/Enemy.cpp
     src/entities/EnemyBarracks.cpp
     src/entities/EnemyTower.cpp
+    src/entities/SummonedUnit.cpp
 
     src/actor_utility/ActorAttributes.cpp
     src/actor_utility/ActorAttack.cpp
@@ -34,6 +35,9 @@ set(SRCS
     src/items/DirectDamageSpell.cpp
     src/items/AreaDamageSpell.cpp
     src/items/HealPotion.cpp
+    src/items/UpgradeSpell.cpp
+    src/items/SummonSpell.cpp
+    src/items/TrapSpell.cpp
 )
 
 

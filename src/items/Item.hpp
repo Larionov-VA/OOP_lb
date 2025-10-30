@@ -11,6 +11,6 @@ public:
     int getCountOfItem() { return countOfItem; };
     void decCountOfItem() { --countOfItem; };
     void incCountOfItem() { ++countOfItem; };
-    virtual void useItem(GameContext& ctx, int userIndex) = 0;
+    virtual void useItem(GameContext& ctx, int userIndex, int power) = 0;
     virtual ~Item() = default;
 };
