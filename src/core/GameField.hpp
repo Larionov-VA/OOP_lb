@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 #include <functional>
+#include <queue>
 #include "EntityManager.hpp"
 #include "FieldCell.hpp"
 
@@ -44,6 +45,7 @@ private:
     int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
+    int getNextStepTowardsTarget(int fromIndex, int targetIndex);
 public:
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
     GameField(const GameField& other)

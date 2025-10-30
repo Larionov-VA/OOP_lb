@@ -256,8 +256,122 @@ bool GameField::playerTurn(char command) {
 }
 
 
-void GameField::summonsTurn() {
+int GameField::getNextStepTowardsTarget(int fromIndex, int targetIndex) {
+    if (fromIndex == targetIndex) return fromIndex;
 
+    int total = widthField * heightField;
+    std::queue<int> q;
+    std::unordered_map<int, bool> visited;
+    std::unordered_map<int, int> parent;
+
+    q.push(fromIndex);
+    visited[fromIndex] = true;
+    parent[fromIndex] = -1;
+
+    auto pushNeighbor = [&](int neigh) {
+        if (neigh < 0 || neigh >= total) return;
+        if (visited[neigh]) return;
+        if (!isMoveCorrect(fromIndex, neigh) && neigh != targetIndex) return;
+        if (neigh != targetIndex && entityManager[neigh]) return;
+        visited[neigh] = true;
+        parent[neigh] = q.front();
+        q.push(neigh);
+    };
+
+    while (!q.empty()) {
+        int cur = q.front();
+        q.pop();
+        if (cur == targetIndex) break;
+
+        int up = cur - widthField;
+        int down = cur + widthField;
+        int left = cur - 1;
+        int right = cur + 1;
+
+        pushNeighbor(up);
+        pushNeighbor(down);
+        pushNeighbor(left);
+        pushNeighbor(right);
+    }
+    if (!visited[targetIndex]) {
+        return fromIndex;
+    }
+    int cur = targetIndex;
+    int prev = parent[cur];
+    while (prev != -1 && prev != fromIndex) {
+        cur = prev;
+        prev = parent[cur];
+    }
+    return cur;
+}
+
+
+void GameField::summonsTurn() {
+    // std::vector<int> summonIndexes = entityManager.getIndexesWithEntity(Entity::entityType::SUMMONEDUNIT);
+    // if (summonIndexes.empty()) return;
+
+    // std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    // auto towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
+    // auto barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
+    // enemyIndexes.insert(enemyIndexes.end(), towerIndexes.begin(), towerIndexes.end());
+    // enemyIndexes.insert(enemyIndexes.end(), barrackIndexes.begin(), barrackIndexes.end());
+
+    // if (enemyIndexes.empty()) return;
+
+    // struct SummonAction {
+    //     int from;
+    //     int to;
+    //     bool attack;
+    // };
+
+    // std::vector<SummonAction> actions;
+    // for (int summonIndex : summonIndexes) {
+    //     Entity* summon = entityManager[summonIndex];
+    //     if (!summon || !summon->alive()) continue;
+
+    //     auto enemyWithDist = getDistanceToPlayer(enemyIndexes, summonIndex);
+    //     if (enemyWithDist.empty()) continue;
+
+    //     std::sort(enemyWithDist.begin(), enemyWithDist.end(),
+    //               [](const auto& a, const auto& b) { return a.second < b.second; });
+
+    //     int targetIndex = enemyWithDist.front().first;
+    //     float dist = enemyWithDist.front().second;
+
+    //     if (dist <= 1.0f) {
+    //         actions.push_back({summonIndex, targetIndex, true});
+    //         continue;
+    //     }
+
+    //     int nextStep = getNextStepTowardsTarget(summonIndex, targetIndex);
+    //     if (nextStep < 0 || nextStep >= widthField * heightField) continue;
+    //     if (!isMoveCorrect(summonIndex, nextStep)) continue;
+
+    //     actions.push_back({summonIndex, nextStep, false});
+    // }
+
+    // for (auto& act : actions) {
+    //     Entity* summon = entityManager[act.from];
+    //     if (!summon || !summon->alive()) continue;
+
+    //     if (act.attack) {
+    //         Entity* target = entityManager[act.to];
+    //         if (target && target->alive()) {
+    //             target->causeDamage(summon->getDamage());
+    //         }
+    //     } else {
+    //         if (!entityManager[act.to] && cells[act.to].isCellAvaible()) {
+    //             moveEntity(act.from, act.to);
+    //         } else {
+    //             Entity* occupant = entityManager[act.to];
+    //             if (occupant && (occupant->getType() == Entity::entityType::ENEMY ||
+    //                              occupant->getType() == Entity::entityType::TOWER ||
+    //                              occupant->getType() == Entity::entityType::BARRACKS)) {
+    //                 occupant->causeDamage(summon->getDamage());
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 
@@ -277,11 +391,11 @@ void GameField::playerLevelUp(char attribute) {
     switch (attribute) {
     case '1':
         entityManager[playerIndex]->setInt(prevInt + 10);
-        entityManager[playerIndex]->addSpells(0, prevInt);
-        entityManager[playerIndex]->addSpells(1, prevInt);
-        entityManager[playerIndex]->addSpells(2, 2);
         entityManager[playerIndex]->addSpells(3, 1);
-        entityManager[playerIndex]->addSpells(4, prevInt);
+        entityManager[playerIndex]->addSpells(2, 2);
+        entityManager[playerIndex]->addSpells(0, 10);
+        entityManager[playerIndex]->addSpells(1, 10);
+        entityManager[playerIndex]->addSpells(4, 10);
         break;
     case '2':
         entityManager[playerIndex]->setStr(prevStr + 10);
@@ -324,6 +438,14 @@ void GameField::update() {
             cells[index].setAvaible(true);
             cells[index].setCellDead();
             entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
+            entityManager.killEntity(index);
+        }
+    }
+    std::vector<int> summonIndexes = entityManager.getIndexesWithEntity(Entity::entityType::SUMMONEDUNIT);
+    for (int index : summonIndexes) {
+        if (!entityManager[index]->alive()) {
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
             entityManager.killEntity(index);
         }
     }
@@ -427,6 +549,28 @@ void GameField::enemyTurn() {
         Entity* e = entityManager[index];
         if (!e) continue;
         if (!e->alive()) continue;
+        // bool attacked = false;
+        // std::vector<int> potentialTargets = {
+        //     playerIndex,
+        //     index - widthField, index + widthField,
+        //     index - 1, index + 1
+        // };
+
+        // for (int targetIndex : potentialTargets) {
+        //     if (cells[targetIndex].getDistance(cells[index]) <= 1) {
+        //         Entity* target = entityManager[targetIndex];
+        //         if (!target) continue;
+
+        //         if (target->getType() == Entity::entityType::PLAYER ||
+        //             target->getType() == Entity::entityType::SUMMONEDUNIT) {
+        //             target->causeDamage(e->getDamage());
+        //             attacked = true;
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // if (attacked) continue;
         if (cells[playerIndex].getDistance(cells[index]) <= 1) {
             Entity* playerEnt = entityManager[playerIndex];
             if (playerEnt) {
@@ -628,6 +772,9 @@ std::vector<wchar_t> GameField::show() {
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
                     data.push_back(L'𐇐');
+                }
+                else if (currentEntity->getType() == Entity::entityType::SUMMONEDUNIT) {
+                    data.push_back(L'✦');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
                     data.push_back(L'𖨆');

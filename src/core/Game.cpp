@@ -53,8 +53,11 @@ bool Game::performAnAction(char playerAction) {
     if (nextTurnAction) {
         field->update();
         field->summonsTurn();
+        field->update();
         field->enemyTurn();
+        field->update();
         field->buildingsTurn();
+        field->update();
     }
     return true;
 }

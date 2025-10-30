@@ -2,7 +2,8 @@
 #include "ISpell.hpp"
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
-
+#include "../entities/SummonedUnit.hpp"
+#include <memory>
 
 class SummonSpell : public SpellScroll {
 private:

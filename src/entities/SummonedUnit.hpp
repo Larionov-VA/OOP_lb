@@ -12,10 +12,14 @@ public:
     entityType getType() const override {
         return entityType::SUMMONEDUNIT;
     }
-    SummonedUnit() : SummonedUnit(10, 100, 1){};
-    SummonedUnit(int attack, int maxHealth, int level) : unitAttack(attack), unitHealth(maxHealth), unitLevel(1) {};
+    SummonedUnit() : SummonedUnit(1, 10, 100){};
+    SummonedUnit(int level) : SummonedUnit(level, 10, 100){};
+    SummonedUnit(int level, int attack, int maxHealth) : unitAttack(attack), unitHealth(maxHealth), unitLevel(level) {};
     bool alive() const override;
     void causeDamage(int damage) override;
     int getDamage() override;
     std::pair<int, int> getHealth() override;
+    std::unique_ptr<Entity> clone() const override {
+        return std::make_unique<SummonedUnit>(*this);
+    }
 };
