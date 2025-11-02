@@ -14,7 +14,7 @@ set(SRCS
     src/core/GameField.cpp
     src/core/FieldCell.cpp
     src/core/EntityManager.cpp
-    src/core/Visualizer.cpp    
+    src/core/Visualizer.cpp
     src/core/Config.cpp
 
     src/entities/Entity.cpp
@@ -22,7 +22,6 @@ set(SRCS
     src/entities/Enemy.cpp
     src/entities/EnemyBarracks.cpp
     src/entities/EnemyTower.cpp
-    src/entities/SummonedUnit.cpp
 
     src/actor_utility/ActorAttributes.cpp
     src/actor_utility/ActorAttack.cpp
@@ -36,7 +35,6 @@ set(SRCS
     src/items/AreaDamageSpell.cpp
     src/items/HealPotion.cpp
     src/items/UpgradeSpell.cpp
-    src/items/SummonSpell.cpp
     src/items/TrapSpell.cpp
 )
 

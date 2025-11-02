@@ -1,5 +1,6 @@
 #include "Game.hpp"
 
+
 Game::Game() {
 }
 
@@ -52,8 +53,6 @@ bool Game::performAnAction(char playerAction) {
     }
     if (nextTurnAction) {
         field->update();
-        field->summonsTurn();
-        field->update();
         field->enemyTurn();
         field->update();
         field->buildingsTurn();
@@ -82,8 +81,3 @@ void Game::stopGame() {
     delete field;
     field = nullptr;
 }
-
-
-// void Game::startGameLoop() {
-
-// }

@@ -4,7 +4,6 @@
 #include "../items/DirectDamageSpell.hpp"
 #include "../items/AreaDamageSpell.hpp"
 #include "../items/UpgradeSpell.hpp"
-#include "../items/SummonSpell.hpp"
 #include "../items/TrapSpell.hpp"
 
 
@@ -76,12 +75,10 @@ void Hand::setAvailableSpells() {
     std::pair<bool, std::shared_ptr<Item>> areaSpell{true, std::make_shared<AreaDamageSpell>()};
     std::pair<bool, std::shared_ptr<Item>> directSpell{true, std::make_shared<DirectDamageSpell>()};
     std::pair<bool, std::shared_ptr<Item>> updateSpell{true, std::make_shared<UpdateSpell>()};
-    std::pair<bool, std::shared_ptr<Item>> summonSpell{true, std::make_shared<SummonSpell>()};
     std::pair<bool, std::shared_ptr<Item>> trapSpell{true, std::make_shared<TrapSpell>()};
     allItems.push_back(areaSpell);
     allItems.push_back(directSpell);
     allItems.push_back(updateSpell);
-    allItems.push_back(summonSpell);
     allItems.push_back(trapSpell);
 }
 

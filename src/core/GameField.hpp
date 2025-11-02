@@ -46,6 +46,7 @@ private:
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     int getNextStepTowardsTarget(int fromIndex, int targetIndex);
+    bool enemyOnIndex(int index) const;
 public:
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
     GameField(const GameField& other)
@@ -54,7 +55,7 @@ public:
           widthField(other.widthField),
           heightField(other.heightField),
           gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn) 
+          gameTurn(other.gameTurn)
           {}
     GameField& operator=(const GameField& other) {
         if (this == &other) return *this;
@@ -72,7 +73,7 @@ public:
           widthField(other.widthField),
           heightField(other.heightField),
           gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn) 
+          gameTurn(other.gameTurn)
           {}
     GameField& operator=(GameField&& other) noexcept {
         if (this == &other) return *this;

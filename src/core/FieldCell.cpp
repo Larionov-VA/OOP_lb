@@ -1,7 +1,8 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible, bool dead, bool trapped, int trapDamage) {
+FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow,
+    bool avaible, bool dead, bool trapped, int trapDamage) {
     this->index = index;
     this->X = X;
     this->Y = Y;
@@ -28,13 +29,6 @@ void FieldCell::setIndex(int index) {
 }
 
 
-// void FieldCell::swap(FieldCell &cell) {
-//     int temp = cell.getIndex();
-//     cell.setIndex(index);
-//     this->setIndex(temp);
-// }
-
-
 bool FieldCell::isCellSlow() const {
     return slow;
 }
@@ -47,9 +41,9 @@ void FieldCell::setSlow(bool slowState) {
 
 float FieldCell::getDistance(FieldCell oth) const {
     auto othCoord = oth.getCoord();
-    
-    float distance = pow((std::pow((std::abs(othCoord.first - X)), 2) + std::pow((std::abs(othCoord.second - Y)), 2)), 0.5);
-
+    int dX = std::abs(othCoord.first - X);
+    int dY = std::abs(othCoord.second - Y);
+    float distance = pow((std::pow(dX, 2) + std::pow(dY, 2)), 0.5);
     return distance;
 }
 

@@ -1,5 +1,5 @@
 #include "GameField.hpp"
-#include "GameContext.hpp" 
+#include "GameContext.hpp"
 
 GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
     if (width > MAX_FIELD_SIZE || height > MAX_FIELD_SIZE) {
@@ -25,10 +25,10 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, widthField * heightField - 1);
-    
+
     int randomPoint1, randomPoint2;
     const int minDistance = (widthField + heightField) / 3;
-    
+
     do {
         randomPoint1 = dist(gen);
         randomPoint2 = dist(gen);
@@ -36,7 +36,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
 
     FieldCell& cell1 = cells[randomPoint1];
     FieldCell& cell2 = cells[randomPoint2];
-    
+
     FieldCell& cell3 = [&]() -> FieldCell& {
         const int targetDist = (widthField + heightField) / 4;
         for (auto& cell : cells) {
@@ -47,7 +47,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
                 return cell;
             }
         }
-        int midId = ((cell1.getCoord().second + cell2.getCoord().second) / 2) * widthField + 
+        int midId = ((cell1.getCoord().second + cell2.getCoord().second) / 2) * widthField +
                     ((cell1.getCoord().first + cell2.getCoord().first) / 2);
         return cells[midId];
     }();
@@ -65,7 +65,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         auto [x2, y2] = to.getCoord();
         int dx = x2 - x1, dy = y2 - y1;
         int tolerance = abs(dx) + abs(dy) + widthField + heightField;
-        
+
         for (auto& cell : cells) {
             auto [x, y] = cell.getCoord();
             if (abs((x - x1) * dy - (y - y1) * dx) <= tolerance) {
@@ -127,14 +127,16 @@ void GameField::spawnEntity(std::unique_ptr<Entity> entity, int index) {
 
 
 void GameField::generateEnemy() {
-    int countEnemy = sqrt((widthField + heightField) / 2) + gameLevel;
+    int countEnemy = sqrt(((widthField + heightField) / 2) + gameLevel);
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, widthField * heightField - 1);
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     do {
         int randomIndex = dist(gen);
-        if (cells[randomIndex].isCellAvaible() && (cells[playerIndex].getDistance(cells[randomIndex]) > ((widthField + heightField) / 3))) {
+        bool randomCellAvailable = cells[randomIndex].isCellAvaible();
+        float distanceToPlayer = cells[playerIndex].getDistance(cells[randomIndex]);
+        if (randomCellAvailable && (distanceToPlayer > ((widthField + heightField) / 3))) {
             std::unique_ptr<Entity> enemy = std::make_unique<Enemy>(gameLevel);
             spawnEntity(std::move(enemy), randomIndex);
             --countEnemy;
@@ -143,34 +145,40 @@ void GameField::generateEnemy() {
 }
 
 
+bool GameField::enemyOnIndex(int index) const {
+    if (entityManager[index]) {
+        auto type = entityManager[index]->getType();
+        if (type == Entity::entityType::ENEMY ||
+            type == Entity::entityType::BARRACKS ||
+            type == Entity::entityType::TOWER) {
+                return true;
+        }
+    }
+    return false;
+}
+
+
 int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
     int totalCells = widthField * heightField;
     int rowOld = oldIndex / widthField;
     int rowNew = newIndex / widthField;
     bool isHorizontal = (rowOld == rowNew);
-
     if (isHorizontal) {
         int dir = (newIndex > oldIndex) ? 1 : -1;
         int current = oldIndex + dir;
-
         while (current >= 0 && current < totalCells && (current / widthField) == rowOld) {
-            if (entityManager[current] &&
-                (entityManager[current]->getType() == Entity::entityType::ENEMY ||
-                entityManager[current]->getType() == Entity::entityType::BARRACKS ||
-                entityManager[current]->getType() == Entity::entityType::TOWER))
+            if (enemyOnIndex(current)) {
                 return current;
+            }
             current += dir;
         }
     } else {
         int dir = (newIndex > oldIndex) ? widthField : -widthField;
         int current = oldIndex + dir;
-
         while (current >= 0 && current < totalCells) {
-            if (entityManager[current] &&
-                (entityManager[current]->getType() == Entity::entityType::ENEMY ||
-                 entityManager[current]->getType() == Entity::entityType::BARRACKS ||
-                entityManager[current]->getType() == Entity::entityType::TOWER))
+            if (enemyOnIndex(current)) {
                 return current;
+            }
             current += dir;
         }
     }
@@ -185,30 +193,31 @@ bool GameField::playerTurn(char command) {
     int enemyIndex;
     int powerOfSpells;
     bool move = false;
+    bool cellSlowed = entityManager[playerIndex]->checkDebaffState();
     switch (command) {
     case 'w':
-        if (entityManager[playerIndex]->checkDebaffState()) {
+        if (cellSlowed) {
             break;
         }
         newPlayerIndex = playerIndex - widthField;
         move = true;
         break;
     case 'a':
-        if (entityManager[playerIndex]->checkDebaffState()) {
+        if (cellSlowed) {
             break;
         }
         newPlayerIndex = playerIndex - 1;
         move = true;
         break;
     case 's':
-        if (entityManager[playerIndex]->checkDebaffState()) {
+        if (cellSlowed) {
             break;
         }
         newPlayerIndex = playerIndex + widthField;
         move = true;
         break;
     case 'd':
-        if (entityManager[playerIndex]->checkDebaffState()) {
+        if (cellSlowed) {
             break;
         }
         newPlayerIndex = playerIndex + 1;
@@ -223,7 +232,6 @@ bool GameField::playerTurn(char command) {
     case '1':
     case '2':
     case '3':
-    case '4':
         entityManager[playerIndex]->swapItemInHand(command-'0');
         break;
     case 'q':
@@ -253,125 +261,6 @@ bool GameField::playerTurn(char command) {
         }
     }
     return move;
-}
-
-
-int GameField::getNextStepTowardsTarget(int fromIndex, int targetIndex) {
-    if (fromIndex == targetIndex) return fromIndex;
-
-    int total = widthField * heightField;
-    std::queue<int> q;
-    std::unordered_map<int, bool> visited;
-    std::unordered_map<int, int> parent;
-
-    q.push(fromIndex);
-    visited[fromIndex] = true;
-    parent[fromIndex] = -1;
-
-    auto pushNeighbor = [&](int neigh) {
-        if (neigh < 0 || neigh >= total) return;
-        if (visited[neigh]) return;
-        if (!isMoveCorrect(fromIndex, neigh) && neigh != targetIndex) return;
-        if (neigh != targetIndex && entityManager[neigh]) return;
-        visited[neigh] = true;
-        parent[neigh] = q.front();
-        q.push(neigh);
-    };
-
-    while (!q.empty()) {
-        int cur = q.front();
-        q.pop();
-        if (cur == targetIndex) break;
-
-        int up = cur - widthField;
-        int down = cur + widthField;
-        int left = cur - 1;
-        int right = cur + 1;
-
-        pushNeighbor(up);
-        pushNeighbor(down);
-        pushNeighbor(left);
-        pushNeighbor(right);
-    }
-    if (!visited[targetIndex]) {
-        return fromIndex;
-    }
-    int cur = targetIndex;
-    int prev = parent[cur];
-    while (prev != -1 && prev != fromIndex) {
-        cur = prev;
-        prev = parent[cur];
-    }
-    return cur;
-}
-
-
-void GameField::summonsTurn() {
-    // std::vector<int> summonIndexes = entityManager.getIndexesWithEntity(Entity::entityType::SUMMONEDUNIT);
-    // if (summonIndexes.empty()) return;
-
-    // std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    // auto towerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::TOWER);
-    // auto barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
-    // enemyIndexes.insert(enemyIndexes.end(), towerIndexes.begin(), towerIndexes.end());
-    // enemyIndexes.insert(enemyIndexes.end(), barrackIndexes.begin(), barrackIndexes.end());
-
-    // if (enemyIndexes.empty()) return;
-
-    // struct SummonAction {
-    //     int from;
-    //     int to;
-    //     bool attack;
-    // };
-
-    // std::vector<SummonAction> actions;
-    // for (int summonIndex : summonIndexes) {
-    //     Entity* summon = entityManager[summonIndex];
-    //     if (!summon || !summon->alive()) continue;
-
-    //     auto enemyWithDist = getDistanceToPlayer(enemyIndexes, summonIndex);
-    //     if (enemyWithDist.empty()) continue;
-
-    //     std::sort(enemyWithDist.begin(), enemyWithDist.end(),
-    //               [](const auto& a, const auto& b) { return a.second < b.second; });
-
-    //     int targetIndex = enemyWithDist.front().first;
-    //     float dist = enemyWithDist.front().second;
-
-    //     if (dist <= 1.0f) {
-    //         actions.push_back({summonIndex, targetIndex, true});
-    //         continue;
-    //     }
-
-    //     int nextStep = getNextStepTowardsTarget(summonIndex, targetIndex);
-    //     if (nextStep < 0 || nextStep >= widthField * heightField) continue;
-    //     if (!isMoveCorrect(summonIndex, nextStep)) continue;
-
-    //     actions.push_back({summonIndex, nextStep, false});
-    // }
-
-    // for (auto& act : actions) {
-    //     Entity* summon = entityManager[act.from];
-    //     if (!summon || !summon->alive()) continue;
-
-    //     if (act.attack) {
-    //         Entity* target = entityManager[act.to];
-    //         if (target && target->alive()) {
-    //             target->causeDamage(summon->getDamage());
-    //         }
-    //     } else {
-    //         if (!entityManager[act.to] && cells[act.to].isCellAvaible()) {
-    //             moveEntity(act.from, act.to);
-    //         } else {
-    //             Entity* occupant = entityManager[act.to];
-    //             if (occupant && (occupant->getType() == Entity::entityType::ENEMY ||
-    //                              occupant->getType() == Entity::entityType::TOWER ||
-    //                              occupant->getType() == Entity::entityType::BARRACKS)) {
-    //                 occupant->causeDamage(summon->getDamage());
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 
@@ -484,7 +373,7 @@ int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
 
         std::unordered_map<int, int> visited{};
         int res = getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
-        
+
         return (res == -1) ? indexEnemy : res;
     }
 }
@@ -520,7 +409,7 @@ int GameField::getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std
 }
 
 
-std::vector<std::pair<int, float>> 
+std::vector<std::pair<int, float>>
 GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
     std::vector<std::pair<int, float>> distances;
     float distance;
@@ -581,7 +470,7 @@ void GameField::enemyTurn() {
 
         int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
         bool isTrapped = cells[bestTurn].isTrapped();
-        
+
         if (isTrapped) {
             int trapDamage = cells[bestTurn].checkAndSwitchTrap();
             e->causeDamage(trapDamage);
@@ -654,7 +543,7 @@ bool GameField::playerAlive() const {
 std::shared_ptr<PlayerData> GameField::getPlayerData() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     Player* player = dynamic_cast<Player*>(entityManager[playerIndex]);
-    
+
     std::vector<long long> playerExperience = player->getExperience();
     int playerLevel = player->getLevel();
     bool playerLevelIncreased = player->isLevelIncreased();
@@ -683,9 +572,9 @@ std::shared_ptr<PlayerData> GameField::getPlayerData() {
         playerExperience[2],
         playerLevel,
         playerLevelIncreased,
-        playerHealth.second, 
-        playerHealth.first, 
-        playerAttack, 
+        playerHealth.second,
+        playerHealth.first,
+        playerAttack,
         playerIntelligence,
         playerDexterity,
         playerStrength,
@@ -768,7 +657,7 @@ std::vector<wchar_t> GameField::show() {
     for (int i = 0; i < widthField * heightField; ++i) {
         Entity* currentEntity = entityManager[i];
         if (cells[i].isCellAvaible() || currentEntity) {
-            
+
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
                     data.push_back(L'𐇐');

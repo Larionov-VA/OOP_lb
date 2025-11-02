@@ -15,10 +15,18 @@ private:
     int Y;
 public:
     std::pair<int, int> getCoord() const;
-    FieldCell(int index, unsigned X, unsigned Y, bool slow, bool avaible = false, bool dead = false, bool trapped = false, int trapDamage = 0);
+    FieldCell(
+        int index,
+        unsigned X,
+        unsigned Y,
+        bool slow,
+        bool avaible = false,
+        bool dead = false,
+        bool trapped = false,
+        int trapDamage = 0
+    );
     int getIndex() const;
     void setIndex(int index);
-    // void swap(FieldCell& cell);
     float getDistance(FieldCell oth) const;
     void setTrap(int damage);
     int checkAndSwitchTrap();
@@ -30,4 +38,3 @@ public:
     void setCellDead();
     bool isTrapped();
 };
- 
