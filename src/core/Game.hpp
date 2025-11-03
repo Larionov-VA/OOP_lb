@@ -20,4 +20,6 @@ public:
     std::vector<EnemyData> getEnemyData() override;
     std::vector<wchar_t> getFieldData() override;
     void stopGame() override;
+private:
+    void deleteField();
 };

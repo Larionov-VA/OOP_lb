@@ -11,6 +11,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
     this->widthField = width;
     this->heightField = height;
     this->gameLevel = level;
+    this->gameTurn = 0;
     generateFieldCells(std::move(player));
     generateEnemy();
 }
@@ -187,6 +188,7 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
 
 
 bool GameField::playerTurn(char command) {
+    gameTurn++;
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     GameContext ctx{cells, entityManager};
     int newPlayerIndex;
@@ -456,7 +458,6 @@ void GameField::enemyTurn() {
 }
 
 
-
 void GameField::buildingsTurn() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     std::vector<int> barrackIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);
@@ -561,29 +562,27 @@ std::vector<EnemyData> GameField::getEnemyData() {
     std::vector<int> playerIndexes = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER);
     int playerIndex = playerIndexes[0];
     std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    if (enemyIndexes.empty()) {
-        return {};
-    }
-    std::vector<std::pair<int, float>> enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
-    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
-              [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-                  return a.second < b.second;
-              });
     std::vector<EnemyData> data;
-    data.reserve(enemyIndexesWithDistances.size());
+    if (!enemyIndexes.empty()) {
+        auto enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
+        std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
+                [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
+                    return a.second < b.second;
+                });
+        data.reserve(enemyIndexesWithDistances.size());
 
-    for (const auto& [index, dist] : enemyIndexesWithDistances) {
-        Entity* ent = entityManager[index];
-        if (!ent) continue;
-        Enemy* enemy = dynamic_cast<Enemy*>(ent);
-        if (!enemy) continue;
-        EnemyData enemyData{};
-        enemyData.enemyAttack = enemy->getDamage();
-        std::pair<int, int> enemyHealth = enemy->getHealth();
-        enemyData.enemyHealth = enemyHealth.first;
-        enemyData.enemyMaxHealth = enemyHealth.second;
-        enemyData.name = "Enemy";
-        data.push_back(enemyData);
+        for (const auto& [index, dist] : enemyIndexesWithDistances) {
+            Entity* ent = entityManager[index];
+            Enemy* enemy = dynamic_cast<Enemy*>(ent);
+            if (!enemy) continue;
+            EnemyData enemyData{};
+            enemyData.enemyAttack = enemy->getDamage();
+            std::pair<int, int> enemyHealth = enemy->getHealth();
+            enemyData.enemyHealth = enemyHealth.first;
+            enemyData.enemyMaxHealth = enemyHealth.second;
+            enemyData.name = "Enemy";
+            data.push_back(enemyData);
+        }
     }
     {
         std::vector<int> barracksIndexes = entityManager.getIndexesWithEntity(Entity::entityType::BARRACKS);

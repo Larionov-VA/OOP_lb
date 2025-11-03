@@ -93,6 +93,11 @@ std::vector<std::pair<bool, int>> Hand::getHandData() {
 }
 
 
+std::pair<int, int> Hand::getHandItemDamageAndDistance() {
+
+}
+
+
 int Hand::getCurrentHandSize() {
     return currentSize;
 }

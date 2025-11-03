@@ -1,16 +1,13 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
 #include <unordered_set>
 #include <iostream>
-#include <ctime>
-#include <iomanip>
 #include <memory>
 #include <random>
 #include <algorithm>
 #include <string>
-#include <functional>
 #include <queue>
+
 #include "EntityManager.hpp"
 #include "FieldCell.hpp"
 
@@ -42,6 +39,7 @@ private:
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
     int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
+    int getBestTurnForEnemyBFS(int startIndex, int goalIndex);
     int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);

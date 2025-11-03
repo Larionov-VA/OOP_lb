@@ -26,6 +26,7 @@ public:
     void setPowerOfSpell(int newPower);
     void incPowerOfSpell();
     void addSpells(int indexInHand, int count);
+    std::pair<int, int> getHandItemDamageAndDistance();
 private:
     void setRandomSpell();
     void setAvailableSpells();

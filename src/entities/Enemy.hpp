@@ -16,6 +16,8 @@ private:
     int enemyLevel;
     bool iterative;
 public:
+    Enemy();
+    Enemy(int enemyLevel);
     entityType getType() const override {
         return entityType::ENEMY;
     }
@@ -26,9 +28,6 @@ public:
     bool getIterative();
     void setIterative(bool it);
     bool alive() const override;
-    Enemy();
-    Enemy(int enemyLevel);
-    ~Enemy();
     std::unique_ptr<Entity> clone() const override {
         return std::make_unique<Enemy>(*this);
     }

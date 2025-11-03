@@ -24,7 +24,7 @@ void Game::startGame() {
 void Game::nextLevel() {
     std::unique_ptr<Entity> player = field->returnPlayer();
     GlobalGameConfig::gameLevel++;
-    this->stopGame();
+    deleteField();
     field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -76,6 +76,12 @@ std::vector<wchar_t> Game::getFieldData() {
 
 
 void Game::stopGame() {
+    GlobalGameConfig::gameLevel = 1;
+    deleteField();
+}
+
+
+void Game::deleteField() {
     delete field;
     field = nullptr;
 }

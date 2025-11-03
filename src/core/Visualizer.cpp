@@ -240,7 +240,8 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
         }();
 
         return vbox({
-            text("HAND " + std::to_string(data->playerCurrentHandSize) + "/" + std::to_string(data->playerMaxHandSize)) | bold | center,
+            text("HAND " + std::to_string(data->playerCurrentHandSize) + "/" +
+                           std::to_string(data->playerMaxHandSize)) | bold | center,
             separator(),
             hand
         });
@@ -253,7 +254,8 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
             for (size_t i = 0; i < data.size(); ++i) {
                 std::string line;
                 line += data[i].name + " | ";
-                line += std::to_string(data[i].enemyHealth) + "/"+ std::to_string(data[i].enemyMaxHealth) + " | ";
+                line += std::to_string(data[i].enemyHealth) + "/" +
+                        std::to_string(data[i].enemyMaxHealth) + " | ";
                 line += std::to_string(data[i].enemyAttack);
                 rows.push_back(text(line) | center);
             }

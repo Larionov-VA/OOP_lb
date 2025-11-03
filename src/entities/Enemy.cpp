@@ -11,10 +11,6 @@ Enemy::Enemy(int enemyLevel) {
     iterative = true;
 }
 
-Enemy::~Enemy() {
-
-}
-
 
 int Enemy::getDamage() {
     return enemyAttack.getAttack();
