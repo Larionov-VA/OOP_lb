@@ -46,8 +46,12 @@ private:
 
 public:
     Visualizer();
-    ~Visualizer();
     void setController(IGameController* controller);
     void display();
     void refreash();
+private:
+    void initComponentsIfNeeded(Visualizer* self);
+    ftxui::Component buildRootContainer();
+    ftxui::Component buildRenderer(ftxui::Component root);
+    ftxui::Component buildApp(ftxui::Component renderer);
 };

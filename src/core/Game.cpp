@@ -40,10 +40,8 @@ void Game::playerLevelUp(char attribute) {
 
 
 bool Game::performAnAction(char playerAction) {
-    if (!field) {
-        return false;
-    }
     if (!field->playerAlive()) {
+        GlobalGameConfig::gameLevel = 1;
         return false;
     }
     bool nextTurnAction = true;

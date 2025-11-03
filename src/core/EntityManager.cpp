@@ -1,13 +1,31 @@
 #include "EntityManager.hpp"
 
 
-EntityManager::EntityManager() {
-
+EntityManager::EntityManager(const EntityManager& other) {
+    for (const auto& [index, entity] : other.infoMap) {
+        if (entity)
+            infoMap[index] = entity->clone();
+    }
 }
 
 
-EntityManager::~EntityManager() {
+EntityManager::EntityManager(EntityManager&& other) noexcept : infoMap(std::move(other.infoMap)) {}
 
+
+EntityManager& EntityManager::operator=(const EntityManager& other) {
+    if (this == &other) return *this;
+    infoMap.clear();
+    for (const auto& [index, entity] : other.infoMap) {
+        if (entity)
+            infoMap[index] = entity->clone();
+    }
+    return *this;
+}
+
+EntityManager& EntityManager::operator=(EntityManager&& other) noexcept {
+    if (this == &other) return *this;
+    infoMap = std::move(other.infoMap);
+    return *this;
 }
 
 

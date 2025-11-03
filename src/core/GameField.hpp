@@ -45,7 +45,6 @@ private:
     int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
-    int getNextStepTowardsTarget(int fromIndex, int targetIndex);
     bool enemyOnIndex(int index) const;
 public:
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
@@ -90,7 +89,6 @@ public:
     std::shared_ptr<PlayerData> getPlayerData();
     std::vector<EnemyData> getEnemyData();
     bool playerTurn(char command);
-    void summonsTurn();
     void enemyTurn();
     void buildingsTurn();
     int getCountOfEnemy();
