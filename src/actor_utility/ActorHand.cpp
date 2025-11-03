@@ -64,7 +64,7 @@ void Hand::swapItem(int indexInHand) {
 void Hand::setRandomSpell() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, 4);
+    std::uniform_int_distribution<> distrib(0, 3);
     int randomNumber = distrib(gen);
     allItems[randomNumber].second->incCountOfItem();
     swapItem(randomNumber);

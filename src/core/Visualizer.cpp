@@ -135,70 +135,70 @@ void Visualizer::display() {
             std::vector<Element> rows;
             for (int i = 0; i < 4; ++i) {
                 std::string line;
-                // if (i == 0) {
-                //     if (data->playerHandItem[i].first == false){
-                //         inHand = firestormScrollASCII;
-                //         inHandCount = data->playerHandItem[i].second;
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "AOE Spell\t";
-                //         line += "| " + std::to_string(inHandCount);
-                //         rows.push_back(text(line) | center | dim);
-                //     }
-                //     else {
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "AOE Spell\t";
-                //         line += "| " + std::to_string(data->playerHandItem[i].second);
-                //         rows.push_back(text(line) | center);
-                //     }
-                // }
-                // else if (i == 1) {
-                //     if (data->playerHandItem[i].first == false){
-                //         inHand = fireballScrollASCII;
-                //         inHandCount = data->playerHandItem[i].second;
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Fireball Spell\t";
-                //         line += "| " + std::to_string(inHandCount);
-                //         rows.push_back(text(line) | center | dim);
-                //     }
-                //     else {
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Fireball Spell\t";
-                //         line += "| " + std::to_string(data->playerHandItem[i].second);
-                //         rows.push_back(text(line) | center);
-                //     }
-                // }
-                // else if (i == 2) {
-                //     if (data->playerHandItem[i].first == false){
-                //         inHand = upgradeSpellASCII;
-                //         inHandCount = data->playerHandItem[i].second;
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Upgrade Spell\t";
-                //         line += "| " + std::to_string(inHandCount);
-                //         rows.push_back(text(line) | center | dim);
-                //     }
-                //     else {
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Upgrade Spell\t";
-                //         line += "| " + std::to_string(data->playerHandItem[i].second);
-                //         rows.push_back(text(line) | center);
-                //     }
-                // }
-                // else if (i == 3) {
-                //     if (data->playerHandItem[i].first == false){
-                //         inHand = trapSpellASCII;
-                //         inHandCount = data->playerHandItem[i].second;
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Trap Spell\t";
-                //         line += "| " + std::to_string(inHandCount);
-                //         rows.push_back(text(line) | center | dim);
-                //     }
-                //     else {
-                //         line += std::to_string(i+1) + ": ";
-                //         line += "Trap Spell\t";
-                //         line += "| " + std::to_string(data->playerHandItem[i].second);
-                //         rows.push_back(text(line) | center);
-                //     }
-                // }
+                if (i == 0) {
+                    if (data->playerHandItem[i].first == false){
+                        inHand = firestormScrollASCII;
+                        inHandCount = data->playerHandItem[i].second;
+                        line += std::to_string(i+1) + ": ";
+                        line += "AOE Spell\t";
+                        line += "| " + std::to_string(inHandCount);
+                        rows.push_back(text(line) | center | dim);
+                    }
+                    else {
+                        line += std::to_string(i+1) + ": ";
+                        line += "AOE Spell\t";
+                        line += "| " + std::to_string(data->playerHandItem[i].second);
+                        rows.push_back(text(line) | center);
+                    }
+                }
+                else if (i == 1) {
+                    if (data->playerHandItem[i].first == false){
+                        inHand = fireballScrollASCII;
+                        inHandCount = data->playerHandItem[i].second;
+                        line += std::to_string(i+1) + ": ";
+                        line += "Fireball Spell\t";
+                        line += "| " + std::to_string(inHandCount);
+                        rows.push_back(text(line) | center | dim);
+                    }
+                    else {
+                        line += std::to_string(i+1) + ": ";
+                        line += "Fireball Spell\t";
+                        line += "| " + std::to_string(data->playerHandItem[i].second);
+                        rows.push_back(text(line) | center);
+                    }
+                }
+                else if (i == 2) {
+                    if (data->playerHandItem[i].first == false){
+                        inHand = upgradeSpellASCII;
+                        inHandCount = data->playerHandItem[i].second;
+                        line += std::to_string(i+1) + ": ";
+                        line += "Upgrade Spell\t";
+                        line += "| " + std::to_string(inHandCount);
+                        rows.push_back(text(line) | center | dim);
+                    }
+                    else {
+                        line += std::to_string(i+1) + ": ";
+                        line += "Upgrade Spell\t";
+                        line += "| " + std::to_string(data->playerHandItem[i].second);
+                        rows.push_back(text(line) | center);
+                    }
+                }
+                else if (i == 3) {
+                    if (data->playerHandItem[i].first == false){
+                        inHand = trapSpellASCII;
+                        inHandCount = data->playerHandItem[i].second;
+                        line += std::to_string(i+1) + ": ";
+                        line += "Trap Spell\t";
+                        line += "| " + std::to_string(inHandCount);
+                        rows.push_back(text(line) | center | dim);
+                    }
+                    else {
+                        line += std::to_string(i+1) + ": ";
+                        line += "Trap Spell\t";
+                        line += "| " + std::to_string(data->playerHandItem[i].second);
+                        rows.push_back(text(line) | center);
+                    }
+                }
             }
             return vbox({
                 paragraph(inHand) | center | border | flex,
@@ -512,7 +512,6 @@ void Visualizer::display() {
         }
         return false;
     });
-
     screen_->Loop(app);
 }
 

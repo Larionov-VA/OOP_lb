@@ -280,11 +280,10 @@ void GameField::playerLevelUp(char attribute) {
     switch (attribute) {
     case '1':
         entityManager[playerIndex]->setInt(prevInt + 10);
-        entityManager[playerIndex]->addSpells(3, 1);
-        entityManager[playerIndex]->addSpells(2, 2);
         entityManager[playerIndex]->addSpells(0, 10);
         entityManager[playerIndex]->addSpells(1, 10);
-        entityManager[playerIndex]->addSpells(4, 10);
+        entityManager[playerIndex]->addSpells(2, 2);
+        entityManager[playerIndex]->addSpells(3, 1);
         break;
     case '2':
         entityManager[playerIndex]->setStr(prevStr + 10);
@@ -330,14 +329,6 @@ void GameField::update() {
             entityManager.killEntity(index);
         }
     }
-    std::vector<int> summonIndexes = entityManager.getIndexesWithEntity(Entity::entityType::SUMMONEDUNIT);
-    for (int index : summonIndexes) {
-        if (!entityManager[index]->alive()) {
-            cells[index].setAvaible(true);
-            cells[index].setCellDead();
-            entityManager.killEntity(index);
-        }
-    }
 }
 
 
@@ -370,7 +361,6 @@ int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
         }
         return bestTurn.first;
     } else {
-
         std::unordered_map<int, int> visited{};
         int res = getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
 
@@ -438,28 +428,6 @@ void GameField::enemyTurn() {
         Entity* e = entityManager[index];
         if (!e) continue;
         if (!e->alive()) continue;
-        // bool attacked = false;
-        // std::vector<int> potentialTargets = {
-        //     playerIndex,
-        //     index - widthField, index + widthField,
-        //     index - 1, index + 1
-        // };
-
-        // for (int targetIndex : potentialTargets) {
-        //     if (cells[targetIndex].getDistance(cells[index]) <= 1) {
-        //         Entity* target = entityManager[targetIndex];
-        //         if (!target) continue;
-
-        //         if (target->getType() == Entity::entityType::PLAYER ||
-        //             target->getType() == Entity::entityType::SUMMONEDUNIT) {
-        //             target->causeDamage(e->getDamage());
-        //             attacked = true;
-        //             break;
-        //         }
-        //     }
-        // }
-
-        // if (attacked) continue;
         if (cells[playerIndex].getDistance(cells[index]) <= 1) {
             Entity* playerEnt = entityManager[playerIndex];
             if (playerEnt) {
@@ -661,9 +629,6 @@ std::vector<wchar_t> GameField::show() {
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
                     data.push_back(L'𐇐');
-                }
-                else if (currentEntity->getType() == Entity::entityType::SUMMONEDUNIT) {
-                    data.push_back(L'✦');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
                     data.push_back(L'𖨆');
