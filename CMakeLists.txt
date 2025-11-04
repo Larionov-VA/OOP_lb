@@ -16,6 +16,8 @@ set(SRCS
     src/core/EntityManager.cpp
     src/core/Visualizer.cpp
     src/core/Config.cpp
+    src/core/FileHandler.cpp
+    src/core/SaveManager.cpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp

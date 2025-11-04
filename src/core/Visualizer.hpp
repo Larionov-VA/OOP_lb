@@ -43,7 +43,6 @@ private:
         std::string difficulty = "MEDIUM";
         std::vector<std::string> difficulties = {"EASY", "MEDIUM", "HARD"};
     } gameOptions;
-
 public:
     Visualizer();
     void setController(IGameController* controller);

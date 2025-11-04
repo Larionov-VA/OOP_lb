@@ -1,11 +1,14 @@
 #include <fstream>
-
+#include <string>
 
 class FileHandler {
 private:
     std::fstream file_;
 public:
-    explicit FileHandler(const std::string& filename, std::ios::openmode mode);
-    std::fstream& stream();
+    FileHandler(const std::string& filename, std::ios::openmode mode);
     ~FileHandler();
+    void write(const std::string& string);
+    std::string read();
+private:
+    std::fstream& stream();
 };

@@ -103,7 +103,10 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
     });
 
     exitAndSaveButtonComp = Button("Save & Exit", [self] {
-        if (self->controller_) self->controller_->stopGame();
+        if (self->controller_) {
+            self->controller_->saveGame();
+            self->controller_->stopGame();
+        }
         self->currentState = ScreenState::MainMenu;
         self->refreash();
     });
@@ -408,7 +411,7 @@ ftxui::Component Visualizer::buildApp(ftxui::Component renderer) {
                 switch (mainSelected) {
                     case 0: // NEW GAME
                         if (controller_) {
-                            controller_->startGame();
+                            controller_->startNewGame();
                         }
                         currentState = ScreenState::InGame;
                         refreash();
@@ -416,7 +419,7 @@ ftxui::Component Visualizer::buildApp(ftxui::Component renderer) {
 
                     case 1: // CONTINUE GAME
                         if (controller_) {
-                            controller_->startGame();
+                            controller_->startNewGame();
                         }
                         return true;
 

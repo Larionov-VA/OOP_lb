@@ -1,23 +1,28 @@
 #include "Game.hpp"
 
 
-Game::Game() {
-}
-
-
 Game::~Game() {
-    delete field;
+    if (field) {
+        delete field;
+    }
 }
 
 
-void Game::startGame() {
+void Game::ContinueGame(int gameID) {
+    this->gameID = gameID;
+
+}
+
+
+void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
-    field = new GameField(
+    this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
         GlobalGameConfig::fieldHeight,
         GlobalGameConfig::gameLevel
     );
+    this->gameID = (int)std::time(nullptr);
 }
 
 
@@ -25,7 +30,7 @@ void Game::nextLevel() {
     std::unique_ptr<Entity> player = field->returnPlayer();
     GlobalGameConfig::gameLevel++;
     deleteField();
-    field = new GameField(
+    this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
         GlobalGameConfig::fieldHeight,
@@ -35,12 +40,12 @@ void Game::nextLevel() {
 
 
 void Game::playerLevelUp(char attribute) {
-    field->playerLevelUp(attribute);
+    this->field->playerLevelUp(attribute);
 }
 
 
 bool Game::performAnAction(char playerAction) {
-    if (!field->playerAlive()) {
+    if (!this->field->playerAlive()) {
         GlobalGameConfig::gameLevel = 1;
         return false;
     }
@@ -50,28 +55,28 @@ bool Game::performAnAction(char playerAction) {
         this->nextLevel();
     }
     if (nextTurnAction) {
-        field->update();
-        field->enemyTurn();
-        field->update();
-        field->buildingsTurn();
-        field->update();
+        this->field->update();
+        this->field->enemyTurn();
+        this->field->update();
+        this->field->buildingsTurn();
+        this->field->update();
     }
     return true;
 }
 
 
 std::shared_ptr<PlayerData> Game::getPlayerData() {
-    return field->getPlayerData();
+    return this->field->getPlayerData();
 };
 
 
 std::vector<EnemyData> Game::getEnemyData() {
-    return field->getEnemyData();
+    return this->field->getEnemyData();
 };
 
 
 std::vector<wchar_t> Game::getFieldData() {
-    return field->show();
+    return this->field->show();
 }
 
 
@@ -82,6 +87,17 @@ void Game::stopGame() {
 
 
 void Game::deleteField() {
-    delete field;
-    field = nullptr;
+    delete this->field;
+    this->field = nullptr;
+}
+
+
+void Game::saveGame() {
+    SaveManager saver;
+    saver.newSave(gameID);
+}
+
+
+void Game::loadGame() {
+
 }

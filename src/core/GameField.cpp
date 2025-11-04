@@ -1,6 +1,23 @@
 #include "GameField.hpp"
 #include "GameContext.hpp"
 
+
+GameField::GameField(
+        std::vector<FieldCell> cells,
+        EntityManager entityManager,
+        int widthField,
+        int heightField,
+        int gameLevel,
+        int gameTurn) {
+    this->cells = cells;
+    this->entityManager = entityManager;
+    this->widthField = widthField;
+    this->heightField = heightField;
+    this->gameLevel = gameLevel;
+    this->gameTurn = gameTurn;
+}
+
+
 GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
     if (width > MAX_FIELD_SIZE || height > MAX_FIELD_SIZE) {
         throw std::range_error("Max size of field is 25");

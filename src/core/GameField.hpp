@@ -38,13 +38,19 @@ private:
     bool isMoveCorrect(int oldIndex, int newIndex) const;
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
-    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
-    int getBestTurnForEnemyBFS(int startIndex, int goalIndex);
-    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
+    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
+    GameField(
+        std::vector<FieldCell> cells,
+        EntityManager entityManager,
+        int widthField,
+        int heightField,
+        int gameLevel,
+        int gameTurn
+    );
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
     GameField(const GameField& other)
         : cells(other.cells),
