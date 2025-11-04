@@ -63,7 +63,8 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
 
     tempWidth = self->gameOptions.fieldWidth;
     tempHeight = self->gameOptions.fieldHeight;
-    diffSelected = findDifficultyIndex(self->gameOptions.difficulties, self->gameOptions.difficulty);
+    diffSelected = findDifficultyIndex(
+        self->gameOptions.difficulties, self->gameOptions.difficulty);
 
     mainMenuComp = Menu(&mainEntries, &mainSelected) | size(WIDTH, EQUAL, 35);
 
@@ -78,7 +79,8 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
         optionsChanged = true;
         GlobalGameConfig::fieldWidth = self->gameOptions.fieldWidth;
         GlobalGameConfig::fieldHeight = self->gameOptions.fieldHeight;
-        GlobalGameConfig::difficulty = (GlobalGameConfig::difficulties)findDifficultyIndex(self->gameOptions.difficulties, self->gameOptions.difficulty);
+        GlobalGameConfig::difficulty = findDifficultyIndex(
+            self->gameOptions.difficulties, self->gameOptions.difficulty);
         self->currentState = ScreenState::MainMenu;
         self->refreash();
     });
@@ -86,7 +88,8 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
     cancelButtonComp = Button("Cancel", [self] {
         tempWidth = self->gameOptions.fieldWidth;
         tempHeight = self->gameOptions.fieldHeight;
-        diffSelected = findDifficultyIndex(self->gameOptions.difficulties, self->gameOptions.difficulty);
+        diffSelected = findDifficultyIndex(
+            self->gameOptions.difficulties, self->gameOptions.difficulty);
         self->currentState = ScreenState::MainMenu;
         self->refreash();
     });
@@ -117,14 +120,18 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
             self->currentState = ScreenState::LevelUp;
         }
         float lifeIndicator = (float)data->playerHealth/data->playerMaxHealth;
-        float expIndicator = (float)(data->playerCurrentExperience - data->playerPrevLevelUpExperience)/(data->playerLevelUpExperience - data->playerPrevLevelUpExperience);
+        float currentExp = data->playerCurrentExperience - data->playerPrevLevelUpExperience;
+        float expToLvlUp = data->playerLevelUpExperience - data->playerPrevLevelUpExperience;
+        float expIndicator = currentExp/expToLvlUp;
         return vbox({
             text("PLAYER INFO") | bold | center | color(Color::Green),
             separator(),
             gauge(lifeIndicator) | color(Color::Red) | border | flex,
-            text("Health: " + std::to_string(data->playerHealth) + "/" + std::to_string(data->playerMaxHealth)),
+            text("Health: " + std::to_string(data->playerHealth) +
+                         "/" + std::to_string(data->playerMaxHealth)),
             gauge(expIndicator) | color(Color::Blue) | border | flex,
-            text("Experience: " + std::to_string(data->playerCurrentExperience) + "/" + std::to_string(data->playerLevelUpExperience)),
+            text("Experience: " + std::to_string(data->playerCurrentExperience)
+                        + "/" + std::to_string(data->playerLevelUpExperience)),
             text("Level " + std::to_string(data->playerLevel)),
             text("Attack: " + std::to_string(data->playerAttack)),
             text("Weapon: " + data->playerWeapon),
@@ -160,80 +167,42 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
             )
         });
     });
-
     playerHandComp = Renderer([self] {
         std::shared_ptr<PlayerData> data = self->controller_->getPlayerData();
+
+        struct SpellInfo {
+            const std::string& asciiArt;
+            const std::string name;
+        };
+
+        const std::array<SpellInfo, 4> spells = {{
+            {firestormScrollASCII, "AOE Spell"},
+            {fireballScrollASCII, "Fireball Spell"},
+            {upgradeSpellASCII, "Upgrade Spell"},
+            {trapSpellASCII, "Trap Spell"}
+        }};
+
         auto hand = [&] {
             std::string inHand;
             int inHandCount = 0;
             std::vector<Element> rows;
+
             for (int i = 0; i < 4; ++i) {
-                std::string line;
-                if (i == 0) {
-                    if (data->playerHandItem[i].first == false){
-                        inHand = firestormScrollASCII;
-                        inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i+1) + ": ";
-                        line += "AOE Spell\t";
-                        line += "| " + std::to_string(inHandCount);
-                        rows.push_back(text(line) | center | dim);
-                    }
-                    else {
-                        line += std::to_string(i+1) + ": ";
-                        line += "AOE Spell\t";
-                        line += "| " + std::to_string(data->playerHandItem[i].second);
-                        rows.push_back(text(line) | center);
-                    }
-                }
-                else if (i == 1) {
-                    if (data->playerHandItem[i].first == false){
-                        inHand = fireballScrollASCII;
-                        inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i+1) + ": ";
-                        line += "Fireball Spell\t";
-                        line += "| " + std::to_string(inHandCount);
-                        rows.push_back(text(line) | center | dim);
-                    }
-                    else {
-                        line += std::to_string(i+1) + ": ";
-                        line += "Fireball Spell\t";
-                        line += "| " + std::to_string(data->playerHandItem[i].second);
-                        rows.push_back(text(line) | center);
-                    }
-                }
-                else if (i == 2) {
-                    if (data->playerHandItem[i].first == false){
-                        inHand = upgradeSpellASCII;
-                        inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i+1) + ": ";
-                        line += "Upgrade Spell\t";
-                        line += "| " + std::to_string(inHandCount);
-                        rows.push_back(text(line) | center | dim);
-                    }
-                    else {
-                        line += std::to_string(i+1) + ": ";
-                        line += "Upgrade Spell\t";
-                        line += "| " + std::to_string(data->playerHandItem[i].second);
-                        rows.push_back(text(line) | center);
-                    }
-                }
-                else if (i == 3) {
-                    if (data->playerHandItem[i].first == false){
-                        inHand = trapSpellASCII;
-                        inHandCount = data->playerHandItem[i].second;
-                        line += std::to_string(i+1) + ": ";
-                        line += "Trap Spell\t";
-                        line += "| " + std::to_string(inHandCount);
-                        rows.push_back(text(line) | center | dim);
-                    }
-                    else {
-                        line += std::to_string(i+1) + ": ";
-                        line += "Trap Spell\t";
-                        line += "| " + std::to_string(data->playerHandItem[i].second);
-                        rows.push_back(text(line) | center);
-                    }
+                const auto& item = data->playerHandItem[i];
+                bool isSelected = item.first;
+                int count = item.second;
+
+                std::string line = std::to_string(i+1) + ": " + spells[i].name + "\t| " + std::to_string(count);
+
+                if (!isSelected) {
+                    inHand = spells[i].asciiArt;
+                    inHandCount = count;
+                    rows.push_back(text(line) | center | dim);
+                } else {
+                    rows.push_back(text(line) | center);
                 }
             }
+
             return vbox({
                 paragraph(inHand) | center | border | flex,
                 text("amount: " + std::to_string(inHandCount)),
@@ -244,7 +213,7 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
 
         return vbox({
             text("HAND " + std::to_string(data->playerCurrentHandSize) + "/" +
-                           std::to_string(data->playerMaxHandSize)) | bold | center,
+                        std::to_string(data->playerMaxHandSize)) | bold | center,
             separator(),
             hand
         });
@@ -549,6 +518,12 @@ ftxui::Component Visualizer::buildApp(ftxui::Component renderer) {
             if (event == Event::Character('3')) {
                 controller_->playerLevelUp('3');
                 currentState = ScreenState::InGame;
+                return true;
+            }
+        }
+        else if (currentState == ScreenState::OptionsMenu) {
+            if (event == Event::Escape) {
+                currentState = ScreenState::MainMenu;
                 return true;
             }
         }
