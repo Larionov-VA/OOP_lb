@@ -9,6 +9,7 @@ add_subdirectory(external/ftxui)
 
 
 set(SRCS
+    src/core/CellState.cpp
     src/core/main.cpp
     src/core/Game.cpp
     src/core/GameField.cpp

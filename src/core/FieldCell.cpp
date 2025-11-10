@@ -6,11 +6,11 @@ FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow,
     this->index = index;
     this->X = X;
     this->Y = Y;
-    this->slow = slow;
-    this->avaible = avaible;
-    this->dead = dead;
-    this->trapped = trapped;
-    this->trapDamage = trapDamage;
+    this->state.setSlow(slow);
+    this->state.setAvaible(avaible);
+    this->state.setEnemyCorpse(dead);
+    this->state.setTrapped(trapped);
+    this->state.setTrapDamage(trapDamage);
 }
 
 
@@ -30,12 +30,12 @@ void FieldCell::setIndex(int index) {
 
 
 bool FieldCell::isCellSlow() const {
-    return slow;
+    return state.getSlow();
 }
 
 
 void FieldCell::setSlow(bool slowState) {
-    this->slow = slowState;
+    this->state.setSlow(slowState);
 }
 
 
@@ -49,41 +49,44 @@ float FieldCell::getDistance(FieldCell oth) const {
 
 
 void FieldCell::setTrap(int damage) {
-    this->trapped = true;
-    this->trapDamage = damage;
+    this->state.setTrapped(true);
+    this->state.setTrapDamage(damage);
 }
 
 
 int FieldCell::checkAndSwitchTrap() {
-    if (trapped) {
-        this->trapped = false;
-        return trapDamage;
+    if (this->state.getTrapped()) {
+        this->state.setTrapped(false);
+        return this->state.getTrapDamage();
     }
     return 0;
 }
 
 
+bool FieldCell::isTrapped() {
+    return this->state.getTrapped();
+}
+
+
 bool FieldCell::isCellAvaible() const {
-    return avaible;
+    return this->state.getAvaible();
 }
 
 
 void FieldCell::setAvaible(bool avaible) {
-    this->avaible = avaible;
+    this->state.setAvaible(avaible);
 }
 
+
 bool FieldCell::checkCellDead() {
-    if (dead) {
-        dead = false;
+    if (this->state.getEnemyCorpse()) {
+        this->state.setEnemyCorpse(false);
         return true;
     }
     return false;
 }
 
-void FieldCell::setCellDead() {
-    dead = true;
-}
 
-bool FieldCell::isTrapped() {
-    return trapped;
+void FieldCell::setCellDead() {
+    this->state.setEnemyCorpse(true);
 }

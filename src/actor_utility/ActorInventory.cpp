@@ -4,7 +4,7 @@
 
 
 void Inventory::addItem(std::shared_ptr<Item> item) {
-    
+    (void)item;
 }
 
 
@@ -19,7 +19,7 @@ Inventory::Inventory() : Inventory(10) {}
 
 Inventory::Inventory(int inventorySize) {
     for (int i = 0; i < inventorySize; ++i) {
-        
+
     }
 }
 

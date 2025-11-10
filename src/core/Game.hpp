@@ -25,5 +25,7 @@ public:
     std::vector<EnemyData> getEnemyData() override;
     std::vector<wchar_t> getFieldData() override;
 private:
+    int getGameID();
+    void setGameID(int newGameID);
     void deleteField();
 };

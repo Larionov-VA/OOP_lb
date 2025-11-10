@@ -101,3 +101,13 @@ void Game::saveGame() {
 void Game::loadGame() {
 
 }
+
+
+int Game::getGameID() {
+    return this->gameID;
+}
+
+
+void Game::setGameID(int newGameID) {
+    this->gameID = newGameID;
+}

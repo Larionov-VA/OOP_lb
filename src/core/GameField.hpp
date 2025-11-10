@@ -33,12 +33,22 @@ private:
     int gameLevel;
     int gameTurn;
 private:
+    int getFieldWidth();
+    int getFieldHeight();
+    int getGameLevel();
+    int getGameTurn();
+    void setFieldWidth(int newFieldWidth);
+    void setFieldHeight(int newFieldHeight);
+    void setGameLevel(int newGameLevel);
+    void setGameTurn(int newGameTurn);
+private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
     bool isMoveCorrect(int oldIndex, int newIndex) const;
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
-    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
+    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
+    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;

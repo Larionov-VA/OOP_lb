@@ -692,3 +692,43 @@ std::vector<wchar_t> GameField::show() {
     }
     return data;
 }
+
+
+int GameField::getFieldWidth() {
+    return this->widthField;
+}
+
+
+int GameField::getFieldHeight() {
+    return this->heightField;
+}
+
+
+int GameField::getGameLevel() {
+    return this->gameLevel;
+}
+
+
+int GameField::getGameTurn() {
+    return this->gameTurn;
+}
+
+
+void GameField::setFieldWidth(int newFieldWidth) {
+    this->widthField = newFieldWidth;
+}
+
+
+void GameField::setFieldHeight(int newFieldHeight) {
+    this->heightField = newFieldHeight;
+}
+
+
+void GameField::setGameLevel(int newGameLevel) {
+    this->gameLevel = newGameLevel;
+}
+
+
+void GameField::setGameTurn(int newGameTurn) {
+    this->gameTurn = newGameTurn;
+}
