@@ -1,0 +1,31 @@
+#pragma once
+#include <vector>
+#include "ISaveManager.hpp"
+
+
+class SavesTreeNode : public ISaveManager{
+private:
+    ISaveManager* wrappedObject;
+    std::vector<ISaveManager*> childs{};
+public:
+    SavesTreeNode(ISaveManager* obj) : wrappedObject(obj) {};
+    void addChild(ISaveManager* child) override {
+        childs.push_back(child);
+    }
+    void saveState(int saveID) override {
+        if (wrappedObject) {
+            wrappedObject->saveState(saveID);
+        }
+        for (auto child : childs) {
+            child->saveState(saveID);
+        }
+    }
+    void loadState(int loadID) override { (void)loadID; };
+    char log() override { return '\0'; };
+    std::vector<ISaveManager*> getNextNodes() {
+        return childs;
+    }
+    std::vector<ISaveManager*> getChilds() override {
+        return childs;
+    }
+};

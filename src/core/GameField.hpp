@@ -19,19 +19,31 @@
 
 #include "Config.hpp"
 #include "Visualizer.hpp"
+#include "ISaveManager.hpp"
+#include "SaveManager.hpp"
+#include "SavesTree.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
 
+#define GAMEFIELD_SAVES_DIR "/Game/GameField/"
 
-class GameField {
+class GameField : public ISaveManager{
 private:
+    SavesTreeNode* head;
     std::vector<FieldCell> cells{};
     EntityManager entityManager{};
     int widthField;
     int heightField;
     int gameLevel;
     int gameTurn;
+public:
+    void addChild(ISaveManager* child) override { head->addChild(child); };
+    void saveState(int saveID) override;
+    void loadState(int loadID) override { (void)loadID; };
+    char log() override { return 'F'; };
+    std::vector<ISaveManager*> getChilds() override { return head->getChilds(); };
+    SavesTreeNode* getSaveWrapper() { return head; }
 private:
     int getFieldWidth();
     int getFieldHeight();
@@ -53,6 +65,7 @@ private:
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
+    ~GameField() { delete head; };
     GameField(
         std::vector<FieldCell> cells,
         EntityManager entityManager,

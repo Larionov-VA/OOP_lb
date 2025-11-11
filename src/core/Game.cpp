@@ -1,9 +1,17 @@
 #include "Game.hpp"
 
 
+Game::Game() {
+    head = new SavesTreeNode{this};
+}
+
+
 Game::~Game() {
     if (field) {
         delete field;
+    }
+    if (head) {
+        delete head;
     }
 }
 
@@ -16,6 +24,7 @@ void Game::ContinueGame(int gameID) {
 
 void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
+    // this->head = (SavesTreeNode*)this;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -23,6 +32,12 @@ void Game::startNewGame() {
         GlobalGameConfig::gameLevel
     );
     this->gameID = (int)std::time(nullptr);
+    if (head) {
+        head->addChild(this->field);
+    }
+
+    // this->addChild((ISaveManager*)this->field);
+    // this->getChilds()[0]->addChild((ISaveManager*)this->field);
 }
 
 
@@ -36,6 +51,7 @@ void Game::nextLevel() {
         GlobalGameConfig::fieldHeight,
         GlobalGameConfig::gameLevel
     );
+    head->addChild(this->field);
 }
 
 
@@ -95,6 +111,10 @@ void Game::deleteField() {
 void Game::saveGame() {
     SaveManager saver;
     saver.newSave(gameID);
+    head->saveState(gameID);
+    // std::string fullPathForSave = SAVES_PATH + std::to_string(gameID) + CUR_SAVES_DIR + "Game.txt";
+    // FileHandler flog{"gameLog.txt", std::ios::app};
+    // flog.write(fullPathForSave);
 }
 
 
@@ -110,4 +130,16 @@ int Game::getGameID() {
 
 void Game::setGameID(int newGameID) {
     this->gameID = newGameID;
+}
+
+
+void Game::saveState(int saveID) {
+    std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAME_SAVES_DIR + "data.txt";
+    FileHandler file{fullPathForSave, std::ios::out};
+    file.write(std::to_string(this->getGameID()));
+}
+
+
+void Game::loadState(int loadID) {
+    (void)loadID;
 }

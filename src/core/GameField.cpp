@@ -1,6 +1,6 @@
 #include "GameField.hpp"
 #include "GameContext.hpp"
-
+#include "SavesTree.hpp"
 
 GameField::GameField(
         std::vector<FieldCell> cells,
@@ -9,6 +9,7 @@ GameField::GameField(
         int heightField,
         int gameLevel,
         int gameTurn) {
+    head = new SavesTreeNode{this};
     this->cells = cells;
     this->entityManager = entityManager;
     this->widthField = widthField;
@@ -25,6 +26,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
     if (width < MIN_FIELD_SIZE || height < MIN_FIELD_SIZE) {
         throw std::range_error("Min size of field is 10");
     }
+    head = new SavesTreeNode{this};
     this->widthField = width;
     this->heightField = height;
     this->gameLevel = level;
@@ -691,6 +693,27 @@ std::vector<wchar_t> GameField::show() {
         }
     }
     return data;
+}
+
+
+void GameField::saveState(int saveID) {
+    try
+    {
+        std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAMEFIELD_SAVES_DIR + "data.txt";
+        FileHandler file{fullPathForSave, std::ios::out};
+    }
+    catch(const std::exception& e)
+    {
+        FileHandler file{"ERRLOG.txt", std::ios::out};
+        file.write(e.what());
+    }
+
+    // std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAMEFIELD_SAVES_DIR + "data.txt";
+    // FileHandler file{fullPathForSave, std::ios::out};
+    // file.write(std::to_string(this->getFieldWidth()) + '\n');
+    // file.write(std::to_string(this->getFieldHeight()) + '\n');
+    // file.write(std::to_string(this->getGameLevel()) + '\n');
+    // file.write(std::to_string(this->getGameTurn()));
 }
 
 
