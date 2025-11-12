@@ -113,6 +113,9 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     spawnEntity(std::make_unique<EnemyTower>(gameLevel), cell3.getIndex());
     spawnEntity(std::make_unique<EnemyBarracks>(gameLevel), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
+    for (auto& cell : cells) {
+        head->addChild(&cell);
+    }
 }
 
 

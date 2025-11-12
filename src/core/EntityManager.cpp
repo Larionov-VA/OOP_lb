@@ -64,7 +64,6 @@ void EntityManager::killEntity(int index) {
 
 void EntityManager::changeEntityIndex(int oldIndex, int newIndex) {
     if (infoMap.find(newIndex) != infoMap.end()) {
-        // кто-то уже стоит в newIndex — нельзя двигать туда
         return;
     }
     auto it = infoMap.find(oldIndex);
