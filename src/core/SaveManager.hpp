@@ -10,6 +10,6 @@ private:
     void createDirTree(int gameID);
     // void saveRecursive(int gameID, ISaveManager* headOfTree);
 public:
-    void newSave(int gameID);
+    void newSaveDir(int gameID);
     SaveManager();
 };

@@ -10,9 +10,10 @@ Game::~Game() {
     if (field) {
         delete field;
     }
-    // if (head) {
-    //     delete head;
-    // }
+    if (head) {
+        head->clearChildren();
+        delete head;
+    }
 }
 
 
@@ -24,7 +25,6 @@ void Game::ContinueGame(int gameID) {
 
 void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
-    // this->head = (SavesTreeNode*)this;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -35,9 +35,6 @@ void Game::startNewGame() {
     if (head) {
         head->addChild(this->field);
     }
-
-    // this->addChild((ISaveManager*)this->field);
-    // this->getChilds()[0]->addChild((ISaveManager*)this->field);
 }
 
 
@@ -115,11 +112,8 @@ void Game::deleteField() {
 
 void Game::saveGame() {
     SaveManager saver;
-    saver.newSave(gameID);
+    saver.newSaveDir(gameID);
     head->saveState(gameID);
-    // std::string fullPathForSave = SAVES_PATH + std::to_string(gameID) + CUR_SAVES_DIR + "Game.txt";
-    // FileHandler flog{"gameLog.txt", std::ios::app};
-    // flog.write(fullPathForSave);
 }
 
 
