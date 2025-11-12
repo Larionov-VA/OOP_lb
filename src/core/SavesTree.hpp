@@ -28,4 +28,7 @@ public:
     std::vector<ISaveManager*> getChilds() override {
         return childs;
     }
+    void clearChildren() {
+        childs.clear();
+    }
 };

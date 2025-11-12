@@ -10,9 +10,9 @@ Game::~Game() {
     if (field) {
         delete field;
     }
-    if (head) {
-        delete head;
-    }
+    // if (head) {
+    //     delete head;
+    // }
 }
 
 
@@ -103,8 +103,13 @@ void Game::stopGame() {
 
 
 void Game::deleteField() {
-    delete this->field;
-    this->field = nullptr;
+    if (this->field) {
+        if (head) {
+            head->clearChildren();
+        }
+        delete this->field;
+        this->field = nullptr;
+    }
 }
 
 

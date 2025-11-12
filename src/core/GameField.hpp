@@ -65,7 +65,7 @@ private:
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
-    ~GameField() { delete head; };
+    // ~GameField() { delete head; };
     GameField(
         std::vector<FieldCell> cells,
         EntityManager entityManager,
