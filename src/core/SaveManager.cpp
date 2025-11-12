@@ -25,6 +25,21 @@ void SaveManager::createDirTree(int gameID) {
 }
 
 
-void SaveManager::newSaveDir(int gameID) {
+void SaveManager::saveRecursive(int gameID, ISaveManager* headOfTree) {
+    if (headOfTree) {
+        // FileHandler flog{"saverlog.txt", std::ios::app};
+        // flog.write("gameID: " + std::to_string(gameID) + '\n');
+        // flog.write(std::to_string(headOfTree->log()) + '\n');
+        headOfTree->saveState(gameID);
+        auto vecChilds = headOfTree->getChilds();
+        for (auto child : vecChilds) {
+            saveRecursive(gameID, child);
+        }
+    }
+}
+
+
+void SaveManager::newSaveDir(int gameID, ISaveManager* headOfTree) {
     createDirTree(gameID);
+    saveRecursive(gameID, headOfTree);
 }

@@ -19,8 +19,8 @@ public:
     void addChild(ISaveManager* child) override { head->addChild(child); };
     void saveState(int saveID) override;
     void loadState(int loadID) override;
-    char log() override { return 'G'; };
-    SavesTreeNode* getSaveWrapper() { return head; }
+    // char log() override { return 'G'; };
+    // SavesTreeNode* getSaveWrapper() { return head; }
     std::vector<ISaveManager*> getChilds() override { return head->getChilds(); };
 public:
     Game();

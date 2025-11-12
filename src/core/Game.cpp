@@ -2,7 +2,7 @@
 
 
 Game::Game() {
-    head = new SavesTreeNode{this};
+    head = new SavesTreeNode;
 }
 
 
@@ -112,8 +112,8 @@ void Game::deleteField() {
 
 void Game::saveGame() {
     SaveManager saver;
-    saver.newSaveDir(gameID);
-    head->saveState(gameID);
+    saver.newSaveDir(gameID, this);
+    // head->saveState(gameID);
 }
 
 

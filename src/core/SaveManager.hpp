@@ -8,8 +8,8 @@
 class SaveManager {
 private:
     void createDirTree(int gameID);
-    // void saveRecursive(int gameID, ISaveManager* headOfTree);
+    void saveRecursive(int gameID, ISaveManager* headOfTree);
 public:
-    void newSaveDir(int gameID);
+    void newSaveDir(int gameID, ISaveManager* headOfTree);
     SaveManager();
 };

@@ -41,9 +41,9 @@ public:
     void addChild(ISaveManager* child) override { head->addChild(child); };
     void saveState(int saveID) override;
     void loadState(int loadID) override { (void)loadID; };
-    char log() override { return 'F'; };
+    // char log() override { return 'F'; };
     std::vector<ISaveManager*> getChilds() override { return head->getChilds(); };
-    SavesTreeNode* getSaveWrapper() { return head; }
+    // SavesTreeNode* getSaveWrapper() { return head; }
 private:
     int getFieldWidth();
     int getFieldHeight();
@@ -65,7 +65,12 @@ private:
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
-    // ~GameField() { delete head; };
+    ~GameField() {
+        for (auto& cell : cells) {
+            delete cell;
+        }
+        delete head;
+    };
     GameField(
         std::vector<FieldCell*> cells,
         EntityManager entityManager,

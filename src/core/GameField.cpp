@@ -9,7 +9,7 @@ GameField::GameField(
         int heightField,
         int gameLevel,
         int gameTurn) {
-    head = new SavesTreeNode{this};
+    head = new SavesTreeNode;
     this->cells = cells;
     this->entityManager = entityManager;
     this->widthField = widthField;
@@ -26,7 +26,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
     if (width < MIN_FIELD_SIZE || height < MIN_FIELD_SIZE) {
         throw std::range_error("Min size of field is 10");
     }
-    head = new SavesTreeNode{this};
+    head = new SavesTreeNode;
     this->widthField = width;
     this->heightField = height;
     this->gameLevel = level;

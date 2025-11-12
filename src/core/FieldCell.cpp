@@ -3,7 +3,7 @@
 
 FieldCell::FieldCell(int index, int X, int Y, bool slow,
     bool avaible, bool dead, bool trapped, int trapDamage) {
-    head = new SavesTreeNode{this};
+    head = new SavesTreeNode;
     this->index = index;
     this->X = X;
     this->Y = Y;

@@ -1,33 +1,24 @@
 #pragma once
 #include <vector>
-#include "ISaveManager.hpp"
-#include "FileHandler.hpp"
+// #include "ISaveManager.hpp"
+// #include "FileHandler.hpp"
 
-class SavesTreeNode : public ISaveManager{
+class SavesTreeNode {
 private:
-    ISaveManager* wrappedObject;
+    // ISaveManager* wrappedObject;
     std::vector<ISaveManager*> childs{};
 public:
-    SavesTreeNode(ISaveManager* obj) : wrappedObject(obj) {};
-    void addChild(ISaveManager* child) override {
+    // SavesTreeNode(ISaveManager* obj) : wrappedObject(obj) {};
+    void addChild(ISaveManager* child) {
         childs.push_back(child);
     }
-    void saveState(int saveID) override {
-        if (wrappedObject) {
-            wrappedObject->saveState(saveID);
-        }
-        for (auto child : childs) {
-            child->saveState(saveID);
-        }
-        FileHandler file{"savelog.txt", std::ios::out};
-        // file.write(".\n");
-    }
-    void loadState(int loadID) override { (void)loadID; };
-    char log() override { return '\0'; };
-    std::vector<ISaveManager*> getNextNodes() {
-        return childs;
-    }
-    std::vector<ISaveManager*> getChilds() override {
+    // void saveState(int saveID) override { (void)saveID; };
+    // void loadState(int loadID) override { (void)loadID; };
+    // char log() override { return '\0'; };
+    // std::vector<ISaveManager*> getNextNodes() {
+    //     return childs;
+    // }
+    std::vector<ISaveManager*> getChilds() {
         return childs;
     }
     void clearChildren() {

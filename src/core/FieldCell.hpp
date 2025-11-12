@@ -21,8 +21,8 @@ public:
     void addChild(ISaveManager* child) override { (void)child; };
     void saveState(int saveID) override;
     void loadState(int loadID) override;
-    char log() override { return 'C'; };
-    SavesTreeNode* getSaveWrapper() { return nullptr; }
+    // char log() override { return 'C'; };
+    // SavesTreeNode* getSaveWrapper() { return nullptr; }
     std::vector<ISaveManager*> getChilds() override { return {}; };
 public:
     FieldCell(
