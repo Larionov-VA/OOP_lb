@@ -31,7 +31,7 @@
 class GameField : public ISaveManager{
 private:
     SavesTreeNode* head;
-    std::vector<FieldCell> cells{};
+    std::vector<FieldCell*> cells{};
     EntityManager entityManager{};
     int widthField;
     int heightField;
@@ -67,7 +67,7 @@ private:
 public:
     // ~GameField() { delete head; };
     GameField(
-        std::vector<FieldCell> cells,
+        std::vector<FieldCell*> cells,
         EntityManager entityManager,
         int widthField,
         int heightField,

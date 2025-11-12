@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "ISaveManager.hpp"
-
+#include "FileHandler.hpp"
 
 class SavesTreeNode : public ISaveManager{
 private:
@@ -19,6 +19,8 @@ public:
         for (auto child : childs) {
             child->saveState(saveID);
         }
+        FileHandler file{"savelog.txt", std::ios::out};
+        // file.write(".\n");
     }
     void loadState(int loadID) override { (void)loadID; };
     char log() override { return '\0'; };

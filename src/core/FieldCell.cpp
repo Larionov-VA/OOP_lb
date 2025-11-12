@@ -1,8 +1,9 @@
 #include "FieldCell.hpp"
 
 
-FieldCell::FieldCell(int index, unsigned X, unsigned Y, bool slow,
+FieldCell::FieldCell(int index, int X, int Y, bool slow,
     bool avaible, bool dead, bool trapped, int trapDamage) {
+    head = new SavesTreeNode{this};
     this->index = index;
     this->X = X;
     this->Y = Y;
@@ -104,7 +105,7 @@ void FieldCell::saveState(int saveID) {
     file.write(std::to_string(X) + '\n');
     file.write(std::to_string(Y));
 
-    FileHandler f{"LOG.txt", std::ios::app};
+    FileHandler f{"LOG.txt", std::ios::out};
     f.write(std::to_string(index) + '\n');
 }
 

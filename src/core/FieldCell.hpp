@@ -12,7 +12,7 @@
 
 class FieldCell : public ISaveManager {
 private:
-    // SavesTreeNode* head;
+    SavesTreeNode* head;
     CellState state;
     int index;
     int X;
@@ -27,8 +27,8 @@ public:
 public:
     FieldCell(
         int index,
-        unsigned X,
-        unsigned Y,
+        int X,
+        int Y,
         bool slow,
         bool avaible = false,
         bool dead = false,

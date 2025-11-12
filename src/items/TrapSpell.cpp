@@ -13,20 +13,20 @@ bool TrapSpell::cast(GameContext& ctx, int userIndex, int power) {
     int left = userIndex - 1;
     int right = userIndex + 1;
     int currentTrapDamage = this->trapDamage * trapLevel * powerOfSpell + power * this->trapDamage;
-    if (ctx.cells[up].isCellAvaible() && !ctx.cells[up].isTrapped()) {
-        ctx.cells[up].setTrap(currentTrapDamage);
+    if (ctx.cells[up]->isCellAvaible() && !ctx.cells[up]->isTrapped()) {
+        ctx.cells[up]->setTrap(currentTrapDamage);
         return true;
     }
-    else if (ctx.cells[down].isCellAvaible() && !ctx.cells[down].isTrapped()) {
-        ctx.cells[down].setTrap(currentTrapDamage);
+    else if (ctx.cells[down]->isCellAvaible() && !ctx.cells[down]->isTrapped()) {
+        ctx.cells[down]->setTrap(currentTrapDamage);
         return true;
     }
-    else if (ctx.cells[left].isCellAvaible() && !ctx.cells[left].isTrapped()) {
-        ctx.cells[left].setTrap(currentTrapDamage);
+    else if (ctx.cells[left]->isCellAvaible() && !ctx.cells[left]->isTrapped()) {
+        ctx.cells[left]->setTrap(currentTrapDamage);
         return true;
     }
-    else if (ctx.cells[right].isCellAvaible() && !ctx.cells[right].isTrapped()) {
-        ctx.cells[right].setTrap(currentTrapDamage);
+    else if (ctx.cells[right]->isCellAvaible() && !ctx.cells[right]->isTrapped()) {
+        ctx.cells[right]->setTrap(currentTrapDamage);
         return true;
     }
     return false;

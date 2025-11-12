@@ -33,7 +33,7 @@ bool DirectDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
         allEnemy.push_back(playerIndex);
     }
     for (int enemyIndex : allEnemy) {
-        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 4) {
+        if (ctx.cells[userIndex]->getDistance(*ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 4) {
             Entity* user = ctx.entityManager[userIndex];
             int userInt = user->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));
