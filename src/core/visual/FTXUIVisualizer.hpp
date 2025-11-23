@@ -1,4 +1,11 @@
 #pragma once
+#include <iostream>
+#include <thread>
+#include <future>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/screen/color.hpp"
@@ -8,24 +15,14 @@
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/event.hpp"
+
 #include "../IGameController.hpp"
 #include "../Config.hpp"
+#include "ASCIIAssets/ASCIIAssets.hpp"
+#include "IVisualizer.hpp"
 
-#include "ASCIIAssets/HealthPotionAsset.hpp"
-#include "ASCIIAssets/FireballScrollAsset.hpp"
-#include "ASCIIAssets/FirestormScrollAsset.hpp"
-#include "ASCIIAssets/SummonScrollAsset.hpp"
-#include "ASCIIAssets/TrapScrollAsset.hpp"
-#include "ASCIIAssets/UpgradeScrollAsset.hpp"
 
-#include <iostream>
-#include <thread>
-#include <future>
-#include <memory>
-#include <string>
-#include <vector>
-
-class FTXUIVisualizer {
+class FTXUIVisualizer : public IVisualizer{
 private:
     std::shared_ptr<ftxui::ScreenInteractive> screen_;
     enum class ScreenState {
@@ -45,8 +42,8 @@ private:
     } gameOptions;
 public:
     FTXUIVisualizer();
-    void setController(IGameController* controller);
-    void display();
+    void setController(IGameController* controller) override;
+    void display() override;
     void refreash();
 private:
     void initComponentsIfNeeded(FTXUIVisualizer* self);
