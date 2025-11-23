@@ -28,7 +28,7 @@ bool AreaDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
         allEnemy.push_back(towerIndex);
     }
     for (int enemyIndex : allEnemy) {
-        if (ctx.cells[userIndex]->getDistance(*ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 3) {
+        if (ctx.cells[userIndex].getDistance(ctx.cells[enemyIndex]) <= baseDistance * powerOfSpell + power * 3) {
             Entity* user = ctx.entityManager[userIndex];
             int userInt = user->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));

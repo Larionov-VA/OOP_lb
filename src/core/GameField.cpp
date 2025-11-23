@@ -1,22 +1,5 @@
 #include "GameField.hpp"
 #include "GameContext.hpp"
-#include "SavesTree.hpp"
-
-GameField::GameField(
-        std::vector<FieldCell*> cells,
-        EntityManager entityManager,
-        int widthField,
-        int heightField,
-        int gameLevel,
-        int gameTurn) {
-    head = new SavesTreeNode;
-    this->cells = cells;
-    this->entityManager = entityManager;
-    this->widthField = widthField;
-    this->heightField = heightField;
-    this->gameLevel = gameLevel;
-    this->gameTurn = gameTurn;
-}
 
 
 GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
@@ -26,7 +9,6 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
     if (width < MIN_FIELD_SIZE || height < MIN_FIELD_SIZE) {
         throw std::range_error("Min size of field is 10");
     }
-    head = new SavesTreeNode;
     this->widthField = width;
     this->heightField = height;
     this->gameLevel = level;
@@ -39,8 +21,7 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
-        FieldCell* cell = new FieldCell{i, i % widthField, i / widthField, false};
-        cells.push_back(cell);
+        cells.emplace_back(i, i % widthField, i / widthField, false);
     }
 
     std::random_device rd;
@@ -53,30 +34,30 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     do {
         randomPoint1 = dist(gen);
         randomPoint2 = dist(gen);
-    } while (cells[randomPoint1]->getDistance(*cells[randomPoint2]) < minDistance);
+    } while (cells[randomPoint1].getDistance(cells[randomPoint2]) < minDistance);
 
-    FieldCell& cell1 = *cells[randomPoint1];
-    FieldCell& cell2 = *cells[randomPoint2];
+    FieldCell& cell1 = cells[randomPoint1];
+    FieldCell& cell2 = cells[randomPoint2];
 
     FieldCell& cell3 = [&]() -> FieldCell& {
         const int targetDist = (widthField + heightField) / 4;
         for (auto& cell : cells) {
-            int dist1 = cell1.getDistance(*cell);
-            int dist2 = cell2.getDistance(*cell);
+            int dist1 = cell1.getDistance(cell);
+            int dist2 = cell2.getDistance(cell);
             if (dist1 == dist2 && dist1 > targetDist) {
-                cell->setAvaible(true);
-                return *cell;
+                cell.setAvaible(true);
+                return cell;
             }
         }
         int midId = ((cell1.getCoord().second + cell2.getCoord().second) / 2) * widthField +
                     ((cell1.getCoord().first + cell2.getCoord().first) / 2);
-        return *cells[midId];
+        return cells[midId];
     }();
 
     auto activateAround = [this](const FieldCell& center, int radius) {
         for (auto& cell : cells) {
-            if (center.getDistance(*cell) < radius) {
-                cell->setAvaible(true);
+            if (center.getDistance(cell) < radius) {
+                cell.setAvaible(true);
             }
         }
     };
@@ -88,9 +69,9 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         int tolerance = abs(dx) + abs(dy) + widthField + heightField;
 
         for (auto& cell : cells) {
-            auto [x, y] = cell->getCoord();
+            auto [x, y] = cell.getCoord();
             if (abs((x - x1) * dy - (y - y1) * dx) <= tolerance) {
-                cell->setAvaible(true);
+                cell.setAvaible(true);
             }
         }
     };
@@ -106,24 +87,21 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         int down = i + widthField;
         int left = i - 1;
         int right = i + 1;
-        if (cells[i]->isCellAvaible() && (!cells[up]->isCellAvaible() || !cells[down]->isCellAvaible() ||
-            !cells[left]->isCellAvaible() || !cells[right]->isCellAvaible()) && (i % widthField)) {
-            cells[i]->setSlow(true);
+        if (cells[i].isCellAvaible() && (!cells[up].isCellAvaible() || !cells[down].isCellAvaible() ||
+            !cells[left].isCellAvaible() || !cells[right].isCellAvaible()) && (i % widthField)) {
+            cells[i].setSlow(true);
         }
     }
     spawnEntity(std::make_unique<EnemyTower>(gameLevel), cell3.getIndex());
     spawnEntity(std::make_unique<EnemyBarracks>(gameLevel), randomPoint2);
     spawnEntity(std::move(player), randomPoint1);
-    for (auto cell : cells) {
-        head->addChild(cell);
-    }
 }
 
 
 void GameField::moveEntity(int oldIndex, int newIndex) {
     entityManager.changeEntityIndex(oldIndex, newIndex);
-    cells[oldIndex]->setAvaible(true);
-    cells[newIndex]->setAvaible(false);
+    cells[oldIndex].setAvaible(true);
+    cells[newIndex].setAvaible(false);
 }
 
 
@@ -132,7 +110,7 @@ bool GameField::isMoveCorrect(int oldIndex, int newIndex) const {
         newIndex < 0 || newIndex >= widthField * heightField) {
         return false;
     }
-    if (!cells[newIndex]->isCellAvaible()) {
+    if (!cells[newIndex].isCellAvaible()) {
         return false;
     }
     int oldX = oldIndex % widthField;
@@ -145,7 +123,7 @@ bool GameField::isMoveCorrect(int oldIndex, int newIndex) const {
 
 
 void GameField::spawnEntity(std::unique_ptr<Entity> entity, int index) {
-    cells[index]->setAvaible(false);
+    cells[index].setAvaible(false);
     entityManager.createEntity(std::move(entity), index);
 }
 
@@ -158,8 +136,8 @@ void GameField::generateEnemy() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     do {
         int randomIndex = dist(gen);
-        bool randomCellAvailable = cells[randomIndex]->isCellAvaible();
-        float distanceToPlayer = cells[playerIndex]->getDistance(*cells[randomIndex]);
+        bool randomCellAvailable = cells[randomIndex].isCellAvaible();
+        float distanceToPlayer = cells[playerIndex].getDistance(cells[randomIndex]);
         if (randomCellAvailable && (distanceToPlayer > ((widthField + heightField) / 3))) {
             std::unique_ptr<Entity> enemy = std::make_unique<Enemy>(gameLevel);
             spawnEntity(std::move(enemy), randomIndex);
@@ -222,28 +200,28 @@ bool GameField::playerTurn(char command) {
     switch (command) {
     case 'w':
         if (cellSlowed) {
-            break;
+            return true;
         }
         newPlayerIndex = playerIndex - widthField;
         move = true;
         break;
     case 'a':
         if (cellSlowed) {
-            break;
+            return true;
         }
         newPlayerIndex = playerIndex - 1;
         move = true;
         break;
     case 's':
         if (cellSlowed) {
-            break;
+            return true;
         }
         newPlayerIndex = playerIndex + widthField;
         move = true;
         break;
     case 'd':
         if (cellSlowed) {
-            break;
+            return true;
         }
         newPlayerIndex = playerIndex + 1;
         move = true;
@@ -278,7 +256,7 @@ bool GameField::playerTurn(char command) {
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
             /*наложение дебафа*/
-            if (cells[newPlayerIndex]->isCellSlow()) {
+            if (cells[newPlayerIndex].isCellSlow()) {
                 entityManager[playerIndex]->setDebaffState();
             }
             /*передвижение*/
@@ -328,8 +306,8 @@ void GameField::update() {
     for (int index : enemyIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index]->setAvaible(true);
-            cells[index]->setCellDead();
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
             entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 10 + 10);
             entityManager.killEntity(index);
         }
@@ -338,8 +316,8 @@ void GameField::update() {
     for (int index : barrackIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index]->setAvaible(true);
-            cells[index]->setCellDead();
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
             entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
             entityManager.killEntity(index);
         }
@@ -348,8 +326,8 @@ void GameField::update() {
     for (int index : towerIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index]->setAvaible(true);
-            cells[index]->setCellDead();
+            cells[index].setAvaible(true);
+            cells[index].setCellDead();
             entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
             entityManager.killEntity(index);
         }
@@ -374,7 +352,7 @@ int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
         enemyTurns.push_back(indexEnemy - 1);
         enemyTurns.push_back(indexEnemy + 1);
         std::vector<std::pair<int, float>> enemyTurnsWithDist = getDistanceToPlayer(enemyTurns, playerIndex);
-        std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy]->getDistance(*cells[playerIndex])};
+        std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy].getDistance(cells[playerIndex])};
         for (const auto& [turn, dist] : enemyTurnsWithDist) {
             if (isMoveCorrect(indexEnemy, turn) && dist < bestTurn.second) {
                 bestTurn.first = turn;
@@ -429,7 +407,7 @@ GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
     std::vector<std::pair<int, float>> distances;
     float distance;
     for (long unsigned int i = 0; i < enemyIndexes.size(); ++i) {
-        distance = cells[playerIndex]->getDistance(*cells[enemyIndexes[i]]);
+        distance = cells[playerIndex].getDistance(cells[enemyIndexes[i]]);
         distances.push_back({enemyIndexes[i], distance});
     }
     return distances;
@@ -453,7 +431,7 @@ void GameField::enemyTurn() {
         Entity* e = entityManager[index];
         if (!e) continue;
         if (!e->alive()) continue;
-        if (cells[playerIndex]->getDistance(*cells[index]) <= 1) {
+        if (cells[playerIndex].getDistance(cells[index]) <= 1) {
             Entity* playerEnt = entityManager[playerIndex];
             if (playerEnt) {
                 playerEnt->causeDamage(e->getDamage());
@@ -462,17 +440,17 @@ void GameField::enemyTurn() {
         }
 
         int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
-        bool isTrapped = cells[bestTurn]->isTrapped();
+        bool isTrapped = cells[bestTurn].isTrapped();
 
         if (isTrapped) {
-            int trapDamage = cells[bestTurn]->checkAndSwitchTrap();
+            int trapDamage = cells[bestTurn].checkAndSwitchTrap();
             e->causeDamage(trapDamage);
         }
         if (bestTurn == index) continue;
         if (occupiedNewIndices.count(bestTurn)) continue;
 
         if (isMoveCorrect(index, bestTurn)) {
-            if (!entityManager[bestTurn] && cells[bestTurn]->isCellAvaible()) {
+            if (!entityManager[bestTurn] && cells[bestTurn].isCellAvaible()) {
                 moveEntity(index, bestTurn);
                 occupiedNewIndices.insert(bestTurn);
             }
@@ -513,7 +491,7 @@ void GameField::buildingsTurn() {
     if (!towerIndexes.empty()) {
         towerIndex = towerIndexes[0];
         EnemyTower* tower = dynamic_cast<EnemyTower*>(entityManager[towerIndex]);
-        if (cells[playerIndex]->getDistance(*cells[towerIndex]) <= tower->getSpellDistance()) {
+        if (cells[playerIndex].getDistance(cells[towerIndex]) <= tower->getSpellDistance()) {
             tower->towerAttack(ctx, towerIndex, 0);
         }
     }
@@ -646,7 +624,7 @@ std::vector<wchar_t> GameField::show() {
     std::vector<wchar_t> data;
     for (int i = 0; i < widthField * heightField; ++i) {
         Entity* currentEntity = entityManager[i];
-        if (cells[i]->isCellAvaible() || currentEntity) {
+        if (cells[i].isCellAvaible() || currentEntity) {
 
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
@@ -662,13 +640,13 @@ std::vector<wchar_t> GameField::show() {
                     data.push_back(L'⛫');
                 }
             }
-            else if (cells[i]->isCellSlow()) {
+            else if (cells[i].isCellSlow()) {
                 data.push_back(L'░');
             }
-            else if (cells[i]->checkCellDead()) {
+            else if (cells[i].checkCellDead()) {
                 data.push_back(L'☠');
             }
-            else if (cells[i]->isTrapped()) {
+            else if (cells[i].isTrapped()) {
                 data.push_back(L'᪠');
             }
             else {
@@ -697,31 +675,6 @@ std::vector<wchar_t> GameField::show() {
         }
     }
     return data;
-}
-
-
-void GameField::saveState(int saveID) {
-    try
-    {
-        std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAMEFIELD_SAVES_DIR + "data.txt";
-        FileHandler file{fullPathForSave, std::ios::out};
-        file.write(std::to_string(this->getFieldWidth()) + '\n');
-        file.write(std::to_string(this->getFieldHeight()) + '\n');
-        file.write(std::to_string(this->getGameLevel()) + '\n');
-        file.write(std::to_string(this->getGameTurn()));
-    }
-    catch(const std::exception& e)
-    {
-        FileHandler file{"ERRLOG.txt", std::ios::out};
-        file.write(e.what());
-    }
-
-    // std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAMEFIELD_SAVES_DIR + "data.txt";
-    // FileHandler file{fullPathForSave, std::ios::out};
-    // file.write(std::to_string(this->getFieldWidth()) + '\n');
-    // file.write(std::to_string(this->getFieldHeight()) + '\n');
-    // file.write(std::to_string(this->getGameLevel()) + '\n');
-    // file.write(std::to_string(this->getGameTurn()));
 }
 
 

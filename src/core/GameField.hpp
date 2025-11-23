@@ -19,31 +19,20 @@
 
 #include "Config.hpp"
 #include "Visualizer.hpp"
-#include "ISaveManager.hpp"
-#include "SaveManager.hpp"
-#include "SavesTree.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
 
 #define GAMEFIELD_SAVES_DIR "/Game/GameField/"
 
-class GameField : public ISaveManager{
+class GameField {
 private:
-    SavesTreeNode* head;
-    std::vector<FieldCell*> cells{};
+    std::vector<FieldCell> cells{};
     EntityManager entityManager{};
     int widthField;
     int heightField;
     int gameLevel;
     int gameTurn;
-public:
-    void addChild(ISaveManager* child) override { head->addChild(child); };
-    void saveState(int saveID) override;
-    void loadState(int loadID) override { (void)loadID; };
-    // char log() override { return 'F'; };
-    std::vector<ISaveManager*> getChilds() override { return head->getChilds(); };
-    // SavesTreeNode* getSaveWrapper() { return head; }
 private:
     int getFieldWidth();
     int getFieldHeight();
@@ -65,57 +54,7 @@ private:
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
-    ~GameField() {
-        for (auto& cell : cells) {
-            delete cell;
-        }
-        delete head;
-    };
-    GameField(
-        std::vector<FieldCell*> cells,
-        EntityManager entityManager,
-        int widthField,
-        int heightField,
-        int gameLevel,
-        int gameTurn
-    );
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
-    GameField(const GameField& other)
-        : cells(other.cells),
-          entityManager(other.entityManager),
-          widthField(other.widthField),
-          heightField(other.heightField),
-          gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn)
-          {}
-    GameField& operator=(const GameField& other) {
-        if (this == &other) return *this;
-        cells = other.cells;
-        entityManager = other.entityManager;
-        widthField = other.widthField;
-        heightField = other.heightField;
-        gameLevel = other.gameLevel;
-        gameTurn = other.gameTurn;
-        return *this;
-    }
-    GameField(GameField&& other) noexcept
-        : cells(std::move(other.cells)),
-          entityManager(std::move(other.entityManager)),
-          widthField(other.widthField),
-          heightField(other.heightField),
-          gameLevel(other.gameLevel),
-          gameTurn(other.gameTurn)
-          {}
-    GameField& operator=(GameField&& other) noexcept {
-        if (this == &other) return *this;
-        cells = std::move(other.cells);
-        entityManager = std::move(other.entityManager);
-        widthField = other.widthField;
-        heightField = other.heightField;
-        gameLevel = other.gameLevel;
-        gameTurn = other.gameTurn;
-        return *this;
-    }
     std::unique_ptr<Entity> returnPlayer();
     bool playerAlive() const;
     std::shared_ptr<PlayerData> getPlayerData();

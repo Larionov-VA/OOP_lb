@@ -3,7 +3,6 @@
 
 FieldCell::FieldCell(int index, int X, int Y, bool slow,
     bool avaible, bool dead, bool trapped, int trapDamage) {
-    head = new SavesTreeNode;
     this->index = index;
     this->X = X;
     this->Y = Y;
@@ -90,26 +89,4 @@ bool FieldCell::checkCellDead() {
 
 void FieldCell::setCellDead() {
     this->state.setEnemyCorpse(true);
-}
-
-
-void FieldCell::saveState(int saveID) {
-    std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + CELL_SAVES_DIR + std::to_string(index) + "_data.txt";
-    FileHandler file{fullPathForSave, std::ios::out};
-    file.write(std::to_string(state.getAvaible()) + '\n');
-    file.write(std::to_string(state.getSlow()) + '\n');
-    file.write(std::to_string(state.getEnemyCorpse()) + '\n');
-    file.write(std::to_string(state.getTrapped()) + '\n');
-    file.write(std::to_string(state.getTrapDamage()) + '\n');
-    file.write(std::to_string(index) + '\n');
-    file.write(std::to_string(X) + '\n');
-    file.write(std::to_string(Y));
-
-    FileHandler f{"LOG.txt", std::ios::out};
-    f.write(std::to_string(index) + '\n');
-}
-
-
-void FieldCell::loadState(int loadID) {
-    (void)loadID;
 }

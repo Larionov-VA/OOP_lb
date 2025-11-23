@@ -4,26 +4,15 @@
 #include "entities/Player.hpp"
 #include "IGameController.hpp"
 #include "Config.hpp"
-#include "SaveManager.hpp"
 #include "FileHandler.hpp"
-#include "ISaveManager.hpp"
-#include "SavesTree.hpp"
+
 #define GAME_SAVES_DIR "/Game/"
 
-class Game : public IGameController, public ISaveManager{
+class Game : public IGameController{
 private:
     GameField* field;
-    SavesTreeNode* head;
     int gameID = 0;
 public:
-    void addChild(ISaveManager* child) override { head->addChild(child); };
-    void saveState(int saveID) override;
-    void loadState(int loadID) override;
-    // char log() override { return 'G'; };
-    // SavesTreeNode* getSaveWrapper() { return head; }
-    std::vector<ISaveManager*> getChilds() override { return head->getChilds(); };
-public:
-    Game();
     ~Game();
     void startNewGame() override;
     void ContinueGame(int gameID) override;

@@ -1,18 +1,12 @@
 #include "Game.hpp"
 
 
-Game::Game() {
-    head = new SavesTreeNode;
-}
+
 
 
 Game::~Game() {
     if (field) {
         delete field;
-    }
-    if (head) {
-        head->clearChildren();
-        delete head;
     }
 }
 
@@ -32,9 +26,6 @@ void Game::startNewGame() {
         GlobalGameConfig::gameLevel
     );
     this->gameID = (int)std::time(nullptr);
-    if (head) {
-        head->addChild(this->field);
-    }
 }
 
 
@@ -48,7 +39,6 @@ void Game::nextLevel() {
         GlobalGameConfig::fieldHeight,
         GlobalGameConfig::gameLevel
     );
-    head->addChild(this->field);
 }
 
 
@@ -101,24 +91,9 @@ void Game::stopGame() {
 
 void Game::deleteField() {
     if (this->field) {
-        if (head) {
-            head->clearChildren();
-        }
         delete this->field;
         this->field = nullptr;
     }
-}
-
-
-void Game::saveGame() {
-    SaveManager saver;
-    saver.newSaveDir(gameID, this);
-    // head->saveState(gameID);
-}
-
-
-void Game::loadGame() {
-
 }
 
 
@@ -131,14 +106,10 @@ void Game::setGameID(int newGameID) {
     this->gameID = newGameID;
 }
 
+void Game::saveGame() {
 
-void Game::saveState(int saveID) {
-    std::string fullPathForSave = SAVES_PATH + std::to_string(saveID) + GAME_SAVES_DIR + "data.txt";
-    FileHandler file{fullPathForSave, std::ios::out};
-    file.write(std::to_string(this->getGameID()));
 }
 
+void Game::loadGame() {
 
-void Game::loadState(int loadID) {
-    (void)loadID;
 }

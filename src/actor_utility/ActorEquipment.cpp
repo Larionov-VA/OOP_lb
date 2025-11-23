@@ -2,6 +2,7 @@
 
 
 Equipment::Equipment() {
+    this->currentWeapon = Equipment::equippedWeapon::MELEE;
 }
 
 
@@ -39,12 +40,12 @@ void Equipment::setRangeWeapon(int newMulti) {
 
 
 bool Equipment::melle() const{
-    return currentWeapon == Equipment::equippedWeapon::MELEE;
+    return (currentWeapon == Equipment::equippedWeapon::MELEE);
 }
 
 
 bool Equipment::range() const {
-    return currentWeapon == Equipment::equippedWeapon::RANGE;
+    return (currentWeapon == Equipment::equippedWeapon::RANGE);
 }
 
 
