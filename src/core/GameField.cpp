@@ -23,22 +23,17 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     for (int i = 0; i < widthField * heightField; ++i) {
         cells.emplace_back(i, i % widthField, i / widthField, false);
     }
-
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, widthField * heightField - 1);
-
     int randomPoint1, randomPoint2;
     const int minDistance = (widthField + heightField) / 3;
-
     do {
         randomPoint1 = dist(gen);
         randomPoint2 = dist(gen);
     } while (cells[randomPoint1].getDistance(cells[randomPoint2]) < minDistance);
-
     FieldCell& cell1 = cells[randomPoint1];
     FieldCell& cell2 = cells[randomPoint2];
-
     FieldCell& cell3 = [&]() -> FieldCell& {
         const int targetDist = (widthField + heightField) / 4;
         for (auto& cell : cells) {
@@ -53,7 +48,6 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
                     ((cell1.getCoord().first + cell2.getCoord().first) / 2);
         return cells[midId];
     }();
-
     auto activateAround = [this](const FieldCell& center, int radius) {
         for (auto& cell : cells) {
             if (center.getDistance(cell) < radius) {
@@ -61,7 +55,6 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
             }
         }
     };
-
     auto activateLine = [this](const FieldCell& from, const FieldCell& to) {
         auto [x1, y1] = from.getCoord();
         auto [x2, y2] = to.getCoord();
@@ -75,13 +68,11 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
             }
         }
     };
-
     activateAround(cell1, (widthField + heightField) / 6);
     activateAround(cell2, (widthField + heightField) / 6);
     activateAround(cell3, (widthField + heightField) / 4);
     activateLine(cell1, cell2);
     activateLine(cell1, cell3);
-
     for (int i = widthField; i < widthField * heightField - widthField; ++i) {
         int up = i - widthField;
         int down = i + widthField;

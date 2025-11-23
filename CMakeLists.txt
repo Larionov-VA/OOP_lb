@@ -15,7 +15,8 @@ set(SRCS
     src/core/GameField.cpp
     src/core/FieldCell.cpp
     src/core/EntityManager.cpp
-    src/core/Visualizer.cpp
+    src/core/visual/FTXUIVisualizer.cpp
+    src/core/visual/NCURSESVisualizer.cpp
     src/core/Config.cpp
     src/core/FileHandler.cpp
 

@@ -1,4 +1,4 @@
-#include "Visualizer.hpp"
+#include "FTXUIVisualizer.hpp"
 using namespace ftxui;
 
 
@@ -41,7 +41,7 @@ static int findDifficultyIndex(const std::vector<std::string>& list, const std::
 }
 
 
-Visualizer::Visualizer() {
+FTXUIVisualizer::FTXUIVisualizer() {
     screen_ = std::shared_ptr<ftxui::ScreenInteractive>(
         new ftxui::ScreenInteractive(ftxui::ScreenInteractive::Fullscreen())
     );
@@ -49,12 +49,12 @@ Visualizer::Visualizer() {
 }
 
 
-void Visualizer::setController(IGameController* controller) {
+void FTXUIVisualizer::setController(IGameController* controller) {
     controller_ = controller;
 }
 
 
-void Visualizer::initComponentsIfNeeded(Visualizer* self) {
+void FTXUIVisualizer::initComponentsIfNeeded(FTXUIVisualizer* self) {
     if (componentsInitialized) return;
     componentsInitialized = true;
 
@@ -271,7 +271,7 @@ void Visualizer::initComponentsIfNeeded(Visualizer* self) {
 }
 
 
-ftxui::Component Visualizer::buildRootContainer() {
+ftxui::Component FTXUIVisualizer::buildRootContainer() {
     initComponentsIfNeeded(this);
     return Container::Tab({
         mainMenuComp,
@@ -282,7 +282,7 @@ ftxui::Component Visualizer::buildRootContainer() {
 }
 
 
-ftxui::Component Visualizer::buildRenderer(ftxui::Component root) {
+ftxui::Component FTXUIVisualizer::buildRenderer(ftxui::Component root) {
     initComponentsIfNeeded(this);
     return Renderer(root, [&] {
         if (currentState == ScreenState::MainMenu) {
@@ -372,7 +372,7 @@ ftxui::Component Visualizer::buildRenderer(ftxui::Component root) {
     });
 }
 
-ftxui::Component Visualizer::buildApp(ftxui::Component renderer) {
+ftxui::Component FTXUIVisualizer::buildApp(ftxui::Component renderer) {
     initComponentsIfNeeded(this);
     return CatchEvent(renderer, [&](Event event) {
         if (currentState == ScreenState::MainMenu) {
@@ -532,7 +532,7 @@ ftxui::Component Visualizer::buildApp(ftxui::Component renderer) {
 }
 
 
-void Visualizer::display() {
+void FTXUIVisualizer::display() {
     initComponentsIfNeeded(this);
     Component root = buildRootContainer();
     Component renderer = buildRenderer(root);
@@ -541,6 +541,6 @@ void Visualizer::display() {
 }
 
 
-void Visualizer::refreash() {
+void FTXUIVisualizer::refreash() {
     if (screen_) screen_->PostEvent(Event::Custom);
 }

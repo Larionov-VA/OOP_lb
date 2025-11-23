@@ -1,5 +1,6 @@
 #pragma once
 #include <unistd.h>
+#include <ctime>
 #include "GameField.hpp"
 #include "entities/Player.hpp"
 #include "IGameController.hpp"

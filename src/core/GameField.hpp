@@ -18,7 +18,7 @@
 #include "entities/EnemyTower.hpp"
 
 #include "Config.hpp"
-#include "Visualizer.hpp"
+// #include "FTXUIVisualizer.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10

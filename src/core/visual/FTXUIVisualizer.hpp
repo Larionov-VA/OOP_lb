@@ -8,8 +8,8 @@
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/event.hpp"
-#include "IGameController.hpp"
-#include "Config.hpp"
+#include "../IGameController.hpp"
+#include "../Config.hpp"
 
 #include "ASCIIAssets/HealthPotionAsset.hpp"
 #include "ASCIIAssets/FireballScrollAsset.hpp"
@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-class Visualizer {
+class FTXUIVisualizer {
 private:
     std::shared_ptr<ftxui::ScreenInteractive> screen_;
     enum class ScreenState {
@@ -44,12 +44,12 @@ private:
         std::vector<std::string> difficulties = {"EASY", "MEDIUM", "HARD"};
     } gameOptions;
 public:
-    Visualizer();
+    FTXUIVisualizer();
     void setController(IGameController* controller);
     void display();
     void refreash();
 private:
-    void initComponentsIfNeeded(Visualizer* self);
+    void initComponentsIfNeeded(FTXUIVisualizer* self);
     ftxui::Component buildRootContainer();
     ftxui::Component buildRenderer(ftxui::Component root);
     ftxui::Component buildApp(ftxui::Component renderer);

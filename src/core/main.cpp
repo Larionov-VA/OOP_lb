@@ -1,11 +1,11 @@
 #include <iostream>
 #include <unistd.h>
 #include "Game.hpp"
-#include "Visualizer.hpp"
+#include "./visual/FTXUIVisualizer.hpp"
 
 int main() {
     Game game;
-    Visualizer vis;
+    FTXUIVisualizer vis;
     vis.setController(&game);
     vis.display();
     return 0;

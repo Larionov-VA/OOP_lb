@@ -1,9 +1,6 @@
 #include "Game.hpp"
 
 
-
-
-
 Game::~Game() {
     if (field) {
         delete field;
