@@ -8,36 +8,33 @@
 #include <thread>
 
 std::atomic<bool> running{true};
-int pin_states[6] = {0}; // 0=off, 1=on
+int pin_states[6] = {0};
 
 void update_display() {
     clear();
 
-    // Заголовок
-    mvprintw(0, 0, "ESP32 Signal Monitor - PIN States");
-    mvprintw(1, 0, "Press 'q' to quit");
+    mvprintw(0, 0, "ESP32 Signal Monitor - Controls: 1-6 (keyboard), Q (quit)");
 
     // Отображаем состояние пинов
     for(int i = 0; i < 6; i++) {
-        int y = 3 + i * 2;
-        int x = 10;
-
+        int y = 2 + i;
         mvprintw(y, 0, "PIN %d:", i+1);
 
         if(pin_states[i]) {
-            attron(COLOR_PAIR(2)); // Зеленый
-            mvprintw(y, x, "[ACTIVE]");
+            attron(COLOR_PAIR(2));
+            mvprintw(y, 10, "[ACTIVE]");
             attroff(COLOR_PAIR(2));
         } else {
-            attron(COLOR_PAIR(1)); // Красный
-            mvprintw(y, x, "[INACTIVE]");
+            attron(COLOR_PAIR(1));
+            mvprintw(y, 10, "[INACTIVE]");
             attroff(COLOR_PAIR(1));
         }
     }
 
-    // Инструкции
-    mvprintw(16, 0, "Connect GND to pins 15-21 on ESP32 to activate");
-    mvprintw(17, 0, "Bluetooth device: ESP32-Signal");
+    mvprintw(10, 0, "Controls:");
+    mvprintw(11, 0, "Keyboard: Press 1-6 to activate pins");
+    mvprintw(12, 0, "Bluetooth: Connect ESP32 and use GND on pins 15-21");
+    mvprintw(13, 0, "Press 'q' to quit");
 
     refresh();
 }
@@ -62,13 +59,11 @@ void bluetooth_thread(const std::string& mac_addr) {
         int len = read(sock, buffer, sizeof(buffer)-1);
 
         if(len > 0) {
-            // Обрабатываем команды
             for(int i = 1; i <= 6; i++) {
                 if(strstr(buffer, ("PIN" + std::to_string(i)).c_str())) {
                     pin_states[i-1] = 1;
-                    // Автоматическое выключение через 2 секунды
                     std::thread([i]() {
-                        usleep(2000000); // 2 секунды
+                        usleep(500000); // 0.5 секунды
                         pin_states[i-1] = 0;
                     }).detach();
                 }
@@ -93,30 +88,39 @@ int main(int argc, char* argv[]) {
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
-    timeout(100); // Неблокирующий ввод
+    timeout(100);
 
-    // Инициализация цветов
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK);    // Неактивный
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Активный
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
 
     // Запуск Bluetooth потока
     std::thread bt_thread(bluetooth_thread, argv[1]);
 
-    // Главный цикл отображения
+    // Главный цикл
     while(running) {
         update_display();
 
-        // Проверка ввода
         int ch = getch();
-        if(ch == 'q' || ch == 'Q') {
-            running = false;
+        switch(ch) {
+            case '1': case '2': case '3': case '4': case '5': case '6':
+                {
+                    int pin = ch - '1'; // Convert '1' to 0, '2' to 1, etc.
+                    pin_states[pin] = 1;
+                    std::thread([pin]() {
+                        usleep(500000);
+                        pin_states[pin] = 0;
+                    }).detach();
+                }
+                break;
+            case 'q': case 'Q':
+                running = false;
+                break;
         }
 
-        usleep(50000); // 50ms
+        usleep(50000);
     }
 
-    // Завершение
     bt_thread.join();
     endwin();
     return 0;

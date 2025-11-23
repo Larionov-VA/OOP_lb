@@ -16,7 +16,7 @@ set(SRCS
     src/core/FieldCell.cpp
     src/core/EntityManager.cpp
     src/core/visual/FTXUIVisualizer.cpp
-    src/core/visual/NCURSESVisualizer.cpp
+    # src/core/visual/NCURSESVisualizer.cpp
     src/core/Config.cpp
     src/core/FileHandler.cpp
 
