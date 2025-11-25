@@ -261,7 +261,11 @@ void NCURSESVisualizer::loopInGame() {
     // ~30 FPS
     const int frame_ms = 33;
     auto frame_start = std::chrono::steady_clock::now();
-
+    auto pdata = gameController->getPlayerData();
+    if (pdata && pdata->levelIncreased) {
+        state = State::LevelUpMenu;
+        return;
+    }
     drawInGame();
 
     int input = fetchInput();
@@ -286,7 +290,6 @@ void NCURSESVisualizer::loopInGame() {
             else if (c == 'e' || c == 'E') { consumed = !gameController->performAnAction('e'); }
             else if (c == 'q' || c == 'Q') { gameController->performAnAction('q'); }
             else if (c >= '1' && c <= '4') {
-                // map '1'..'4' to '0'..'3' as in original
                 gameController->performAnAction((char)('0' + (c - '1')));
             }
             // If performAnAction returned false -> game ended, return to menu
@@ -361,12 +364,14 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
             int bar_w = w - 4;
             int filled = (int)(bar_w * health);
             mvprintw(cur_y++, x + 1, "Health: %d/%d", data->playerHealth, data->playerMaxHealth);
+            attron(COLOR_PAIR(4));
             mvprintw(cur_y, x + 1, "[");
             for (int i = 0; i < bar_w; ++i) {
                 if (i < filled) addch('=');
                 else addch(' ');
             }
             addch(']');
+            attroff(COLOR_PAIR(4));
             cur_y += 2;
             mvprintw(cur_y++, x + 1, "Level: %d", data->playerLevel);
             mvprintw(cur_y++, x + 1, "Exp: %lld/%lld", data->playerCurrentExperience, data->playerLevelUpExperience);
@@ -473,18 +478,13 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
 }
 
 void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
-    // Top: Hand / spells
     drawBoxTitle(x, y, w, " HAND ");
     int cur_y = y + 1;
 
     if (gameController) {
         auto pdata = gameController->getPlayerData();
-        if (pdata->levelIncreased) {
-            this->state = State::LevelUpMenu;
-            drawLevelUpMenu();
-        }
         if (pdata) {
-            for (int i = 0; i < pdata->playerCurrentHandSize && cur_y < y + h - 3; ++i) {
+            for (int i = 0; i < 4; ++i) {
                 auto item = pdata->playerHandItem[i];
                 std::string sel = item.first ? "*" : " ";
                 std::string spell_name;
@@ -500,11 +500,4 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
     } else {
         mvprintw(cur_y++, x + 1, "(no controller)");
     }
-
-    // Bottom: Save & Exit button
-    std::string btn = "[ Save & Exit ]";
-    mvprintw(y + h - 2, x + (w - (int)btn.size())/2, "%s", btn.c_str());
-    mvprintw(y + h - 1, x + 1, "Press 'S' to save & exit");
 }
-
-// End of file
