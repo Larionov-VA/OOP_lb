@@ -73,8 +73,8 @@ void NCURSESVisualizer::display() {
 }
 
 void NCURSESVisualizer::loopMainMenu() {
-    // Target FPS ~ 60
-    const int frame_ms = 1;
+    // Target FPS ~ 30
+    const int frame_ms = 33;
     auto frame_start = std::chrono::steady_clock::now();
 
     drawMainMenu();
@@ -165,8 +165,8 @@ void NCURSESVisualizer::drawMainMenu() {
 }
 
 void NCURSESVisualizer::loopInGame() {
-    // ~60 FPS
-    const int frame_ms = 1;
+    // ~30 FPS
+    const int frame_ms = 33;
     auto frame_start = std::chrono::steady_clock::now();
 
     drawInGame();

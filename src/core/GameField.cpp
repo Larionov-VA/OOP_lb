@@ -652,29 +652,30 @@ std::vector<wchar_t> GameField::show() {
             }
         }
         else {
-            int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
-            switch (randomRock) {
-            case 0:
-                // data.push_back(L'⛰');
-                data.push_back('#');
-                break;
-            case 1:
-                // data.push_back(L'🏔');
-                data.push_back('#');
-                break;
-            case 2:
-                // data.push_back(L'🌳');
-                data.push_back('#');
-                break;
-            case 3:
-                // data.push_back(L'🌲');
-                data.push_back('#');
-                break;
-            default:
-                // data.push_back(L'🏔');
-                data.push_back('#');
-                break;
-            }
+            // int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
+            // switch (randomRock) {
+            // case 0:
+            //     // data.push_back(L'⛰');
+            //     data.push_back('#');
+            //     break;
+            // case 1:
+            //     // data.push_back(L'🏔');
+            //     data.push_back('#');
+            //     break;
+            // case 2:
+            //     // data.push_back(L'🌳');
+            //     data.push_back('#');
+            //     break;
+            // case 3:
+            //     // data.push_back(L'🌲');
+            //     data.push_back('#');
+            //     break;
+            // default:
+            //     // data.push_back(L'🏔');
+            //     data.push_back('#');
+            //     break;
+            // }
+            data.push_back('#');
         }
     }
     return data;
