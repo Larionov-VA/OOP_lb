@@ -1,5 +1,4 @@
 #pragma once
-
 #include <ncurses.h>
 #include <string>
 #include <vector>
@@ -24,9 +23,9 @@ public:
     void display();
 
 private:
-    enum class State { MainMenu, InGame, Exit };
+    enum class State { MainMenu, InGame, LevelUpMenu, Exit };
     State state = State::MainMenu;
-
+    int levelup_selected = 0;
     // Ссылки на внешние контроллеры
     InputController* inputController = nullptr;
     IGameController* gameController = nullptr;
@@ -50,10 +49,12 @@ private:
     // Рендер и обработка событий
     void loopMainMenu();
     void loopInGame();
+    void loopLevelUp();
 
     // Вспомогательные рисовалки
     void drawMainMenu();
     void drawInGame();
+    void drawLevelUpMenu();
 
     // Считывание ввода: сначала InputController (если задан), иначе getch()
     int fetchInput();

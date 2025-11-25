@@ -66,6 +66,9 @@ void NCURSESVisualizer::display() {
             case State::InGame:
                 loopInGame();
                 break;
+            case State::LevelUpMenu:
+                loopLevelUp();
+                break;
             default:
                 break;
         }
@@ -117,6 +120,100 @@ void NCURSESVisualizer::loopMainMenu() {
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
+
+
+void NCURSESVisualizer::loopLevelUp() {
+    const int frame_ms = 33;
+    auto frame_start = std::chrono::steady_clock::now();
+
+    drawLevelUpMenu();
+
+    int input = fetchInput();
+    if (input) {
+        switch (input) {
+            case KEY_UP:
+            case 'w': case 'W':
+                levelup_selected = (levelup_selected - 1 + 3) % 3; break;
+            case KEY_DOWN:
+            case 's': case 'S':
+                levelup_selected = (levelup_selected + 1) % 3; break;
+            case '\n': case 'e': case KEY_ENTER:
+                if (gameController) {
+                    char choice = '1' + levelup_selected;
+                    gameController->playerLevelUp(choice);
+                }
+                state = State::InGame;
+                break;
+            case 'q': case 'Q': case 27: // Esc
+                state = State::InGame;
+                break;
+            default: break;
+        }
+    }
+
+    // frame limiter
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+
+void NCURSESVisualizer::drawLevelUpMenu() {
+    clear();
+    // Заголовок
+    attron(COLOR_PAIR(1));
+    mvhline(0, 0, ' ', term_w);
+    mvprintw(0, (term_w - 15) / 2, " LEVEL UP! ");
+    attroff(COLOR_PAIR(1));
+
+    if (!gameController) return;
+
+    auto pdata = gameController->getPlayerData();
+    if (!pdata) return;
+
+    int box_w = 50;
+    int box_h = 10;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 2;
+
+    // Draw border
+    for (int i = 0; i < box_w; ++i) { mvaddch(by, bx + i, '-'); mvaddch(by + box_h -1, bx + i, '-'); }
+    for (int i = 0; i < box_h; ++i) { mvaddch(by + i, bx, '|'); mvaddch(by + i, bx + box_w - 1, '|'); }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w -1, '+');
+    mvaddch(by + box_h -1, bx, '+'); mvaddch(by + box_h -1, bx + box_w -1, '+');
+
+    // Выбор атрибута
+    std::vector<std::string> options = {
+        "INT +10",
+        "STR +10",
+        "DEX +10"
+    };
+
+    for (size_t i = 0; i < options.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == levelup_selected) {
+            attron(COLOR_PAIR(2));
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+            attroff(COLOR_PAIR(2));
+        } else {
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+        }
+    }
+
+    // Подсказка
+    std::string hint = "Use arrows/WASD + Enter to choose";
+    mvprintw(by + box_h -2, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
+
+    // Полная инфо об игроке
+    int info_y = by + box_h + 1;
+    mvprintw(info_y++, bx, "Level: %d  Exp: %lld/%lld", pdata->playerLevel, pdata->playerCurrentExperience, pdata->playerLevelUpExperience);
+    mvprintw(info_y++, bx, "Health: %d/%d  Attack: %d  Weapon: %s", pdata->playerHealth, pdata->playerMaxHealth, pdata->playerAttack, pdata->playerWeapon.c_str());
+    mvprintw(info_y++, bx, "INT: %d  STR: %d  DEX: %d", pdata->playerIntelligence, pdata->playerStrength, pdata->playerDexterity);
+    mvprintw(info_y++, bx, "Debuff: %s", pdata->playerDebaff.c_str());
+
+    refresh();
+}
+
 
 void NCURSESVisualizer::drawMainMenu() {
     clear();
@@ -390,10 +487,15 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
             for (int i = 0; i < pdata->playerCurrentHandSize && cur_y < y + h - 3; ++i) {
                 auto item = pdata->playerHandItem[i];
                 std::string sel = item.first ? "*" : " ";
-                mvprintw(cur_y++, x + 1, "%d) %s x%d", i+1, "(spell)", item.second);
+                std::string spell_name;
+                switch(i) {
+                    case 0: spell_name = "AOE Spell"; break;
+                    case 1: spell_name = "Fireball"; break;
+                    case 2: spell_name = "Upgrade"; break;
+                    case 3: spell_name = "Trap"; break;
+                }
+                mvprintw(cur_y++, x + 1, "%d) %s %s x%d", i+1, sel.c_str(), spell_name.c_str(), item.second);
             }
-        } else {
-            mvprintw(cur_y++, x + 1, "(no player)");
         }
     } else {
         mvprintw(cur_y++, x + 1, "(no controller)");
