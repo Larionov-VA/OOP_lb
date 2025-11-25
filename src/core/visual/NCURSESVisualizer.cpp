@@ -144,10 +144,6 @@ void NCURSESVisualizer::loopLevelUp() {
                 }
                 state = State::InGame;
                 break;
-            case 'q': case 'Q': case 27: // Esc
-                state = State::InGame;
-                break;
-            default: break;
         }
     }
 
@@ -483,6 +479,9 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
 
     if (gameController) {
         auto pdata = gameController->getPlayerData();
+        if (pdata->levelIncreased) {
+            this->state = State::LevelUpMenu;
+        }
         if (pdata) {
             for (int i = 0; i < pdata->playerCurrentHandSize && cur_y < y + h - 3; ++i) {
                 auto item = pdata->playerHandItem[i];
