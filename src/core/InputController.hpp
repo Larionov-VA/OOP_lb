@@ -21,7 +21,7 @@ private:
     int sock = -1;
     std::thread bt_thread;
     std::chrono::steady_clock::time_point last_press[6];
-    static constexpr char BT_KEYS[6] = { 'w', 'a', 's', 'd', 'q', 'e' };
+    static constexpr char BT_KEYS[6] = { 's', 'd', 'w', 'a', 'q', 'e' };
 
 public:
     InputController();

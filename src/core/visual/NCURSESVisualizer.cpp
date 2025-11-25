@@ -276,7 +276,7 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
             addch(']');
             cur_y += 2;
             mvprintw(cur_y++, x + 1, "Level: %d", data->playerLevel);
-            mvprintw(cur_y++, x + 1, "Exp: %d/%d", data->playerCurrentExperience, data->playerLevelUpExperience);
+            mvprintw(cur_y++, x + 1, "Exp: %lld/%lld", data->playerCurrentExperience, data->playerLevelUpExperience);
             mvprintw(cur_y++, x + 1, "Attack: %d", data->playerAttack);
             mvprintw(cur_y++, x + 1, "Weapon: %s", data->playerWeapon.c_str());
         } else {
@@ -308,61 +308,7 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
     }
 }
 
-// void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
-//     drawBoxTitle(x, y, w, " FIELD ");
 
-//     std::vector<wchar_t> fieldChars;
-//     int fw = GlobalGameConfig::fieldWidth;
-//     int fh = GlobalGameConfig::fieldHeight;
-
-//     if (gameController)
-//         fieldChars = gameController->getFieldData();
-
-//     // каждая клетка занимает два символа: "<char><space>"
-//     int render_cell_width = 2;
-
-//     int render_field_width = fw * render_cell_width;
-//     int render_field_height = fh;
-
-//     // видимая область
-//     int visible_w = std::min(w - 2, render_field_width);
-//     int visible_h = std::min(h - 2, render_field_height);
-
-//     // центрирование, но ТОЛЬКО если панель >= размера поля
-//     int start_x;
-//     if (render_field_width <= w - 2)
-//         start_x = x + (w - render_field_width) / 2;
-//     else
-//         start_x = x + 1;
-
-//     int start_y;
-//     if (render_field_height <= h - 2)
-//         start_y = y + (h - render_field_height) / 2;
-//     else
-//         start_y = y + 1;
-
-//     // вывод
-//     for (int ry = 0; ry < visible_h; ++ry) {
-//         int base_idx = ry * fw;
-//         std::string line;
-
-//         for (int rx = 0; rx < fw && line.size() < visible_w; ++rx) {
-//             int idx = base_idx + rx;
-//             wchar_t ch = (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
-
-//             char out = (ch > 0 && ch < 128) ? (char)ch : '.';
-
-//             line.push_back(out);
-//             line.push_back(' ');
-//         }
-
-//         // обрезаем если строка больше видимой области
-//         if ((int)line.size() > visible_w)
-//             line.resize(visible_w);
-
-//         mvprintw(start_y + ry, start_x, "%s", line.c_str());
-//     }
-// }
 void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     drawBoxTitle(x, y, w, " FIELD ");
 
@@ -372,13 +318,6 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
 
     if (gameController)
         fieldChars = gameController->getFieldData();
-
-    // ВАЖНО: Проверяем размер данных
-    if (fieldChars.size() != fw * fh) {
-        mvprintw(y + 1, x + 1, "DATA SIZE ERROR: got %zu, expected %d",
-                fieldChars.size(), fw * fh);
-        return;
-    }
 
     int render_cell_width = 2;
     int render_field_width = fw * render_cell_width;
@@ -424,7 +363,7 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
             if (actual_rx >= fw) break;     // Выход за границы поля
 
             int idx = base_idx + actual_rx;  // Индекс в данных поля
-            if (idx >= fieldChars.size()) break;
+            if (idx >= (int)fieldChars.size()) break;
 
             wchar_t ch = fieldChars[idx];
             char out = (ch > 0 && ch < 128) ? (char)ch : '.';

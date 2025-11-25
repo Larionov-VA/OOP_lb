@@ -1,32 +1,3 @@
-// #include <ncurses.h>
-// #include <iostream>
-// #include <cstring>
-// #include <unistd.h>
-// #include <bluetooth/bluetooth.h>
-// #include <bluetooth/rfcomm.h>
-// #include <atomic>
-// #include <thread>
-// #include <vector>
-// #include <string>
-// #include <locale.h>
-
-// #include "../Config.hpp"
-// #include "IVisualizer.hpp"
-// #include "ASCIIAssets/ASCIIAssets.hpp"
-
-
-// class NCURSESVisualizer : public IVisualizer{
-// private:
-//     InputController* inputController = nullptr;
-//     IGameController* gameController = nullptr;
-// public:
-//     void setInputController(InputController* inputController) override;
-//     void setGameController(IGameController* gameController) override;
-//     void display() override;
-//     NCURSESVisualizer();
-//     ~NCURSESVisualizer();
-// };
-
 #pragma once
 
 #include <ncurses.h>
