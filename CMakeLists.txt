@@ -17,6 +17,7 @@ set(SRCS
     src/core/visual/NCURSESVisualizer.cpp
     src/core/Config.cpp
     src/core/FileHandler.cpp
+    src/core/InputController.cpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp
@@ -43,7 +44,7 @@ set(SRCS
 # set(CURSES_NEED_WIDE TRUE)
 add_executable(game ${SRCS})
 
-target_compile_options(game PRIVATE -Wall -Wextra)
+target_compile_options(game PRIVATE -Wall -Wextra -pthread)
 target_include_directories(game PRIVATE src/)
 
 # target_compile_definitions(game PRIVATE
@@ -56,4 +57,5 @@ target_link_libraries(game
     PRIVATE ftxui::dom
     PRIVATE ftxui::component
     PRIVATE ncursesw
+    PRIVATE bluetooth
 )

@@ -1,252 +1,448 @@
-// #include "NCURSESVisualizer.hpp"
-
-// NCURSESVisualizer::NCURSESVisualizer() {
-//     initscr();
-//     cbreak();
-//     noecho();
-//     curs_set(0);
-//     timeout(100);
-//     controller_ = nullptr;
-// }
-
-// void NCURSESVisualizer::setController(IGameController* controller) {
-//     controller_ = controller;
-// }
-
-// void NCURSESVisualizer::display() {
-//     while (true)
-//     {
-//         clear();
-//         mvprintw(0, 0, "NCURSES Visualizer - Working!");
-//         refresh();
-//         napms(1000); // Задержка 1 секунда чтобы увидеть сообщение
-//     }
-// }
-
-// NCURSESVisualizer::~NCURSESVisualizer() {
-//     endwin();
-// }
 #include "NCURSESVisualizer.hpp"
-#include <locale.h>  // для setlocale
-
-static bool ncurses_initialized = false;
 
 NCURSESVisualizer::NCURSESVisualizer() {
-    if (!ncurses_initialized) {
-        // Устанавливаем локаль для поддержки wide characters
-        setlocale(LC_ALL, "");
-
-        initscr();
-        cbreak();
-        noecho();
-        keypad(stdscr, TRUE);
-        curs_set(0);
-        timeout(100);
-
-        // Включаем поддержку wide characters в ncurses
-        if (has_colors()) {
-            start_color();
-        }
-
-        ncurses_initialized = true;
-    }
-    controller_ = nullptr;
-}
-
-void NCURSESVisualizer::setController(IGameController* controller) {
-    controller_ = controller;
-}
-
-void NCURSESVisualizer::display() {
-    if (controller_ == nullptr) {
-        mvprintw(0, 0, "Controller is NULL!");
-        refresh();
-        napms(2000);
-        return;
-    }
-
-    controller_->startNewGame();
-
-    while (true) {
-        clear();
-
-        try {
-            std::vector<wchar_t> fieldChars = controller_->getFieldData();
-            int expectedSize = GlobalGameConfig::fieldHeight * GlobalGameConfig::fieldWidth;
-
-            if (fieldChars.size() >= static_cast<size_t>(expectedSize)) {
-                for (int y = 0; y < GlobalGameConfig::fieldHeight; ++y) {
-                    std::wstring line;
-                    for (int x = 0; x < GlobalGameConfig::fieldWidth; ++x) {
-                        int index = y * GlobalGameConfig::fieldWidth + x;
-                        wchar_t symbol = (index < (int)fieldChars.size()) ? fieldChars[index] : L' ';
-                        line += symbol;
-
-                        // ИСПРАВЛЕННАЯ логика: добавляем пробел вместо нулевого символа
-                        wchar_t nextSymbol = L' ';
-                        if (symbol == L'🌳' || symbol == L'🌲' || symbol == L'🔥' ||
-                            symbol == L'🏰' || symbol == L'⚔️' || symbol == L'🏟' ||
-                            symbol == L'⛫' || symbol == L'𐇐' || symbol == L'𖨆' ||
-                            symbol == L'⛰' || symbol == L'🏔') {
-                            nextSymbol = L' ';  // ПРОБЕЛ вместо \0
-                        }
-                        else if (symbol == L'░') {
-                            nextSymbol = L'░';  // для этого символа дублируем
-                        }
-                        // Для остальных символов nextSymbol остается пробелом
-
-                        line += nextSymbol;
-                    }
-                    mvaddwstr(y, 0, line.c_str());
-                }
-
-
-                mvprintw(GlobalGameConfig::fieldHeight + 1, 0,
-                        "Controls: WASD - move, Q - quit");
-            }
-
-            refresh();
-
-            int ch = getch();
-            if (ch == 'q' || ch == 'Q') {
-                controller_->stopGame();
-                clear();
-                break;
-            }
-            else if (ch == 'w' || ch == 'W') controller_->performAnAction('w');
-            else if (ch == 's' || ch == 'S') controller_->performAnAction('s');
-            else if (ch == 'a' || ch == 'A') controller_->performAnAction('a');
-            else if (ch == 'd' || ch == 'D') controller_->performAnAction('d');
-            else if (ch == 'e' || ch == 'E') controller_->performAnAction('e');
-
-            napms(50);
-
-        } catch (...) {
-            break;
-        }
-    }
+    initCurses();
+    last_frame_time = std::chrono::steady_clock::now();
 }
 
 NCURSESVisualizer::~NCURSESVisualizer() {
-    if (ncurses_initialized) {
-        endwin();
-        ncurses_initialized = false;
+    deinitCurses();
+}
+
+void NCURSESVisualizer::setInputController(InputController* ic) {
+    inputController = ic;
+}
+
+void NCURSESVisualizer::setGameController(IGameController* gc) {
+    gameController = gc;
+}
+
+void NCURSESVisualizer::initCurses() {
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE); // getch non-blocking
+    curs_set(0);
+    start_color();
+    use_default_colors();
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);    // header
+    init_pair(2, COLOR_BLACK, COLOR_YELLOW);  // selected menu
+    init_pair(3, COLOR_GREEN, -1);            // player gauge
+    init_pair(4, COLOR_RED, -1);              // health
+    init_pair(5, COLOR_CYAN, -1);             // info
+    updateTermSize();
+    clear();
+    refresh();
+}
+
+void NCURSESVisualizer::deinitCurses() {
+    endwin();
+}
+
+void NCURSESVisualizer::updateTermSize() {
+    getmaxyx(stdscr, term_h, term_w);
+}
+
+int NCURSESVisualizer::fetchInput() {
+    // 0 means nothing
+    if (inputController) {
+        char c = inputController->getInputChar();
+        if (c != 0) return (int)c;
+    }
+    int ch = getch();
+    if (ch == ERR) return 0;
+    return ch;
+}
+
+void NCURSESVisualizer::display() {
+    state = State::MainMenu;
+    while (state != State::Exit) {
+        updateTermSize();
+        switch (state) {
+            case State::MainMenu:
+                loopMainMenu();
+                break;
+            case State::InGame:
+                loopInGame();
+                break;
+            default:
+                break;
+        }
     }
 }
 
+void NCURSESVisualizer::loopMainMenu() {
+    // Target FPS ~ 60
+    const int frame_ms = 1;
+    auto frame_start = std::chrono::steady_clock::now();
 
-// void update_display() {
-//     clear();
+    drawMainMenu();
 
-//     mvprintw(0, 0, "ESP32 Signal Monitor - Controls: 1-6 (keyboard), Q (quit)");
+    int input = fetchInput();
+    if (input) {
+        switch (input) {
+            case KEY_UP:
+            case 'w':
+                main_menu_selected = (main_menu_selected - 1 + (int)main_menu_items.size()) % (int)main_menu_items.size();
+                break;
+            case KEY_DOWN:
+            case 's':
+                main_menu_selected = (main_menu_selected + 1) % (int)main_menu_items.size();
+                break;
+            case '\n':
+            case 'e':
+            case KEY_ENTER:
+                if (main_menu_selected == 0) { // New Game
+                    if (gameController) gameController->startNewGame();
+                    state = State::InGame;
+                } else if (main_menu_selected == 1) { // Continue
+                    if (gameController) gameController->startNewGame(); // your original used startNewGame for continue
+                    state = State::InGame;
+                } else if (main_menu_selected == 2) { // Exit
+                    state = State::Exit;
+                }
+                break;
+            case 'q':
+            case 'Q':
+                state = State::Exit;
+                break;
+            default:
+                break;
+        }
+    }
 
-//     // Отображаем состояние пинов
-//     for(int i = 0; i < 6; i++) {
-//         int y = 2 + i;
-//         mvprintw(y, 0, "PIN %d:", i+1);
+    // frame limiter
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
 
-//         if(pin_states[i]) {
-//             attron(COLOR_PAIR(2));
-//             mvprintw(y, 10, "[ACTIVE]");
-//             attroff(COLOR_PAIR(2));
-//         } else {
-//             attron(COLOR_PAIR(1));
-//             mvprintw(y, 10, "[INACTIVE]");
-//             attroff(COLOR_PAIR(1));
+void NCURSESVisualizer::drawMainMenu() {
+    clear();
+    // Header
+    attron(COLOR_PAIR(1));
+    mvhline(0, 0, ' ', term_w);
+    mvprintw(0, (term_w - 12) / 2, " MAIN MENU ");
+    attroff(COLOR_PAIR(1));
+
+    // Menu box
+    int box_w = 40;
+    int box_h = (int)main_menu_items.size() + 4;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 2;
+    // Draw border
+    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
+    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
+    for (int i = 0; i < box_h; ++i) {
+        mvaddch(by + i, bx, '|');
+        mvaddch(by + i, bx + box_w - 1, '|');
+    }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
+    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
+
+    // Title
+    std::string title = "Choose action";
+    mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
+
+    // Items
+    for (size_t i = 0; i < main_menu_items.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == main_menu_selected) {
+            attron(COLOR_PAIR(2));
+            mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
+            attroff(COLOR_PAIR(2));
+        } else {
+            mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
+        }
+    }
+
+    // Footer
+    std::string hint = "Use arrows/WASD + Enter. Q to quit.";
+    mvprintw(by + box_h, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
+
+    refresh();
+}
+
+void NCURSESVisualizer::loopInGame() {
+    // ~60 FPS
+    const int frame_ms = 1;
+    auto frame_start = std::chrono::steady_clock::now();
+
+    drawInGame();
+
+    int input = fetchInput();
+    if (input) {
+        // navigation / actions
+        if (input == 27) { // ESC
+            // stop game and go to main menu
+            if (gameController) gameController->stopGame();
+            state = State::MainMenu;
+            return;
+        }
+
+        // movement keys + actions
+        char c = (char)input;
+        if (gameController) {
+            bool consumed = false;
+            // accept arrows as well
+            if (input == KEY_UP || c == 'w' || c == 'W') { consumed = !gameController->performAnAction('w'); }
+            else if (input == KEY_DOWN || c == 's' || c == 'S') { consumed = !gameController->performAnAction('s'); }
+            else if (input == KEY_LEFT || c == 'a' || c == 'A') { consumed = !gameController->performAnAction('a'); }
+            else if (input == KEY_RIGHT || c == 'd' || c == 'D') { consumed = !gameController->performAnAction('d'); }
+            else if (c == 'e' || c == 'E') { consumed = !gameController->performAnAction('e'); }
+            else if (c == 'q' || c == 'Q') { gameController->performAnAction('q'); }
+            else if (c >= '1' && c <= '4') {
+                // map '1'..'4' to '0'..'3' as in original
+                gameController->performAnAction((char)('0' + (c - '1')));
+            }
+            // If performAnAction returned false -> game ended, return to menu
+            // We checked consumed above to detect false return (inverted). Simpler: check separately:
+            // But we already inverted above; to be safe, check gameController state by calling performAnAction and reacting if false:
+            // (we already called it above; if it returned false we set state accordingly)
+            if (consumed) {
+                state = State::MainMenu;
+                return;
+            }
+        }
+    }
+
+    // frame limiter
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+void NCURSESVisualizer::drawInGame() {
+    clear();
+    // Header
+    attron(COLOR_PAIR(1));
+    mvhline(0, 0, ' ', term_w);
+    mvprintw(0, (term_w - 12) / 2, " IN GAME ");
+    attroff(COLOR_PAIR(1));
+
+    // Layout: left (25%), center (50%), right (25%)
+    int left_w = term_w / 4;
+    int right_w = term_w / 4;
+    int center_w = term_w - left_w - right_w - 2; // -2 for separators
+    int top = 1;
+    int height = term_h - 2;
+
+    // Vertical separators
+    for (int y = top; y <= top + height; ++y) {
+        mvaddch(y, left_w, '|');
+        mvaddch(y, left_w + 1 + center_w, '|');
+    }
+
+    drawLeftPanel(0, top, left_w, height);
+    drawFieldPanel(left_w + 1, top, center_w, height);
+    drawRightPanel(left_w + 1 + center_w + 1, top, right_w, height);
+
+    // Footer / hint
+    std::string hint = "WASD/arrows - move | Q/E - actions | Esc - menu | 1-4 - use item";
+    mvprintw(term_h - 1, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+
+    refresh();
+}
+
+void NCURSESVisualizer::drawBoxTitle(int x, int y, int w, const std::string& title) {
+    // title at top center of box area
+    mvhline(y, x, ' ', w);
+    mvprintw(y, x + (w - (int)title.size())/2, "%s", title.c_str());
+}
+
+void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
+    // player info at top half, enemy info bottom half
+    int half = h / 2;
+    int cur_y = y;
+
+    // Player info box
+    drawBoxTitle(x, cur_y, w, " PLAYER INFO ");
+    cur_y++;
+    if (gameController) {
+        auto data = gameController->getPlayerData();
+        if (data) {
+            // Health bar and basic stats
+            float health = (data->playerMaxHealth > 0)
+                ? (float)data->playerHealth / (float)data->playerMaxHealth : 0.0f;
+            int bar_w = w - 4;
+            int filled = (int)(bar_w * health);
+            mvprintw(cur_y++, x + 1, "Health: %d/%d", data->playerHealth, data->playerMaxHealth);
+            mvprintw(cur_y, x + 1, "[");
+            for (int i = 0; i < bar_w; ++i) {
+                if (i < filled) addch('=');
+                else addch(' ');
+            }
+            addch(']');
+            cur_y += 2;
+            mvprintw(cur_y++, x + 1, "Level: %d", data->playerLevel);
+            mvprintw(cur_y++, x + 1, "Exp: %d/%d", data->playerCurrentExperience, data->playerLevelUpExperience);
+            mvprintw(cur_y++, x + 1, "Attack: %d", data->playerAttack);
+            mvprintw(cur_y++, x + 1, "Weapon: %s", data->playerWeapon.c_str());
+        } else {
+            mvprintw(cur_y++, x + 1, "(no player data)");
+        }
+    } else {
+        mvprintw(cur_y++, x + 1, "(no game controller)");
+    }
+
+    // Enemy info box
+    cur_y = y + half;
+    drawBoxTitle(x, cur_y, w, " ENEMIES ");
+    cur_y++;
+    if (gameController) {
+        auto enemies = gameController->getEnemyData();
+        if (!enemies.empty()) {
+            for (size_t i = 0; i < enemies.size() && cur_y < y + h - 1; ++i) {
+                mvprintw(cur_y++, x + 1, "%s %d/%d atk:%d",
+                         enemies[i].name.c_str(),
+                         enemies[i].enemyHealth,
+                         enemies[i].enemyMaxHealth,
+                         enemies[i].enemyAttack);
+            }
+        } else {
+            mvprintw(cur_y++, x + 1, "(no enemies)");
+        }
+    } else {
+        mvprintw(cur_y++, x + 1, "(no game controller)");
+    }
+}
+
+// void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
+//     drawBoxTitle(x, y, w, " FIELD ");
+
+//     std::vector<wchar_t> fieldChars;
+//     int fw = GlobalGameConfig::fieldWidth;
+//     int fh = GlobalGameConfig::fieldHeight;
+
+//     if (gameController)
+//         fieldChars = gameController->getFieldData();
+
+//     // каждая клетка занимает два символа: "<char><space>"
+//     int render_cell_width = 2;
+
+//     int render_field_width = fw * render_cell_width;
+//     int render_field_height = fh;
+
+//     // видимая область
+//     int visible_w = std::min(w - 2, render_field_width);
+//     int visible_h = std::min(h - 2, render_field_height);
+
+//     // центрирование, но ТОЛЬКО если панель >= размера поля
+//     int start_x;
+//     if (render_field_width <= w - 2)
+//         start_x = x + (w - render_field_width) / 2;
+//     else
+//         start_x = x + 1;
+
+//     int start_y;
+//     if (render_field_height <= h - 2)
+//         start_y = y + (h - render_field_height) / 2;
+//     else
+//         start_y = y + 1;
+
+//     // вывод
+//     for (int ry = 0; ry < visible_h; ++ry) {
+//         int base_idx = ry * fw;
+//         std::string line;
+
+//         for (int rx = 0; rx < fw && line.size() < visible_w; ++rx) {
+//             int idx = base_idx + rx;
+//             wchar_t ch = (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
+
+//             char out = (ch > 0 && ch < 128) ? (char)ch : '.';
+
+//             line.push_back(out);
+//             line.push_back(' ');
 //         }
+
+//         // обрезаем если строка больше видимой области
+//         if ((int)line.size() > visible_w)
+//             line.resize(visible_w);
+
+//         mvprintw(start_y + ry, start_x, "%s", line.c_str());
 //     }
-
-//     mvprintw(10, 0, "Controls:");
-//     mvprintw(11, 0, "Keyboard: Press 1-6 to activate pins");
-//     mvprintw(12, 0, "Bluetooth: Connect ESP32 and use GND on pins 15-21");
-//     mvprintw(13, 0, "Press 'q' to quit");
-
-//     refresh();
 // }
+void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
+    drawBoxTitle(x, y, w, " FIELD ");  // OK - рисуем заголовок
 
-// void bluetooth_thread(const std::string& mac_addr) {
-//     int sock = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-//     if(sock < 0) return;
+    std::vector<wchar_t> fieldChars;   // вектор для данных поля
+    int fw = GlobalGameConfig::fieldWidth;   // ожидаемая ширина поля (вероятно 20)
+    int fh = GlobalGameConfig::fieldHeight;  // ожидаемая высота поля (вероятно 20)
 
-//     struct sockaddr_rc addr = {0};
-//     addr.rc_family = AF_BLUETOOTH;
-//     addr.rc_channel = 1;
-//     str2ba(mac_addr.c_str(), &addr.rc_bdaddr);
+    if (gameController)
+        fieldChars = gameController->getFieldData();  // получаем реальные данные
 
-//     if(connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-//         close(sock);
-//         return;
-//     }
+    // каждая клетка занимает два символа: "<char><space>"
+    int render_cell_width = 2;  // OK - для квадратных клеток
 
-//     char buffer[256];
-//     while(running) {
-//         memset(buffer, 0, sizeof(buffer));
-//         int len = read(sock, buffer, sizeof(buffer)-1);
+    int render_field_width = fw * render_cell_width;  // 20 * 2 = 40 символов
+    int render_field_height = fh;                     // 20 строк
 
-//         if(len > 0) {
-//             for(int i = 1; i <= 6; i++) {
-//                 if(strstr(buffer, ("PIN" + std::to_string(i)).c_str())) {
-//                     pin_states[i-1] = 1;
-//                     std::thread([i]() {
-//                         usleep(500000);
-//                         pin_states[i-1] = 0;
-//                     }).detach();
-//                 }
-//             }
-//         }
-//         else if(len == 0) break;
+    // видимая область
+    int visible_w = std::min(w - 2, render_field_width);   // min(доступная_ширина, 40)
+    int visible_h = std::min(h - 2, render_field_height);  // min(доступная_высота, 20)
 
-//         usleep(100000);
-//     }
-//     close(sock);
-// }
+    // центрирование, но ТОЛЬКО если панель >= размера поля
+    int start_x;
+    if (render_field_width <= w - 2)  // если поле помещается по ширине
+        start_x = x + (w - render_field_width) / 2;  // центрируем
+    else
+        start_x = x + 1;  // иначе начинаем с отступа 1
 
-// int main(int argc, char* argv[]) {
-//     if(argc != 2) {
-//         std::cout << "Usage: " << argv[0] << " <MAC_address>" << std::endl;
-//         return 1;
-//     }
+    int start_y;
+    if (render_field_height <= h - 2)  // если поле помещается по высоте
+        start_y = y + (h - render_field_height) / 2;  // центрируем
+    else
+        start_y = y + 1;  // иначе начинаем с отступа 1
 
-//     // Инициализация ncurses
-//     initscr();
-//     cbreak();
-//     noecho();
-//     keypad(stdscr, TRUE);
-//     curs_set(0);
-//     timeout(100);
+    // вывод - ВОТ ЗДЕСЬ ОСНОВНАЯ ПРОБЛЕМА!
+    for (int ry = 0; ry < visible_h; ++ry) {  // ry = 0..19 (видимая высота)
+        int base_idx = ry * fw;  // ПРОБЛЕМА: предполагает, что данные идут построчно
+        std::string line;
 
-//     start_color();
-//     init_pair(1, COLOR_RED, COLOR_BLACK);
-//     init_pair(2, COLOR_GREEN, COLOR_BLACK);
+        for (int rx = 0; rx < fw && line.size() < visible_w; ++rx) {
+            int idx = base_idx + rx;  // ПРОБЛЕМА: idx = ry * fw + rx
+            wchar_t ch = (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
 
-//     // Запуск Bluetooth потока
-//     std::thread bt_thread(bluetooth_thread, argv[1]);
+            char out = (ch > 0 && ch < 128) ? (char)ch : '.';
 
-//     // Главный цикл
-//     while(running) {
-//         update_display();
+            line.push_back(out);
+            line.push_back(' ');
+        }
 
-//         int ch = getch();
-//         switch(ch) {
-//             case '1': case '2': case '3': case '4': case '5': case '6':
-//                 {
-//                     int pin = ch - '1'; // Convert '1' to 0, '2' to 1, etc.
-//                     pin_states[pin] = 1;
-//                     std::thread([pin]() {
-//                         usleep(500000);
-//                         pin_states[pin] = 0;
-//                     }).detach();
-//                 }
-//                 break;
-//             case 'q': case 'Q':
-//                 running = false;
-//                 break;
-//         }
+        // обрезаем если строка больше видимой области
+        if ((int)line.size() > visible_w)
+            line.resize(visible_w);
 
-//         usleep(50000);
-//     }
+        mvprintw(start_y + ry, start_x, "%s", line.c_str());
+    }
+}
 
-//     bt_thread.join();
-//     endwin();
-//     return 0;
-// }
+void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
+    // Top: Hand / spells
+    drawBoxTitle(x, y, w, " HAND ");
+    int cur_y = y + 1;
+
+    if (gameController) {
+        auto pdata = gameController->getPlayerData();
+        if (pdata) {
+            for (int i = 0; i < pdata->playerCurrentHandSize && cur_y < y + h - 3; ++i) {
+                auto item = pdata->playerHandItem[i];
+                std::string sel = item.first ? "*" : " ";
+                mvprintw(cur_y++, x + 1, "%d) %s x%d", i+1, "(spell)", item.second);
+            }
+        } else {
+            mvprintw(cur_y++, x + 1, "(no player)");
+        }
+    } else {
+        mvprintw(cur_y++, x + 1, "(no controller)");
+    }
+
+    // Bottom: Save & Exit button
+    std::string btn = "[ Save & Exit ]";
+    mvprintw(y + h - 2, x + (w - (int)btn.size())/2, "%s", btn.c_str());
+    mvprintw(y + h - 1, x + 1, "Press 'S' to save & exit");
+}
+
+// End of file

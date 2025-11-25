@@ -619,26 +619,33 @@ std::vector<wchar_t> GameField::show() {
 
             if (entityManager[i]) {
                 if (currentEntity->getType() == Entity::entityType::PLAYER) {
-                    data.push_back(L'𐇐');
+                    // data.push_back(L'𐇐');
+                    data.push_back('P');
                 }
                 else if (currentEntity->getType() == Entity::entityType::ENEMY) {
-                    data.push_back(L'𖨆');
+                    // data.push_back(L'𖨆');
+                    data.push_back('E');
                 }
                 else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
-                    data.push_back(L'🏟');
+                    // data.push_back(L'🏟');
+                    data.push_back('B');
                 }
                 else if (currentEntity->getType() == Entity::entityType::TOWER) {
-                    data.push_back(L'⛫');
+                    // data.push_back(L'⛫');
+                    data.push_back('T');
                 }
             }
             else if (cells[i].isCellSlow()) {
-                data.push_back(L'░');
+                // data.push_back(L'░');
+                data.push_back(L'&');
             }
             else if (cells[i].checkCellDead()) {
-                data.push_back(L'☠');
+                // data.push_back(L'☠');
+                data.push_back(L'x');
             }
             else if (cells[i].isTrapped()) {
-                data.push_back(L'᪠');
+                // data.push_back(L'᪠');
+                data.push_back(L'o');
             }
             else {
                 data.push_back('-');
@@ -648,19 +655,24 @@ std::vector<wchar_t> GameField::show() {
             int randomRock = (9092/(i+1) << abs(i-900*i))/9*(i+1) % 4;
             switch (randomRock) {
             case 0:
-                data.push_back(L'⛰');
+                // data.push_back(L'⛰');
+                data.push_back('#');
                 break;
             case 1:
-                data.push_back(L'🏔');
+                // data.push_back(L'🏔');
+                data.push_back('@');
                 break;
             case 2:
-                data.push_back(L'🌳');
+                // data.push_back(L'🌳');
+                data.push_back('$');
                 break;
             case 3:
-                data.push_back(L'🌲');
+                // data.push_back(L'🌲');
+                data.push_back('=');
                 break;
             default:
-                data.push_back(L'🏔');
+                // data.push_back(L'🏔');
+                // data.push_back(L'⛰');
                 break;
             }
         }

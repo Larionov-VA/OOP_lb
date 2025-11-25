@@ -4,10 +4,10 @@
 #include "./visual/FTXUIVisualizer.hpp"
 #include "./visual/IVisualizer.hpp"
 #include "./visual/NCURSESVisualizer.hpp"
+#include "InputController.hpp"
 
-int main() {
-    Game game;
-    IVisualizer* vis;
+
+void choiceVisualizer(IVisualizer*& vis) {
     int visChoice;
     std::cout << "[0] - FTXUI\n[1] - NCURSES\n";
     std::cin >> visChoice;
@@ -17,7 +17,17 @@ int main() {
     else {
         vis = new FTXUIVisualizer();
     }
-    vis->setController(&game);
+}
+
+int main() {
+    Game game;
+    IVisualizer* vis;
+    InputController inp;
+    choiceVisualizer(vis);
+    vis->setGameController(&game);
+    vis->setInputController(&inp);
     vis->display();
     return 0;
 }
+
+

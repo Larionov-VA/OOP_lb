@@ -16,6 +16,7 @@
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/event.hpp"
 
+#include "../InputController.hpp"
 #include "../IGameController.hpp"
 #include "../Config.hpp"
 #include "ASCIIAssets/ASCIIAssets.hpp"
@@ -24,7 +25,8 @@
 
 class FTXUIVisualizer : public IVisualizer{
 private:
-    std::shared_ptr<ftxui::ScreenInteractive> screen_;
+    // std::shared_ptr<ftxui::ScreenInteractive> screen_;
+    ftxui::ScreenInteractive screen_;
     enum class ScreenState {
         MainMenu,
         OptionsMenu,
@@ -33,7 +35,8 @@ private:
         LevelUp,
         Exit
     } currentState;
-    IGameController* controller_ = nullptr;
+    IGameController* gameController = nullptr;
+    InputController* inputController = nullptr;
     struct GameOptions {
         int fieldWidth = 25;
         int fieldHeight = 25;
@@ -42,11 +45,12 @@ private:
     } gameOptions;
 public:
     FTXUIVisualizer();
-    void setController(IGameController* controller) override;
+    void setInputController(InputController* inputController) override;
+    void setGameController(IGameController* gameController) override;
     void display() override;
-    void refreash();
+    void refresh();
 private:
-    void initComponentsIfNeeded(FTXUIVisualizer* self);
+    void initComponentsIfNeeded();
     ftxui::Component buildRootContainer();
     ftxui::Component buildRenderer(ftxui::Component root);
     ftxui::Component buildApp(ftxui::Component renderer);
