@@ -22,7 +22,7 @@ void NCURSESVisualizer::initCurses() {
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE); // getch non-blocking
+    nodelay(stdscr, TRUE);
     curs_set(0);
     start_color();
     use_default_colors();
@@ -292,10 +292,6 @@ void NCURSESVisualizer::loopInGame() {
             else if (c >= '1' && c <= '4') {
                 gameController->performAnAction((char)('0' + (c - '1')));
             }
-            // If performAnAction returned false -> game ended, return to menu
-            // We checked consumed above to detect false return (inverted). Simpler: check separately:
-            // But we already inverted above; to be safe, check gameController state by calling performAnAction and reacting if false:
-            // (we already called it above; if it returned false we set state accordingly)
             if (consumed) {
                 state = State::MainMenu;
                 return;
@@ -342,39 +338,48 @@ void NCURSESVisualizer::drawInGame() {
 }
 
 void NCURSESVisualizer::drawBoxTitle(int x, int y, int w, const std::string& title) {
-    // title at top center of box area
     mvhline(y, x, ' ', w);
     mvprintw(y, x + (w - (int)title.size())/2, "%s", title.c_str());
 }
 
 void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
-    // player info at top half, enemy info bottom half
     int half = h / 2;
     int cur_y = y;
 
-    // Player info box
     drawBoxTitle(x, cur_y, w, " PLAYER INFO ");
     cur_y++;
     if (gameController) {
         auto data = gameController->getPlayerData();
         if (data) {
-            // Health bar and basic stats
             float health = (data->playerMaxHealth > 0)
                 ? (float)data->playerHealth / (float)data->playerMaxHealth : 0.0f;
+            float currentExp = data->playerCurrentExperience - data->playerPrevLevelUpExperience;
+            float expToLvlUp = data->playerLevelUpExperience - data->playerPrevLevelUpExperience;
+            float exp = currentExp/expToLvlUp;
             int bar_w = w - 4;
-            int filled = (int)(bar_w * health);
+            int health_filled = (int)(bar_w * health);
+            int exp_filled = (int)(bar_w * exp);
             mvprintw(cur_y++, x + 1, "Health: %d/%d", data->playerHealth, data->playerMaxHealth);
-            attron(COLOR_PAIR(4));
             mvprintw(cur_y, x + 1, "[");
+            attron(COLOR_PAIR(4));
             for (int i = 0; i < bar_w; ++i) {
-                if (i < filled) addch('=');
+                if (i < health_filled) addch('=');
                 else addch(' ');
             }
-            addch(']');
             attroff(COLOR_PAIR(4));
+            addch(']');
             cur_y += 2;
             mvprintw(cur_y++, x + 1, "Level: %d", data->playerLevel);
             mvprintw(cur_y++, x + 1, "Exp: %lld/%lld", data->playerCurrentExperience, data->playerLevelUpExperience);
+            mvprintw(cur_y, x + 1, "[");
+            attron(COLOR_PAIR(5));
+            for (int i = 0; i < bar_w; ++i) {
+                if (i < exp_filled) addch('=');
+                else addch(' ');
+            }
+            attroff(COLOR_PAIR(5));
+            addch(']');
+            cur_y += 2;
             mvprintw(cur_y++, x + 1, "Attack: %d", data->playerAttack);
             mvprintw(cur_y++, x + 1, "Weapon: %s", data->playerWeapon.c_str());
         } else {
@@ -383,8 +388,6 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
     } else {
         mvprintw(cur_y++, x + 1, "(no game controller)");
     }
-
-    // Enemy info box
     cur_y = y + half;
     drawBoxTitle(x, cur_y, w, " ENEMIES ");
     cur_y++;
@@ -471,7 +474,13 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
             int screen_y = start_y + ry;
 
             if (screen_x < x + w && screen_y < y + h) {
+                if (out == 'E' || out == 'T' || out == 'B') {
+                    attron(COLOR_PAIR(4));
+                }
                 mvaddch(screen_y, screen_x, out);
+                if (out == 'E' || out == 'T' || out == 'B') {
+                    attroff(COLOR_PAIR(4));
+                }
             }
         }
     }
