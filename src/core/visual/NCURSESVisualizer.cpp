@@ -481,6 +481,7 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
         auto pdata = gameController->getPlayerData();
         if (pdata->levelIncreased) {
             this->state = State::LevelUpMenu;
+            drawLevelUpMenu();
         }
         if (pdata) {
             for (int i = 0; i < pdata->playerCurrentHandSize && cur_y < y + h - 3; ++i) {
