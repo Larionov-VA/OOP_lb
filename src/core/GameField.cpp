@@ -660,19 +660,19 @@ std::vector<wchar_t> GameField::show() {
                 break;
             case 1:
                 // data.push_back(L'🏔');
-                data.push_back('@');
+                data.push_back('#');
                 break;
             case 2:
                 // data.push_back(L'🌳');
-                data.push_back('$');
+                data.push_back('#');
                 break;
             case 3:
                 // data.push_back(L'🌲');
-                data.push_back('=');
+                data.push_back('#');
                 break;
             default:
                 // data.push_back(L'🏔');
-                // data.push_back(L'⛰');
+                data.push_back('#');
                 break;
             }
         }

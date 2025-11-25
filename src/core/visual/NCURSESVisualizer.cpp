@@ -364,58 +364,79 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
 //     }
 // }
 void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
-    drawBoxTitle(x, y, w, " FIELD ");  // OK - рисуем заголовок
+    drawBoxTitle(x, y, w, " FIELD ");
 
-    std::vector<wchar_t> fieldChars;   // вектор для данных поля
-    int fw = GlobalGameConfig::fieldWidth;   // ожидаемая ширина поля (вероятно 20)
-    int fh = GlobalGameConfig::fieldHeight;  // ожидаемая высота поля (вероятно 20)
+    std::vector<wchar_t> fieldChars;
+    int fw = GlobalGameConfig::fieldWidth;
+    int fh = GlobalGameConfig::fieldHeight;
 
     if (gameController)
-        fieldChars = gameController->getFieldData();  // получаем реальные данные
+        fieldChars = gameController->getFieldData();
 
-    // каждая клетка занимает два символа: "<char><space>"
-    int render_cell_width = 2;  // OK - для квадратных клеток
+    // ВАЖНО: Проверяем размер данных
+    if (fieldChars.size() != fw * fh) {
+        mvprintw(y + 1, x + 1, "DATA SIZE ERROR: got %zu, expected %d",
+                fieldChars.size(), fw * fh);
+        return;
+    }
 
-    int render_field_width = fw * render_cell_width;  // 20 * 2 = 40 символов
-    int render_field_height = fh;                     // 20 строк
+    int render_cell_width = 2;
+    int render_field_width = fw * render_cell_width;
+    int render_field_height = fh;
 
-    // видимая область
-    int visible_w = std::min(w - 2, render_field_width);   // min(доступная_ширина, 40)
-    int visible_h = std::min(h - 2, render_field_height);  // min(доступная_высота, 20)
+    // ВИДИМАЯ область - вся панель минус отступы
+    int visible_w = w - 2;  // минус границы
+    int visible_h = h - 2;  // минус границы
 
-    // центрирование, но ТОЛЬКО если панель >= размера поля
-    int start_x;
-    if (render_field_width <= w - 2)  // если поле помещается по ширине
-        start_x = x + (w - render_field_width) / 2;  // центрируем
-    else
-        start_x = x + 1;  // иначе начинаем с отступа 1
+    // ЦЕНТРИРОВАНИЕ: всегда центрируем, если поле меньше панели
+    // Если поле больше панели - показываем центральную часть
+    int start_x = x + 1;
+    int start_y = y + 1;
 
-    int start_y;
-    if (render_field_height <= h - 2)  // если поле помещается по высоте
-        start_y = y + (h - render_field_height) / 2;  // центрируем
-    else
-        start_y = y + 1;  // иначе начинаем с отступа 1
+    int offset_x = 0;
+    int offset_y = 0;
 
-    // вывод - ВОТ ЗДЕСЬ ОСНОВНАЯ ПРОБЛЕМА!
-    for (int ry = 0; ry < visible_h; ++ry) {  // ry = 0..19 (видимая высота)
-        int base_idx = ry * fw;  // ПРОБЛЕМА: предполагает, что данные идут построчно
-        std::string line;
+    // Если поле меньше панели по ширине - центрируем
+    if (render_field_width < visible_w) {
+        start_x = x + 1 + (visible_w - render_field_width) / 2;
+    } else {
+        // Иначе обрезаем по бокам
+        offset_x = (render_field_width - visible_w) / 2;
+    }
 
-        for (int rx = 0; rx < fw && line.size() < visible_w; ++rx) {
-            int idx = base_idx + rx;  // ПРОБЛЕМА: idx = ry * fw + rx
-            wchar_t ch = (idx < (int)fieldChars.size()) ? fieldChars[idx] : L' ';
+    // Если поле меньше панели по высоте - центрируем
+    if (render_field_height < visible_h) {
+        start_y = y + 1 + (visible_h - render_field_height) / 2;
+    } else {
+        // Иначе обрезаем сверху/снизу
+        offset_y = (render_field_height - visible_h) / 2;
+    }
 
+    // ВЫВОД с правильной индексацией
+    for (int ry = 0; ry < std::min(visible_h, render_field_height); ++ry) {
+        int actual_ry = ry + offset_y;  // Учитываем смещение для обрезания
+        if (actual_ry >= fh) break;     // Выход за границы поля
+
+        int base_idx = actual_ry * fw;  // Правильная индексация row-major
+
+        for (int rx = 0; rx < std::min(visible_w / 2, fw); ++rx) {
+            int actual_rx = rx + offset_x;  // Учитываем смещение для обрезания
+            if (actual_rx >= fw) break;     // Выход за границы поля
+
+            int idx = base_idx + actual_rx;  // Индекс в данных поля
+            if (idx >= fieldChars.size()) break;
+
+            wchar_t ch = fieldChars[idx];
             char out = (ch > 0 && ch < 128) ? (char)ch : '.';
 
-            line.push_back(out);
-            line.push_back(' ');
+            // Позиция на экране
+            int screen_x = start_x + rx * 2;
+            int screen_y = start_y + ry;
+
+            if (screen_x < x + w && screen_y < y + h) {
+                mvaddch(screen_y, screen_x, out);
+            }
         }
-
-        // обрезаем если строка больше видимой области
-        if ((int)line.size() > visible_w)
-            line.resize(visible_w);
-
-        mvprintw(start_y + ry, start_x, "%s", line.c_str());
     }
 }
 
