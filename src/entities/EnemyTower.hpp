@@ -24,9 +24,6 @@ public:
     int getDamage() override;
     void towerAttack(GameContext &ctx, int userIndex, int power);
     int getSpellDistance();
-    std::unique_ptr<Entity> clone() const override {
-        return std::make_unique<EnemyTower>(*this);
-    }
     int getLevel() override;
     int getInt() override;
 };

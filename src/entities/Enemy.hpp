@@ -28,7 +28,4 @@ public:
     bool getIterative();
     void setIterative(bool it);
     bool alive() const override;
-    std::unique_ptr<Entity> clone() const override {
-        return std::make_unique<Enemy>(*this);
-    }
 };

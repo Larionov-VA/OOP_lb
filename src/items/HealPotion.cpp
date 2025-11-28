@@ -6,5 +6,5 @@ void HealPotion::useItem(GameContext& ctx, int userIndex, int power) {
     (void)userIndex;
     (void)power;
     int playerIndex = ctx.entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
-    ctx.entityManager[playerIndex]->regenerateLife();
+    ctx.entityManager[playerIndex]->regenerateLife(0.5);
 }

@@ -26,11 +26,11 @@ void NCURSESVisualizer::initCurses() {
     curs_set(0);
     start_color();
     use_default_colors();
-    init_pair(1, COLOR_WHITE, COLOR_BLUE);    // header
-    init_pair(2, COLOR_BLACK, COLOR_YELLOW);  // selected menu
-    init_pair(3, COLOR_GREEN, -1);            // player gauge
-    init_pair(4, COLOR_RED, -1);              // health
-    init_pair(5, COLOR_CYAN, -1);             // info
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);
+    init_pair(2, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(3, COLOR_GREEN, -1);
+    init_pair(4, COLOR_RED, -1);
+    init_pair(5, COLOR_CYAN, -1);
     updateTermSize();
     clear();
     refresh();
@@ -45,7 +45,6 @@ void NCURSESVisualizer::updateTermSize() {
 }
 
 int NCURSESVisualizer::fetchInput() {
-    // 0 means nothing
     if (inputController) {
         char c = inputController->getInputChar();
         if (c != 0) return (int)c;
@@ -96,13 +95,13 @@ void NCURSESVisualizer::loopMainMenu() {
             case '\n':
             case 'e':
             case KEY_ENTER:
-                if (main_menu_selected == 0) { // New Game
+                if (main_menu_selected == 0) {
                     if (gameController) gameController->startNewGame();
                     state = State::InGame;
-                } else if (main_menu_selected == 1) { // Continue
-                    if (gameController) gameController->startNewGame(); // your original used startNewGame for continue
+                } else if (main_menu_selected == 1) {
+                    if (gameController) gameController->ContinueGame();
                     state = State::InGame;
-                } else if (main_menu_selected == 2) { // Exit
+                } else if (main_menu_selected == 2) {
                     state = State::Exit;
                 }
                 break;
@@ -114,8 +113,6 @@ void NCURSESVisualizer::loopMainMenu() {
                 break;
         }
     }
-
-    // frame limiter
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
@@ -146,8 +143,6 @@ void NCURSESVisualizer::loopLevelUp() {
                 break;
         }
     }
-
-    // frame limiter
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
@@ -156,7 +151,6 @@ void NCURSESVisualizer::loopLevelUp() {
 
 void NCURSESVisualizer::drawLevelUpMenu() {
     clear();
-    // Заголовок
     attron(COLOR_PAIR(1));
     mvhline(0, 0, ' ', term_w);
     mvprintw(0, (term_w - 15) / 2, " LEVEL UP! ");
@@ -172,13 +166,11 @@ void NCURSESVisualizer::drawLevelUpMenu() {
     int bx = (term_w - box_w) / 2;
     int by = (term_h - box_h) / 2;
 
-    // Draw border
     for (int i = 0; i < box_w; ++i) { mvaddch(by, bx + i, '-'); mvaddch(by + box_h -1, bx + i, '-'); }
     for (int i = 0; i < box_h; ++i) { mvaddch(by + i, bx, '|'); mvaddch(by + i, bx + box_w - 1, '|'); }
     mvaddch(by, bx, '+'); mvaddch(by, bx + box_w -1, '+');
     mvaddch(by + box_h -1, bx, '+'); mvaddch(by + box_h -1, bx + box_w -1, '+');
 
-    // Выбор атрибута
     std::vector<std::string> options = {
         "INT +10",
         "STR +10",
@@ -196,11 +188,9 @@ void NCURSESVisualizer::drawLevelUpMenu() {
         }
     }
 
-    // Подсказка
-    std::string hint = "Use arrows/WASD + Enter to choose";
+    std::string hint = "Use WASD/Arrows + Enter/E to choose";
     mvprintw(by + box_h -2, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
 
-    // Полная инфо об игроке
     int info_y = by + box_h + 1;
     mvprintw(info_y++, bx, "Level: %d  Exp: %lld/%lld", pdata->playerLevel, pdata->playerCurrentExperience, pdata->playerLevelUpExperience);
     mvprintw(info_y++, bx, "Health: %d/%d  Attack: %d  Weapon: %s", pdata->playerHealth, pdata->playerMaxHealth, pdata->playerAttack, pdata->playerWeapon.c_str());
@@ -213,18 +203,16 @@ void NCURSESVisualizer::drawLevelUpMenu() {
 
 void NCURSESVisualizer::drawMainMenu() {
     clear();
-    // Header
     attron(COLOR_PAIR(1));
     mvhline(0, 0, ' ', term_w);
     mvprintw(0, (term_w - 12) / 2, " MAIN MENU ");
     attroff(COLOR_PAIR(1));
 
-    // Menu box
     int box_w = 40;
     int box_h = (int)main_menu_items.size() + 4;
     int bx = (term_w - box_w) / 2;
     int by = (term_h - box_h) / 2;
-    // Draw border
+
     for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
     for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
     for (int i = 0; i < box_h; ++i) {
@@ -234,11 +222,9 @@ void NCURSESVisualizer::drawMainMenu() {
     mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
     mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
 
-    // Title
     std::string title = "Choose action";
     mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
 
-    // Items
     for (size_t i = 0; i < main_menu_items.size(); ++i) {
         int iy = by + 2 + (int)i;
         if ((int)i == main_menu_selected) {
@@ -250,7 +236,6 @@ void NCURSESVisualizer::drawMainMenu() {
         }
     }
 
-    // Footer
     std::string hint = "Use arrows/WASD + Enter. Q to quit.";
     mvprintw(by + box_h, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
 
@@ -270,19 +255,15 @@ void NCURSESVisualizer::loopInGame() {
 
     int input = fetchInput();
     if (input) {
-        // navigation / actions
-        if (input == 27) { // ESC
-            // stop game and go to main menu
+        if (input == 27) {
             if (gameController) gameController->stopGame();
             state = State::MainMenu;
             return;
         }
 
-        // movement keys + actions
         char c = (char)input;
         if (gameController) {
             bool consumed = false;
-            // accept arrows as well
             if (input == KEY_UP || c == 'w' || c == 'W') { consumed = !gameController->performAnAction('w'); }
             else if (input == KEY_DOWN || c == 's' || c == 'S') { consumed = !gameController->performAnAction('s'); }
             else if (input == KEY_LEFT || c == 'a' || c == 'A') { consumed = !gameController->performAnAction('a'); }
@@ -299,7 +280,6 @@ void NCURSESVisualizer::loopInGame() {
         }
     }
 
-    // frame limiter
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
@@ -307,20 +287,17 @@ void NCURSESVisualizer::loopInGame() {
 
 void NCURSESVisualizer::drawInGame() {
     clear();
-    // Header
     attron(COLOR_PAIR(1));
     mvhline(0, 0, ' ', term_w);
     mvprintw(0, (term_w - 12) / 2, " IN GAME ");
     attroff(COLOR_PAIR(1));
 
-    // Layout: left (25%), center (50%), right (25%)
     int left_w = term_w / 4;
     int right_w = term_w / 4;
-    int center_w = term_w - left_w - right_w - 2; // -2 for separators
+    int center_w = term_w - left_w - right_w - 2;
     int top = 1;
     int height = term_h - 2;
 
-    // Vertical separators
     for (int y = top; y <= top + height; ++y) {
         mvaddch(y, left_w, '|');
         mvaddch(y, left_w + 1 + center_w, '|');
@@ -330,7 +307,6 @@ void NCURSESVisualizer::drawInGame() {
     drawFieldPanel(left_w + 1, top, center_w, height);
     drawRightPanel(left_w + 1 + center_w + 1, top, right_w, height);
 
-    // Footer / hint
     std::string hint = "WASD/arrows - move | Q/E - actions | Esc - menu | 1-4 - use item";
     mvprintw(term_h - 1, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
 
@@ -410,6 +386,25 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
 }
 
 
+void NCURSESVisualizer::setColor(char out) {
+    if (out == 'E' || out == 'T' || out == 'B') {
+        attron(COLOR_PAIR(4));
+    }
+    if (out == 'P') {
+        attron(COLOR_PAIR(3));
+    }
+}
+
+void NCURSESVisualizer::unsetColor(char out) {
+    if (out == 'E' || out == 'T' || out == 'B') {
+        attroff(COLOR_PAIR(4));
+    }
+    if (out == 'P') {
+        attroff(COLOR_PAIR(3));
+    }
+}
+
+
 void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     drawBoxTitle(x, y, w, " FIELD ");
 
@@ -424,63 +419,48 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     int render_field_width = fw * render_cell_width;
     int render_field_height = fh;
 
-    // ВИДИМАЯ область - вся панель минус отступы
-    int visible_w = w - 2;  // минус границы
-    int visible_h = h - 2;  // минус границы
+    int visible_w = w - 2;
+    int visible_h = h - 2;
 
-    // ЦЕНТРИРОВАНИЕ: всегда центрируем, если поле меньше панели
-    // Если поле больше панели - показываем центральную часть
     int start_x = x + 1;
     int start_y = y + 1;
 
     int offset_x = 0;
     int offset_y = 0;
 
-    // Если поле меньше панели по ширине - центрируем
     if (render_field_width < visible_w) {
         start_x = x + 1 + (visible_w - render_field_width) / 2;
     } else {
-        // Иначе обрезаем по бокам
         offset_x = (render_field_width - visible_w) / 2;
     }
-
-    // Если поле меньше панели по высоте - центрируем
     if (render_field_height < visible_h) {
         start_y = y + 1 + (visible_h - render_field_height) / 2;
     } else {
-        // Иначе обрезаем сверху/снизу
         offset_y = (render_field_height - visible_h) / 2;
     }
-
-    // ВЫВОД с правильной индексацией
     for (int ry = 0; ry < std::min(visible_h, render_field_height); ++ry) {
-        int actual_ry = ry + offset_y;  // Учитываем смещение для обрезания
-        if (actual_ry >= fh) break;     // Выход за границы поля
+        int actual_ry = ry + offset_y;
+        if (actual_ry >= fh) break;
 
-        int base_idx = actual_ry * fw;  // Правильная индексация row-major
+        int base_idx = actual_ry * fw;
 
         for (int rx = 0; rx < std::min(visible_w / 2, fw); ++rx) {
-            int actual_rx = rx + offset_x;  // Учитываем смещение для обрезания
-            if (actual_rx >= fw) break;     // Выход за границы поля
+            int actual_rx = rx + offset_x;
+            if (actual_rx >= fw) break;
 
-            int idx = base_idx + actual_rx;  // Индекс в данных поля
+            int idx = base_idx + actual_rx;
             if (idx >= (int)fieldChars.size()) break;
 
             wchar_t ch = fieldChars[idx];
             char out = (ch > 0 && ch < 128) ? (char)ch : '.';
 
-            // Позиция на экране
             int screen_x = start_x + rx * 2;
             int screen_y = start_y + ry;
 
             if (screen_x < x + w && screen_y < y + h) {
-                if (out == 'E' || out == 'T' || out == 'B') {
-                    attron(COLOR_PAIR(4));
-                }
+                setColor(out);
                 mvaddch(screen_y, screen_x, out);
-                if (out == 'E' || out == 'T' || out == 'B') {
-                    attroff(COLOR_PAIR(4));
-                }
+                unsetColor(out);
             }
         }
     }

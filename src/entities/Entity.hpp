@@ -24,7 +24,7 @@ public:
     virtual bool melle() { return true; };
     virtual bool checkDebaffState() { return false; };
     virtual void setDebaffState() {};
-    virtual void regenerateLife() {};
+    virtual void regenerateLife(float procrecoveryPercentage) { (void)procrecoveryPercentage;};
 
     virtual bool timeToSpawn() { return false; };
     virtual void useItem(GameContext& ctx, int userIndex, int power) { (void)ctx; (void)userIndex; (void)power; };
@@ -41,6 +41,4 @@ public:
     virtual void addExperience(int exp) { (void)exp; };
     virtual void addSpells(int indexInHand, int count) { (void)indexInHand; (void)count; };
     virtual std::vector<long long> getExperience() { return {0,0,0}; };
-
-    virtual std::unique_ptr<Entity> clone() const = 0;
 };

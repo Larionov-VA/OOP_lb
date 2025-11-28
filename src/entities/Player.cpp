@@ -1,18 +1,18 @@
 #include "Player.hpp"
 
 Player::Player(
-    int playerAttack, 
-    int playerHealth, 
+    int playerAttack,
+    int playerHealth,
     int playerLevel,
     long long prevLevelUpExperience,
-    long long playerExperience, 
+    long long playerExperience,
     long long levelUpExperience,
     int playerIntelligence,
     int playerDexterity,
     int playerStrength,
     int playerHandSize
 ) {
-    
+
     this->playerAttack = Attack{playerAttack};
     this->playerHealth = Health{playerHealth};
     this->playerHand = Hand{playerHandSize};
@@ -22,7 +22,7 @@ Player::Player(
 
 
 Player::Player() {
-    
+
 }
 
 
@@ -145,9 +145,9 @@ void Player::useItem(GameContext &ctx, int userIndex, int power) {
     playerHand.useItem(ctx, userIndex, power);
 }
 
-void Player::regenerateLife() {
+void Player::regenerateLife(float procrecoveryPercentage) {
     int currentMaxHealth = playerHealth.getMaxHealth();
-    playerHealth.regenerate(currentMaxHealth/2);
+    playerHealth.regenerate(currentMaxHealth * procrecoveryPercentage);
 }
 
 void Player::swapItemInHand(int itemIndexInHand) {

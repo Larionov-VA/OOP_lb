@@ -22,8 +22,5 @@ public:
     std::pair<int, int>  getHealth() override;
     void causeDamage(int damage) override;
     bool alive() const override;
-    std::unique_ptr<Entity> clone() const override {
-        return std::make_unique<EnemyBarracks>(*this);
-    }
     int getLevel() override;
 };

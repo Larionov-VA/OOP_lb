@@ -16,7 +16,7 @@ private:
 public:
     ~Game();
     void startNewGame() override;
-    void ContinueGame(int gameID) override;
+    void ContinueGame() override;
     void stopGame() override;
     void saveGame() override;
     void loadGame() override;

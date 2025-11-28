@@ -8,8 +8,7 @@ Game::~Game() {
 }
 
 
-void Game::ContinueGame(int gameID) {
-    this->gameID = gameID;
+void Game::ContinueGame() {
 
 }
 
@@ -28,6 +27,7 @@ void Game::startNewGame() {
 
 void Game::nextLevel() {
     std::unique_ptr<Entity> player = field->returnPlayer();
+    player->regenerateLife(1.0);
     GlobalGameConfig::gameLevel++;
     deleteField();
     this->field = new GameField(
