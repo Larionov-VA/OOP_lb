@@ -95,10 +95,11 @@ float FieldCell::getDistance(const FieldCell& oth) const {
 // }
 
 char FieldCell::getCellSymbol() {
-    char res = '-';
+    char res = '_';
     if (!state.getAvaible()) {
         res = '#';
-    } else if (state.haveSpecificState()) {
+    }
+    if (state.haveSpecificState()) {
         res = state.getCellSymbol();
     }
     return res;

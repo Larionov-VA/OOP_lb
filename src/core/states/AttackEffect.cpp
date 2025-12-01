@@ -1,6 +1,6 @@
 #include "AttackEffect.hpp"
 
-AttackEffect::AttackEffect() : AttackEffect('/', 0, 1) {}
+AttackEffect::AttackEffect() : AttackEffect('/', 0, 3) {}
 
 AttackEffect::AttackEffect(char effectSympol, int effectDelay, int effectDuration) {
     this->stateSymbol = effectSympol;
@@ -9,13 +9,13 @@ AttackEffect::AttackEffect(char effectSympol, int effectDelay, int effectDuratio
 }
 
 void AttackEffect::incDuration() {
-    --this->durationOfState;
-    --this->effectDelay;
+    ++this->durationOfState;
+    ++this->effectDelay;
 }
 
 void AttackEffect::decDuration() {
-    ++this->durationOfState;
-    ++this->effectDelay;
+    --this->durationOfState;
+    --this->effectDelay;
 }
 
 int AttackEffect::getDamage() {

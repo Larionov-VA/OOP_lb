@@ -1,7 +1,7 @@
 #include "DecelerationEffect.hpp"
 
 
-DecelerationEffect::DecelerationEffect() : DecelerationEffect(1, '&') {}
+DecelerationEffect::DecelerationEffect() : DecelerationEffect(1, '=') {}
 
 
 DecelerationEffect::DecelerationEffect(int duration, char symbol) {

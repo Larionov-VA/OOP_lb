@@ -70,15 +70,18 @@ int CellState::getStateDamage() const {
 //     this->trapDamage = newTrapDamage;
 // }
 
-char CellState::getCellSymbol() const {
+char CellState::getCellSymbol() {
     if (temporaryState) {
-        return temporaryState->getSymbol();
         temporaryState->decDuration();
+        char res = temporaryState->getSymbol();
+        if (!temporaryState->getDuration()) {
+            temporaryState = nullptr;
+        }
+        return res;
     }
     else {
         return constState->getSymbol();
     }
-
 }
 
 bool CellState::haveSpecificState() const {

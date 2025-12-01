@@ -1,6 +1,6 @@
 #include "CoupreAnimate.hpp"
 
-CoupreAnimate::CoupreAnimate() : CoupreAnimate('x', 0, 1) {}
+CoupreAnimate::CoupreAnimate() : CoupreAnimate('x', 0, 3) {}
 
 CoupreAnimate::CoupreAnimate(char effectSympol, int effectDelay, int effectDuration) {
     this->stateSymbol = effectSympol;
@@ -9,13 +9,13 @@ CoupreAnimate::CoupreAnimate(char effectSympol, int effectDelay, int effectDurat
 }
 
 void CoupreAnimate::incDuration() {
-    --this->durationOfState;
-    --this->effectDelay;
+    ++this->durationOfState;
+    ++this->effectDelay;
 }
 
 void CoupreAnimate::decDuration() {
-    ++this->durationOfState;
-    ++this->effectDelay;
+    --this->durationOfState;
+    --this->effectDelay;
 }
 
 int CoupreAnimate::getDamage() {

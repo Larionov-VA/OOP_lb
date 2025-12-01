@@ -52,7 +52,7 @@ private:
     bool isMoveCorrect(int oldIndex, int newIndex);
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
-    int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
+    int firstEnemyIndexOnLine(int oldIndex, int newIndex);
     int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
@@ -71,4 +71,5 @@ public:
     void update();
     std::vector<wchar_t> show();
     void animateBowAttack(int playerIndex, int enemyIndex);
+    void animateSwordAttack(int enemyIndex);
 };

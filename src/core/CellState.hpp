@@ -15,7 +15,7 @@ private:
 public:
     CellState();
     CellState(std::unique_ptr<IState> constState, std::unique_ptr<IState> temporaryState);
-    char getCellSymbol() const;
+    char getCellSymbol();
     bool haveSpecificState() const;
     void setConstState(std::unique_ptr<IState> constState);
     void setTemporaryState(std::unique_ptr<IState> temporaryState);

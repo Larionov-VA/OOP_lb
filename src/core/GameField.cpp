@@ -161,15 +161,19 @@ bool GameField::enemyOnIndex(int index) const {
 }
 
 
-int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
+int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) {
     int totalCells = widthField * heightField;
     int rowOld = oldIndex / widthField;
     int rowNew = newIndex / widthField;
     bool isHorizontal = (rowOld == rowNew);
+
     if (isHorizontal) {
         int dir = (newIndex > oldIndex) ? 1 : -1;
         int current = oldIndex + dir;
         while (current >= 0 && current < totalCells && (current / widthField) == rowOld) {
+            if (!cells[current].returnCellState().getAvaible() && !enemyOnIndex(current)) {
+                return -1;
+            }
             if (enemyOnIndex(current)) {
                 return current;
             }
@@ -179,6 +183,9 @@ int GameField::firstEnemyIndexOnLine(int oldIndex, int newIndex) const {
         int dir = (newIndex > oldIndex) ? widthField : -widthField;
         int current = oldIndex + dir;
         while (current >= 0 && current < totalCells) {
+            if (!cells[current].returnCellState().getAvaible() && !enemyOnIndex(current)) {
+                return -1;
+            }
             if (enemyOnIndex(current)) {
                 return current;
             }
@@ -247,6 +254,7 @@ bool GameField::playerTurn(char command) {
     if (move) {
         int playerDamage = entityManager[playerIndex]->getDamage();
         if (entityManager[newPlayerIndex]) {
+            animateSwordAttack(newPlayerIndex);
             entityManager[newPlayerIndex]->causeDamage(playerDamage);
         }
         else if (!entityManager[playerIndex]->melle()) {
@@ -628,12 +636,43 @@ std::vector<EnemyData> GameField::getEnemyData() {
 
 
 void GameField::animateBowAttack(int playerIndex, int enemyIndex) {
-    if (abs(playerIndex - enemyIndex) < GlobalGameConfig::fieldWidth) {
-
+    int animateDelay = 0;
+    int currentIndex = playerIndex;
+    int step = 0;
+    int playerX = playerIndex % GlobalGameConfig::fieldWidth;
+    int playerY = playerIndex / GlobalGameConfig::fieldWidth;
+    int enemyX = enemyIndex % GlobalGameConfig::fieldWidth;
+    int enemyY = enemyIndex / GlobalGameConfig::fieldWidth;
+    char arrowSymbol = '_';
+    if (playerX < enemyX && playerY == enemyY) {
+        step = 1;
+        arrowSymbol = '-';
     }
-    else {
-
+    else if (playerX > enemyX && playerY == enemyY) {
+        step = -1;
+        arrowSymbol = '-';
     }
+    else if (playerY < enemyY && playerX == enemyX) {
+        step = GlobalGameConfig::fieldWidth;
+        arrowSymbol = '|';
+    }
+    else if (playerY > enemyY && playerX == enemyX) {
+        step = -GlobalGameConfig::fieldWidth;
+        arrowSymbol = '|';
+    }
+    while (currentIndex != enemyIndex) {
+        std::unique_ptr<IState> bowAnimate = std::make_unique<AttackEffect>(arrowSymbol, animateDelay++, 1);
+        cells[currentIndex].returnCellState().setTemporaryState(std::move(bowAnimate));
+        currentIndex += step;
+    }
+    std::unique_ptr<IState> hitEffect = std::make_unique<AttackEffect>('*', animateDelay, 1);
+    cells[enemyIndex].returnCellState().setTemporaryState(std::move(hitEffect));
+}
+
+
+void GameField::animateSwordAttack(int enemyIndex) {
+    std::unique_ptr<IState> swordAnimate = std::make_unique<AttackEffect>();
+    cells[enemyIndex].returnCellState().setTemporaryState(move(swordAnimate));
 }
 
 
@@ -644,7 +683,9 @@ std::vector<wchar_t> GameField::show() {
     }
     const std::unordered_map<int, std::unique_ptr<Entity>>& entityMap = entityManager.returnInfoMap();
     for (const auto& [index, entity] : entityMap) {
-        data[index] = (wchar_t)entity->returnEntitySymbol();
+        if (data[index] != '/') {
+            data[index] = (wchar_t)entity->returnEntitySymbol();
+        }
     }
     return data;
 }

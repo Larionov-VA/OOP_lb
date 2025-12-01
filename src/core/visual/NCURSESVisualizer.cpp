@@ -244,7 +244,7 @@ void NCURSESVisualizer::drawMainMenu() {
 
 void NCURSESVisualizer::loopInGame() {
     // ~30 FPS
-    const int frame_ms = 33;
+    const int frame_ms = 15;
     auto frame_start = std::chrono::steady_clock::now();
     auto pdata = gameController->getPlayerData();
     if (pdata && pdata->levelIncreased) {
