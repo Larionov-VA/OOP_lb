@@ -62,4 +62,5 @@ public:
     void swapItemInHand(int itemIndexInHand) override;
     std::vector<std::pair<bool, int>> getHandItems();
     std::pair<int, int> getHandSize();
+    char returnEntitySymbol() override;
 };

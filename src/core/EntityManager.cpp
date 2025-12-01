@@ -66,3 +66,8 @@ std::vector<int> EntityManager::getIndexesWithEntity(Entity::entityType type) co
     }
     return indexesOfCellsWithEntity;
 }
+
+
+const std::unordered_map<int, std::unique_ptr<Entity>>& EntityManager::returnInfoMap() {
+    return this->infoMap;
+}

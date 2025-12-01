@@ -26,4 +26,5 @@ public:
     int getSpellDistance();
     int getLevel() override;
     int getInt() override;
+    char returnEntitySymbol() override;
 };

@@ -21,7 +21,7 @@ void Stats::addExperience(int experience) {
     if (this->currentExperience >= this->levelUpExperience) {
         this->level++;
         this->prevLevelUpExperience = this->levelUpExperience;
-        this->levelUpExperience = this->levelUpExperience * this->level / 2 + 50;
+        this->levelUpExperience = this->levelUpExperience + 50 * this->level;
         levelIncreased = true;
     }
 }

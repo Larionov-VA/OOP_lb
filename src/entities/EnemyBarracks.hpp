@@ -23,4 +23,5 @@ public:
     void causeDamage(int damage) override;
     bool alive() const override;
     int getLevel() override;
+    char returnEntitySymbol() override;
 };

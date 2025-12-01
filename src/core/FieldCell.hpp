@@ -18,24 +18,24 @@ public:
         int index,
         int X,
         int Y,
-        bool slow,
-        bool avaible = false,
-        bool dead = false,
-        bool trapped = false,
-        int trapDamage = 0
+        std::unique_ptr<IState> constState = nullptr,
+        std::unique_ptr<IState> temporaryState = nullptr
     );
     int getIndex() const;
     char getCellSymbol();
+    // void setCellState(std::unique_ptr<IState> constState, std::unique_ptr<IState> temporaryState);
     void setIndex(int index);
-    float getDistance(FieldCell oth) const;
+    float getDistance(const FieldCell& oth) const;
     std::pair<int, int> getCoord() const;
-    void setTrap(int damage);
-    int checkAndSwitchTrap();
-    bool isTrapped();
-    bool isCellAvaible() const;
-    void setAvaible(bool avaible);
-    bool isCellSlow() const;
-    void setSlow(bool avaible);
-    bool checkCellDead();
-    void setCellDead();
+    // void setTrap(int damage);
+    // int checkAndSwitchTrap();
+    // bool isTrapped();
+    // bool isCellAvaible() const;
+    // void setAvaible(bool avaible);
+    // bool haveState() const;
+    CellState& returnCellState();
+    // bool isCellSlow() const;
+    // void setSlow(bool avaible);
+    // bool checkCellDead();
+    // void setCellDead();
 };

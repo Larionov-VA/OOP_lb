@@ -28,4 +28,5 @@ public:
     bool getIterative();
     void setIterative(bool it);
     bool alive() const override;
+    char returnEntitySymbol() override;
 };

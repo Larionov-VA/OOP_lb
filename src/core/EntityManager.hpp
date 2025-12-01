@@ -18,4 +18,5 @@ public:
     std::vector<int> getIndexesWithEntity(Entity::entityType type) const;
     Entity* getEntity(int index);
     std::unique_ptr<Entity> returnEntity(int index);
+    const std::unordered_map<int, std::unique_ptr<Entity>>& returnInfoMap();
 };

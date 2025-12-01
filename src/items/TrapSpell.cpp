@@ -13,20 +13,25 @@ bool TrapSpell::cast(GameContext& ctx, int userIndex, int power) {
     int left = userIndex - 1;
     int right = userIndex + 1;
     int currentTrapDamage = this->trapDamage * trapLevel * powerOfSpell + power * this->trapDamage;
-    if (ctx.cells[up].isCellAvaible() && !ctx.cells[up].isTrapped()) {
-        ctx.cells[up].setTrap(currentTrapDamage);
+    CellState& upCellState = ctx.cells[up].returnCellState();
+    CellState& downCellState = ctx.cells[down].returnCellState();
+    CellState& leftCellState = ctx.cells[left].returnCellState();
+    CellState& rightCellState = ctx.cells[right].returnCellState();
+    std::unique_ptr<IState> trapState = std::make_unique<TrapEffect>('o', currentTrapDamage, 1);
+    if (upCellState.getAvaible() && !upCellState.haveSpecificState()) {
+        upCellState.setConstState(move(trapState));
         return true;
     }
-    else if (ctx.cells[down].isCellAvaible() && !ctx.cells[down].isTrapped()) {
-        ctx.cells[down].setTrap(currentTrapDamage);
+    else if (downCellState.getAvaible() && !downCellState.haveSpecificState()) {
+        downCellState.setConstState(move(trapState));
         return true;
     }
-    else if (ctx.cells[left].isCellAvaible() && !ctx.cells[left].isTrapped()) {
-        ctx.cells[left].setTrap(currentTrapDamage);
+    else if (leftCellState.getAvaible() && !leftCellState.haveSpecificState()) {
+        leftCellState.setConstState(move(trapState));
         return true;
     }
-    else if (ctx.cells[right].isCellAvaible() && !ctx.cells[right].isTrapped()) {
-        ctx.cells[right].setTrap(currentTrapDamage);
+    else if (rightCellState.getAvaible() && !rightCellState.haveSpecificState()) {
+        rightCellState.setConstState(move(trapState));
         return true;
     }
     return false;

@@ -21,7 +21,8 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
-        cells.emplace_back(i, i % widthField, i / widthField, false);
+        cells.emplace_back(i, i % widthField, i / widthField);
+        cells[i].returnCellState().setAvaible(false);
     }
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -40,7 +41,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
             int dist1 = cell1.getDistance(cell);
             int dist2 = cell2.getDistance(cell);
             if (dist1 == dist2 && dist1 > targetDist) {
-                cell.setAvaible(true);
+                cell.returnCellState().setAvaible(true);
                 return cell;
             }
         }
@@ -51,7 +52,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     auto activateAround = [this](const FieldCell& center, int radius) {
         for (auto& cell : cells) {
             if (center.getDistance(cell) < radius) {
-                cell.setAvaible(true);
+                cell.returnCellState().setAvaible(true);
             }
         }
     };
@@ -64,7 +65,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         for (auto& cell : cells) {
             auto [x, y] = cell.getCoord();
             if (abs((x - x1) * dy - (y - y1) * dx) <= tolerance) {
-                cell.setAvaible(true);
+                cell.returnCellState().setAvaible(true);
             }
         }
     };
@@ -78,9 +79,18 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
         int down = i + widthField;
         int left = i - 1;
         int right = i + 1;
-        if (cells[i].isCellAvaible() && (!cells[up].isCellAvaible() || !cells[down].isCellAvaible() ||
-            !cells[left].isCellAvaible() || !cells[right].isCellAvaible()) && (i % widthField)) {
-            cells[i].setSlow(true);
+        bool currentCellAvaible = cells[i].returnCellState().getAvaible();
+        bool upCellAvaible = cells[up].returnCellState().getAvaible();
+        bool downCellAvaible = cells[down].returnCellState().getAvaible();
+        bool leftCellAvaible = cells[left].returnCellState().getAvaible();
+        bool rightCellAvaible = cells[right].returnCellState().getAvaible();
+        if (
+            currentCellAvaible &&
+            (!upCellAvaible || !downCellAvaible || !leftCellAvaible || !rightCellAvaible) &&
+            (i % widthField)
+        ) {
+            std::unique_ptr<IState> decelerationCellEffect = std::make_unique<DecelerationEffect>();
+            cells[i].returnCellState().setConstState(move(decelerationCellEffect));
         }
     }
     spawnEntity(std::make_unique<EnemyTower>(gameLevel), cell3.getIndex());
@@ -91,17 +101,17 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
 
 void GameField::moveEntity(int oldIndex, int newIndex) {
     entityManager.changeEntityIndex(oldIndex, newIndex);
-    cells[oldIndex].setAvaible(true);
-    cells[newIndex].setAvaible(false);
+    cells[oldIndex].returnCellState().setAvaible(true);
+    cells[newIndex].returnCellState().setAvaible(false);
 }
 
 
-bool GameField::isMoveCorrect(int oldIndex, int newIndex) const {
+bool GameField::isMoveCorrect(int oldIndex, int newIndex) {
     if (oldIndex < 0 || oldIndex >= widthField * heightField ||
         newIndex < 0 || newIndex >= widthField * heightField) {
         return false;
     }
-    if (!cells[newIndex].isCellAvaible()) {
+    if (!cells[newIndex].returnCellState().getAvaible()) {
         return false;
     }
     int oldX = oldIndex % widthField;
@@ -114,7 +124,7 @@ bool GameField::isMoveCorrect(int oldIndex, int newIndex) const {
 
 
 void GameField::spawnEntity(std::unique_ptr<Entity> entity, int index) {
-    cells[index].setAvaible(false);
+    cells[index].returnCellState().setAvaible(false);
     entityManager.createEntity(std::move(entity), index);
 }
 
@@ -127,7 +137,7 @@ void GameField::generateEnemy() {
     int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
     do {
         int randomIndex = dist(gen);
-        bool randomCellAvailable = cells[randomIndex].isCellAvaible();
+        bool randomCellAvailable = cells[randomIndex].returnCellState().getAvaible();
         float distanceToPlayer = cells[playerIndex].getDistance(cells[randomIndex]);
         if (randomCellAvailable && (distanceToPlayer > ((widthField + heightField) / 3))) {
             std::unique_ptr<Entity> enemy = std::make_unique<Enemy>(gameLevel);
@@ -235,22 +245,26 @@ bool GameField::playerTurn(char command) {
         break;
     }
     if (move) {
-        enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
         int playerDamage = entityManager[playerIndex]->getDamage();
         if (entityManager[newPlayerIndex]) {
-            /*newPlayerIndex == enemyIndex если entityManager[newPlayerIndex] занят*/
             entityManager[newPlayerIndex]->causeDamage(playerDamage);
         }
-        else if (enemyIndex != -1 && !entityManager[playerIndex]->melle()) {
-            /*дальний бой*/
-            entityManager[enemyIndex]->causeDamage(playerDamage);
+        else if (!entityManager[playerIndex]->melle()) {
+            enemyIndex = firstEnemyIndexOnLine(playerIndex, newPlayerIndex);
+            if (enemyIndex != -1) {
+                animateBowAttack(playerIndex, enemyIndex);
+                entityManager[enemyIndex]->causeDamage(playerDamage);
+            }
+            else {
+                if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+                    moveEntity(playerIndex, newPlayerIndex);
+                }
+            }
         }
         else if (isMoveCorrect(playerIndex, newPlayerIndex)) {
-            /*наложение дебафа*/
-            if (cells[newPlayerIndex].isCellSlow()) {
-                entityManager[playerIndex]->setDebaffState();
+            if (cells[newPlayerIndex].returnCellState().haveSpecificState()) {
+                entityManager[playerIndex]->setDebaffState(); // to do: сделать этот метод под IState;
             }
-            /*передвижение*/
             moveEntity(playerIndex, newPlayerIndex);
         }
     }
@@ -297,9 +311,10 @@ void GameField::update() {
     for (int index : enemyIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index].setAvaible(true);
-            cells[index].setCellDead();
-            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 10 + 10);
+            cells[index].returnCellState().setAvaible(true);
+            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
+            entityManager[playerIndex]->addExperience(enemyLevel * 10 + 10);
             entityManager.killEntity(index);
         }
     }
@@ -307,9 +322,10 @@ void GameField::update() {
     for (int index : barrackIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index].setAvaible(true);
-            cells[index].setCellDead();
-            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
+            cells[index].returnCellState().setAvaible(true);
+            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
+            entityManager[playerIndex]->addExperience(enemyLevel * 30 + 10);
             entityManager.killEntity(index);
         }
     }
@@ -317,9 +333,10 @@ void GameField::update() {
     for (int index : towerIndexes) {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
-            cells[index].setAvaible(true);
-            cells[index].setCellDead();
-            entityManager[playerIndex]->addExperience(enemyLevel * enemyLevel * 50 + 10);
+            cells[index].returnCellState().setAvaible(true);
+            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
+            entityManager[playerIndex]->addExperience(enemyLevel * 50 + 10);
             entityManager.killEntity(index);
         }
     }
@@ -431,17 +448,17 @@ void GameField::enemyTurn() {
         }
 
         int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
-        bool isTrapped = cells[bestTurn].isTrapped();
+        bool haveSpecificState = cells[bestTurn].returnCellState().haveSpecificState();
 
-        if (isTrapped) {
-            int trapDamage = cells[bestTurn].checkAndSwitchTrap();
+        if (haveSpecificState) {
+            int trapDamage = cells[bestTurn].returnCellState().getStateDamage();
             e->causeDamage(trapDamage);
         }
         if (bestTurn == index) continue;
         if (occupiedNewIndices.count(bestTurn)) continue;
 
         if (isMoveCorrect(index, bestTurn)) {
-            if (!entityManager[bestTurn] && cells[bestTurn].isCellAvaible()) {
+            if (!entityManager[bestTurn] && cells[bestTurn].returnCellState().getAvaible()) {
                 moveEntity(index, bestTurn);
                 occupiedNewIndices.insert(bestTurn);
             }
@@ -610,54 +627,25 @@ std::vector<EnemyData> GameField::getEnemyData() {
 }
 
 
+void GameField::animateBowAttack(int playerIndex, int enemyIndex) {
+    if (abs(playerIndex - enemyIndex) < GlobalGameConfig::fieldWidth) {
+
+    }
+    else {
+
+    }
+}
+
+
 std::vector<wchar_t> GameField::show() {
-    // std::vector<int> enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
     std::vector<wchar_t> data;
     for (auto& cell: cells) {
         data.push_back((wchar_t)cell.getCellSymbol());
     }
-    // for (int i = 0; i < widthField * heightField; ++i) {
-    //     Entity* currentEntity = entityManager[i];
-    //     if (cells[i].isCellAvaible() || currentEntity) {
-
-    //         if (entityManager[i]) {
-    //             if (currentEntity->getType() == Entity::entityType::PLAYER) {
-    //                 // data.push_back(L'𐇐');
-    //                 data.push_back('P');
-    //             }
-    //             else if (currentEntity->getType() == Entity::entityType::ENEMY) {
-    //                 // data.push_back(L'𖨆');
-    //                 data.push_back('E');
-    //             }
-    //             else if (currentEntity->getType() == Entity::entityType::BARRACKS) {
-    //                 // data.push_back(L'🏟');
-    //                 data.push_back('B');
-    //             }
-    //             else if (currentEntity->getType() == Entity::entityType::TOWER) {
-    //                 // data.push_back(L'⛫');
-    //                 data.push_back('T');
-    //             }
-    //         }
-    //         else if (cells[i].isCellSlow()) {
-    //             // data.push_back(L'░');
-    //             data.push_back(L'&');
-    //         }
-    //         else if (cells[i].checkCellDead()) {
-    //             // data.push_back(L'☠');
-    //             data.push_back(L'x');
-    //         }
-    //         else if (cells[i].isTrapped()) {
-    //             // data.push_back(L'᪠');
-    //             data.push_back(L'o');
-    //         }
-    //         else {
-    //             data.push_back('-');
-    //         }
-    //     }
-    //     else {
-    //         data.push_back('#');
-    //     }
-    // }
+    const std::unordered_map<int, std::unique_ptr<Entity>>& entityMap = entityManager.returnInfoMap();
+    for (const auto& [index, entity] : entityMap) {
+        data[index] = (wchar_t)entity->returnEntitySymbol();
+    }
     return data;
 }
 

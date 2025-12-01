@@ -20,7 +20,10 @@ set(SRCS
     src/core/visual/FTXUIVisualizer.cpp
     src/core/visual/NCURSESVisualizer.cpp
 
-    src/core/states/DecelerationState.cpp
+    src/core/states/TrapEffect.cpp
+    src/core/states/DecelerationEffect.cpp
+    src/core/states/CoupreAnimate.cpp
+    src/core/states/AttackEffect.cpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp

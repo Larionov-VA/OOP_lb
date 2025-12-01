@@ -1,10 +1,12 @@
 #pragma once
 #include "IState.hpp"
 
-class DecelerationState : public IState{
+class AttackEffect : public IState{
+private:
+    int effectDelay;
 public:
-    DecelerationState();
-    DecelerationState(int duration, char symbol);
+    AttackEffect();
+    AttackEffect(char effectSympol, int effectDelay, int effectDuration);
     void incDuration() override;
     void decDuration() override;
 

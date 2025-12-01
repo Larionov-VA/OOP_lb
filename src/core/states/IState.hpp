@@ -1,3 +1,5 @@
+#pragma once
+
 class IState {
 protected:
     int durationOfState;

@@ -2,7 +2,7 @@
 #include "ISpell.hpp"
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
-
+#include "../core/states/TrapEffect.hpp"
 
 class TrapSpell : public SpellScroll {
 private:

@@ -161,3 +161,7 @@ std::vector<std::pair<bool, int>> Player::getHandItems() {
 std::pair<int, int> Player::getHandSize() {
     return {playerHand.getCurrentHandSize(), playerHand.getMaxHandSize()};
 }
+
+char Player::returnEntitySymbol() {
+    return 'P';
+}

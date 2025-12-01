@@ -44,3 +44,7 @@ bool EnemyBarracks::alive() const {
 int EnemyBarracks::getLevel() {
     return barracksLevel;
 }
+
+char EnemyBarracks::returnEntitySymbol() {
+    return 'B';
+}

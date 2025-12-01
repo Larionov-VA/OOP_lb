@@ -1,28 +1,36 @@
 #pragma once
-#include <IState.hpp>
+#include "./states/IState.hpp"
 #include <memory>
 
 
 class CellState {
 private:
-    std::unique_ptr<IState> state;
-    bool enemyCorpse;
+    std::unique_ptr<IState> constState;
+    std::unique_ptr<IState> temporaryState;
     bool avaible;
-    bool slow;
-    bool trapped;
-    int trapDamage;
+    // bool enemyCorpse;
+    // bool slow;
+    // bool trapped;
+    // int trapDamage;
 public:
     CellState();
-    CellState(bool enemyCorpse, bool avaible, bool slow, bool trapped, int trapDamage);
+    CellState(std::unique_ptr<IState> constState, std::unique_ptr<IState> temporaryState);
     char getCellSymbol() const;
-    bool getEnemyCorpse() const;
+    bool haveSpecificState() const;
+    void setConstState(std::unique_ptr<IState> constState);
+    void setTemporaryState(std::unique_ptr<IState> temporaryState);
+    // bool getEnemyCorpse() const;
     bool getAvaible() const;
-    bool getSlow() const;
-    bool getTrapped() const;
-    int getTrapDamage() const;
-    void setEnemyCorpse(int newEnemyCorpse);
-    void setAvaible(int newAvaible);
-    void setSlow(int newSlow);
-    void setTrapped(int newTrapped);
-    void setTrapDamage(int newTrapDamage);
+    void setAvaible(bool newAvaible);
+    int getStateDamage() const;
+    // bool getSlow() const;
+    // bool getTrapped() const;
+    // int getTrapDamage() const;
+    // void setEnemyCorpse(int newEnemyCorpse);
+    // void setAvaible(int newAvaible);
+
+    // void setSlow(int newSlow);
+
+    // void setTrapped(int newTrapped);
+    // void setTrapDamage(int newTrapDamage);
 };

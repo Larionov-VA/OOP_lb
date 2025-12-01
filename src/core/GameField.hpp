@@ -8,6 +8,11 @@
 #include <string>
 #include <queue>
 
+#include "./states/CoupreAnimate.hpp"
+#include "./states/DecelerationEffect.hpp"
+#include "./states/AttackEffect.hpp"
+#include "./states/IState.hpp"
+
 #include "EntityManager.hpp"
 #include "FieldCell.hpp"
 
@@ -18,7 +23,6 @@
 #include "entities/EnemyTower.hpp"
 
 #include "Config.hpp"
-// #include "FTXUIVisualizer.hpp"
 
 #define MAX_FIELD_SIZE 25
 #define MIN_FIELD_SIZE 10
@@ -45,7 +49,7 @@ private:
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
-    bool isMoveCorrect(int oldIndex, int newIndex) const;
+    bool isMoveCorrect(int oldIndex, int newIndex);
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
     int firstEnemyIndexOnLine(int oldIndex, int newIndex) const;
@@ -66,4 +70,5 @@ public:
     void playerLevelUp(char attribute);
     void update();
     std::vector<wchar_t> show();
+    void animateBowAttack(int playerIndex, int enemyIndex);
 };

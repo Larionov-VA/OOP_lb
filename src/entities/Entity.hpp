@@ -41,4 +41,5 @@ public:
     virtual void addExperience(int exp) { (void)exp; };
     virtual void addSpells(int indexInHand, int count) { (void)indexInHand; (void)count; };
     virtual std::vector<long long> getExperience() { return {0,0,0}; };
+    virtual char returnEntitySymbol() = 0;
 };

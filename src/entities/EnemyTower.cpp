@@ -59,3 +59,7 @@ int EnemyTower::getLevel() {
 int EnemyTower::getInt() {
     return towerlevel * 10;
 }
+
+char EnemyTower::returnEntitySymbol() {
+    return 'T';
+}

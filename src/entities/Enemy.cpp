@@ -42,3 +42,7 @@ void Enemy::causeDamage(int damage) {
 bool Enemy::alive() const {
     return enemyHealth.getCurrentHealth();
 }
+
+char Enemy::returnEntitySymbol() {
+    return 'E';
+}
