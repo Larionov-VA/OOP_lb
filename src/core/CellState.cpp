@@ -60,3 +60,7 @@ void CellState::setTrapped(int newTrapped) {
 void CellState::setTrapDamage(int newTrapDamage) {
     this->trapDamage = newTrapDamage;
 }
+
+char CellState::getCellSymbol() const {
+    return state->getSymbol();
+}

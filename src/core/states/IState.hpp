@@ -1,5 +1,3 @@
-
-
 class IState {
 protected:
     int durationOfState;
@@ -10,9 +8,9 @@ public:
     virtual void decDuration() = 0;
 
     virtual int getDamage() = 0;
-    virtual void setDamage() = 0;
+    virtual void setDamage(int damage) = 0;
 
-    virtual void setDuration(int countOfRounds) const = 0;
-    virtual bool getDuration() const = 0;
+    virtual void setDuration(int countOfRounds) = 0;
+    virtual int getDuration() const = 0;
     virtual char getSymbol() const = 0;
 };

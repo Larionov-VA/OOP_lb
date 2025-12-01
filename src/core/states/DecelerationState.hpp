@@ -5,13 +5,13 @@ class DecelerationState : public IState{
 public:
     DecelerationState();
     DecelerationState(int duration, char symbol);
-    void incDuration();
-    void decDuration();
+    void incDuration() override;
+    void decDuration() override;
 
-    int getDamage();
-    void setDamage(int damage);
+    int getDamage() override;
+    void setDamage(int damage) override;
 
-    void setDuration(int countOfRounds) const;
-    bool getDuration() const ;
-    char getSymbol() const;
+    void setDuration(int countOfRounds) override;
+    int getDuration() const override;
+    char getSymbol() const override;
 };
