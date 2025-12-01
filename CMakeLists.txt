@@ -13,11 +13,14 @@ set(SRCS
     src/core/GameField.cpp
     src/core/FieldCell.cpp
     src/core/EntityManager.cpp
-    src/core/visual/FTXUIVisualizer.cpp
-    src/core/visual/NCURSESVisualizer.cpp
     src/core/Config.cpp
     src/core/FileHandler.cpp
     src/core/InputController.cpp
+
+    src/core/visual/FTXUIVisualizer.cpp
+    src/core/visual/NCURSESVisualizer.cpp
+
+    src/core/states/DecelerationState.cpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp

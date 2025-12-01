@@ -25,6 +25,7 @@ public:
         int trapDamage = 0
     );
     int getIndex() const;
+    char getCellSymbol();
     void setIndex(int index);
     float getDistance(FieldCell oth) const;
     std::pair<int, int> getCoord() const;

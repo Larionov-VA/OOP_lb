@@ -90,3 +90,21 @@ bool FieldCell::checkCellDead() {
 void FieldCell::setCellDead() {
     this->state.setEnemyCorpse(true);
 }
+
+char FieldCell::getCellSymbol() {
+    char res = '-';
+    if (!state.getAvaible()) {
+        res = '#';
+    }
+    else if (state.getEnemyCorpse()) {
+        state.setEnemyCorpse(false);
+        res = 'x';
+    }
+    else if (state.getTrapped()) {
+        res = 'o';
+    }
+    else if (state.getSlow()) {
+        res = '@';
+    }
+    return res;
+}
