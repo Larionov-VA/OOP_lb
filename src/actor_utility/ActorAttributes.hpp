@@ -1,6 +1,6 @@
 #pragma once
 
-class Atributes {
+class Attributes {
 private:
     int intelligence;
     int dexterity;
@@ -12,7 +12,7 @@ public:
     void setIntelligence(int newInt);
     void setDexterity(int newDex);
     void setStrength(int newStr);
-    Atributes(int intelligence, int dexterity, int strength);
-    Atributes();
-    ~Atributes();
+    Attributes(int intelligence, int dexterity, int strength);
+    Attributes();
+    ~Attributes();
 };

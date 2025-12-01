@@ -17,7 +17,7 @@ Player::Player(
     this->playerHealth = Health{playerHealth};
     this->playerHand = Hand{playerHandSize};
     this->playerStats = Stats{prevLevelUpExperience, playerExperience, levelUpExperience, playerLevel};
-    this->playerAttributes = Atributes{playerIntelligence, playerDexterity, playerStrength};
+    this->playerAttributes = Attributes{playerIntelligence, playerDexterity, playerStrength};
 }
 
 

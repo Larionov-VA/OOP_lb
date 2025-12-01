@@ -25,7 +25,6 @@
 
 class FTXUIVisualizer : public IVisualizer{
 private:
-    // std::shared_ptr<ftxui::ScreenInteractive> screen_;
     ftxui::ScreenInteractive screen_;
     enum class ScreenState {
         MainMenu,

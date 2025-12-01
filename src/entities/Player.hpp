@@ -17,7 +17,7 @@
 
 class Player : public Entity {
 private:
-    Atributes playerAttributes;
+    Attributes playerAttributes;
     Attack playerAttack;
     Equipment playerEquipment;
     Hand playerHand;

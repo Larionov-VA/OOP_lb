@@ -1,42 +1,42 @@
 #include "ActorAttributes.hpp"
 
 
-Atributes::Atributes(int intelligence, int dexterity, int strength) {
+Attributes::Attributes(int intelligence, int dexterity, int strength) {
     this->intelligence = intelligence;
     this->dexterity = dexterity;
     this->strength = strength;
 }
 
 
-Atributes::Atributes(): Atributes(10,10,10) {};
+Attributes::Attributes(): Attributes(10,10,10) {};
 
 
-Atributes::~Atributes() {
+Attributes::~Attributes() {
 }
 
 
-int Atributes::getIntelligence() const {
+int Attributes::getIntelligence() const {
     return intelligence;
 }
 
 
-int Atributes::getDexterity() const {
+int Attributes::getDexterity() const {
     return dexterity;
 }
 
 
-int Atributes::getStrength() const {
+int Attributes::getStrength() const {
     return strength;
 }
 
-void Atributes::setIntelligence(int newInt) {
+void Attributes::setIntelligence(int newInt) {
     intelligence = newInt;
 }
 
-void Atributes::setDexterity(int newDex) {
+void Attributes::setDexterity(int newDex) {
     dexterity = newDex;
 }
 
-void Atributes::setStrength(int newStr) {
+void Attributes::setStrength(int newStr) {
     strength = newStr;
 }
