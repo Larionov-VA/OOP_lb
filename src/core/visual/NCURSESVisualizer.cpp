@@ -18,6 +18,7 @@ void NCURSESVisualizer::setGameController(IGameController* gc) {
 }
 
 void NCURSESVisualizer::initCurses() {
+    setlocale(LC_ALL, "");
     initscr();
     cbreak();
     noecho();
@@ -148,10 +149,6 @@ void NCURSESVisualizer::loopLevelUp() {
 
 void NCURSESVisualizer::drawLevelUpMenu() {
     clear();
-    attron(COLOR_PAIR(1));
-    mvhline(0, 0, ' ', term_w);
-    mvprintw(0, (term_w - 15) / 2, " LEVEL UP! ");
-    attroff(COLOR_PAIR(1));
 
     if (!gameController) return;
 
@@ -169,9 +166,9 @@ void NCURSESVisualizer::drawLevelUpMenu() {
     mvaddch(by + box_h -1, bx, '+'); mvaddch(by + box_h -1, bx + box_w -1, '+');
 
     std::vector<std::string> options = {
-        "INT +10",
-        "STR +10",
-        "DEX +10"
+        "INT +10 -- Increases spell damage",
+        "STR +10 -- Increases sword damage and max life",
+        "DEX +10 -- Increases bow damage"
     };
 
     for (size_t i = 0; i < options.size(); ++i) {
@@ -185,7 +182,7 @@ void NCURSESVisualizer::drawLevelUpMenu() {
         }
     }
 
-    std::string hint = "Use WASD/Arrows + Enter/E to choose";
+    std::string hint = "Use 'W'&'S' + Enter/E to choose";
     mvprintw(by + box_h -2, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
 
     int info_y = by + box_h + 1;
@@ -200,15 +197,42 @@ void NCURSESVisualizer::drawLevelUpMenu() {
 
 void NCURSESVisualizer::drawMainMenu() {
     clear();
-    attron(COLOR_PAIR(1));
-    mvhline(0, 0, ' ', term_w);
-    mvprintw(0, (term_w - 12) / 2, " MAIN MENU ");
-    attroff(COLOR_PAIR(1));
+    std::vector<std::wstring> titleArt = {
+        L" _____                                                                                                 _____ ",
+        L"( ___ )-----------------------------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                                                 |   | ",
+        L" |   |                   ▄█    █▄       ▄████████    ▄████████  ▄██████▄     ▄████████                 |   | ",
+        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███   ███    ███                 |   | ",
+        L" |   |                  ███    ███     ███    █▀    ███    ███ ███    ███   ███    █▀                  |   | ",
+        L" |   |                 ▄███▄▄▄▄███▄▄  ▄███▄▄▄      ▄███▄▄▄▄██▀ ███    ███   ███                        |   | ",
+        L" |   |                ▀▀███▀▀▀▀███▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀   ███    ███ ▀███████████                 |   | ",
+        L" |   |                  ███    ███     ███    █▄  ▀███████████ ███    ███          ███                 |   | ",
+        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███    ▄█    ███                 |   | ",
+        L" |   |                  ███    █▀      ██████████   ███    ███  ▀██████▀   ▄████████▀                  |   | ",
+        L" |   |                                    ███    ███                                                   |   | ",
+        L" |   |         ▄████████    ▄████████  ▄█    █▄     ▄████████ ███▄▄▄▄      ▄██████▄     ▄████████      |   | ",
+        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███▀▀▀██▄   ███    ███   ███    ███      |   | ",
+        L" |   |        ███    ███   ███    █▀  ███    ███   ███    █▀  ███   ███   ███    █▀    ███    █▀       |   | ",
+        L" |   |       ▄███▄▄▄▄██▀  ▄███▄▄▄     ███    ███  ▄███▄▄▄     ███   ███  ▄███         ▄███▄▄▄          |   | ",
+        L" |   |      ▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ███    ███ ▀▀███▀▀▀     ███   ███ ▀▀███ ████▄  ▀▀███▀▀▀          |   | ",
+        L" |   |      ▀███████████   ███    █▄  ███    ███   ███    █▄  ███   ███   ███    ███   ███    █▄       |   | ",
+        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███   ███   ███    ███   ███    ███      |   | ",
+        L" |   |        ███    ███   ██████████  ▀██████▀    ██████████  ▀█   █▀    ████████▀    ██████████      |   | ",
+        L" |   |        ███    ███                                                                               |   | ",
+        L" |___|                                                                                                 |___| ",
+        L"(_____)-----------------------------------------------------------------------------------------------(_____)",
+    };
 
+
+    int art_x = (term_w - (int)titleArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(5));
+    drawWideAsciiArt(art_x, art_y, titleArt);
+    attroff(COLOR_PAIR(5));
     int box_w = 40;
     int box_h = (int)main_menu_items.size() + 4;
     int bx = (term_w - box_w) / 2;
-    int by = (term_h - box_h) / 2;
+    int by = (term_h - box_h) / 3 * 2;
 
     for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
     for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
@@ -225,15 +249,15 @@ void NCURSESVisualizer::drawMainMenu() {
     for (size_t i = 0; i < main_menu_items.size(); ++i) {
         int iy = by + 2 + (int)i;
         if ((int)i == main_menu_selected) {
-            attron(COLOR_PAIR(2));
+            attron(COLOR_PAIR(5));
             mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
-            attroff(COLOR_PAIR(2));
+            attroff(COLOR_PAIR(5));
         } else {
             mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
         }
     }
 
-    std::string hint = "Use arrows/WASD + Enter. Q to quit.";
+    std::string hint = "Use 'W'&'S' + Enter/E. Esc/Q to quit.";
     mvprintw(by + box_h, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
 
     refresh();
@@ -282,10 +306,6 @@ void NCURSESVisualizer::loopInGame() {
 
 void NCURSESVisualizer::drawInGame() {
     clear();
-    attron(COLOR_PAIR(1));
-    mvhline(0, 0, ' ', term_w);
-    mvprintw(0, (term_w - 12) / 2, " IN GAME ");
-    attroff(COLOR_PAIR(1));
 
     int left_w = term_w / 4;
     int right_w = term_w / 4;
@@ -302,7 +322,7 @@ void NCURSESVisualizer::drawInGame() {
     drawFieldPanel(left_w + 1, top, center_w, height);
     drawRightPanel(left_w + 1 + center_w + 1, top, right_w);
 
-    std::string hint = "WASD/arrows - move | Q/E - actions | Esc - menu | 1-4 - use item";
+    std::string hint = "WASD/arrows - move | Q - swap weapon | E - use item | Esc - menu | 1-4 - swap spell";
     mvprintw(term_h - 1, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
 
     refresh();
@@ -353,6 +373,12 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
             cur_y += 2;
             mvprintw(cur_y++, x + 1, "Attack: %d", data->playerAttack);
             mvprintw(cur_y++, x + 1, "Weapon: %s", data->playerWeapon.c_str());
+            mvprintw(cur_y++, x + 1, "Attributes");
+            mvprintw(cur_y++, x + 1, "int: %s str: %s dex: %s",
+                std::to_string(data->playerIntelligence).c_str(),
+                std::to_string(data->playerStrength).c_str(),
+                std::to_string(data->playerDexterity).c_str()
+            );
         } else {
             mvprintw(cur_y++, x + 1, "(no player data)");
         }
@@ -401,8 +427,6 @@ void NCURSESVisualizer::unsetColor(char out) {
 
 
 void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
-    drawBoxTitle(x, y, w, " FIELD ");
-
     std::vector<wchar_t> fieldChars;
     int fw = GlobalGameConfig::fieldWidth;
     int fh = GlobalGameConfig::fieldHeight;
@@ -483,5 +507,11 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w) {
         }
     } else {
         mvprintw(cur_y++, x + 1, "(no controller)");
+    }
+}
+
+void NCURSESVisualizer::drawWideAsciiArt(int x, int y, const std::vector<std::wstring>& art) {
+    for (size_t i = 0; i < art.size(); ++i) {
+        mvwaddwstr(stdscr, y + i, x, art[i].c_str());
     }
 }

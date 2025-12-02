@@ -20,6 +20,7 @@ public:
     }
 
     ~AudioPlayer() {
+        stop();
         if (sound_loaded) {
             ma_sound_uninit(&sound);
         }

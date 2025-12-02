@@ -4,7 +4,8 @@
 #include <vector>
 #include <memory>
 #include <chrono>
-
+#include <wchar.h>
+#include <locale.h>
 #include "IVisualizer.hpp"
 #include "../InputController.hpp"
 #include "../IGameController.hpp"
@@ -51,8 +52,9 @@ private:
     void drawLeftPanel(int x, int y, int w, int h);
     void drawFieldPanel(int x, int y, int w, int h);
     void drawRightPanel(int x, int y, int w);
-
+    void drawWideAsciiArt(int x, int y, const std::vector<std::wstring>& art);
     void drawBoxTitle(int x, int y, int w, const std::string& title);
+
     void setColor(char out);
     void unsetColor(char out);
 };
