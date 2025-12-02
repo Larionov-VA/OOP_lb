@@ -35,5 +35,8 @@ int AttackEffect::getDuration() const {
 }
 
 char AttackEffect::getSymbol() const {
-    return this->stateSymbol;
+    if (this->effectDelay <= 0) {
+        return this->stateSymbol;
+    }
+    return '_';
 }

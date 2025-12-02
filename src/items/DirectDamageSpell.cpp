@@ -37,10 +37,27 @@ bool DirectDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
             Entity* user = ctx.entityManager[userIndex];
             int userInt = user->getInt();
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));
+            animateCast(ctx, enemyIndex);
             return true;
         }
     }
     return false;
+}
+
+
+void DirectDamageSpell::animateCast(GameContext& ctx, int target) {
+    int upIndex = target - GlobalGameConfig::fieldWidth;
+    int downIndex = target + GlobalGameConfig::fieldWidth;
+    int leftIndex = target - 1;
+    int rightIndex = target + 1;
+    std::unique_ptr<IState> upCastEffect = std::make_unique<AttackEffect>('&', 0, 4);
+    ctx.cells[upIndex].returnCellState().setTemporaryState(move(upCastEffect));
+    std::unique_ptr<IState> downCastEffect = std::make_unique<AttackEffect>('&', 0, 4);
+    ctx.cells[downIndex].returnCellState().setTemporaryState(move(downCastEffect));
+    std::unique_ptr<IState> leftCastEffect = std::make_unique<AttackEffect>('&', 0, 4);
+    ctx.cells[leftIndex].returnCellState().setTemporaryState(move(leftCastEffect));
+    std::unique_ptr<IState> rightCastEffect = std::make_unique<AttackEffect>('&', 0, 4);
+    ctx.cells[rightIndex].returnCellState().setTemporaryState(move(rightCastEffect));
 }
 
 

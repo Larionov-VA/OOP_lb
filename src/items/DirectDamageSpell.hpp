@@ -2,6 +2,8 @@
 #include "ISpell.hpp"
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
+#include "../core/states/AttackEffect.hpp"
+#include "../core/states/IState.hpp"
 
 class DirectDamageSpell : public SpellScroll {
 private:
@@ -20,4 +22,6 @@ public:
     void setBaseDamage(int newDamage);
     void setBaseDistance(int newDistance);
     int getBaseDistance();
+private:
+    void animateCast(GameContext& ctx, int target);
 };

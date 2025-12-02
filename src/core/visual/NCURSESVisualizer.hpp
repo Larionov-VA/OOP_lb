@@ -50,7 +50,7 @@ private:
 
     void drawLeftPanel(int x, int y, int w, int h);
     void drawFieldPanel(int x, int y, int w, int h);
-    void drawRightPanel(int x, int y, int w, int h);
+    void drawRightPanel(int x, int y, int w);
 
     void drawBoxTitle(int x, int y, int w, const std::string& title);
     void setColor(char out);

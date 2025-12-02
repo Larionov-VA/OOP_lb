@@ -34,5 +34,16 @@ bool AreaDamageSpell::cast(GameContext& ctx, int userIndex, int power) {
             ctx.entityManager[enemyIndex]->causeDamage((userInt + baseDamage) * (powerOfSpell + userInt/10));
         }
     }
+    animateCast(ctx, userIndex, baseDistance * powerOfSpell + power * 3);
     return true;
+}
+
+void AreaDamageSpell::animateCast(GameContext& ctx, int userIndex, int distance) {
+    for (size_t i = 0; i < ctx.cells.size(); ++i) {
+        float currentDistanceToUser = ctx.cells[userIndex].getDistance(ctx.cells[i]);
+        if (currentDistanceToUser <= (float)distance) {
+            std::unique_ptr<IState> castEffect = std::make_unique<AttackEffect>('&', currentDistanceToUser, 2);
+            ctx.cells[i].returnCellState().setTemporaryState(move(castEffect));
+        }
+    }
 }

@@ -2,6 +2,8 @@
 #include "ISpell.hpp"
 #include "../core/EntityManager.hpp"
 #include "../core/FieldCell.hpp"
+#include "../core/states/AttackEffect.hpp"
+#include "../core/states/IState.hpp"
 
 class AreaDamageSpell : public SpellScroll {
 private:
@@ -17,4 +19,6 @@ public:
     }
     ~AreaDamageSpell() override = default;
     bool cast(GameContext& ctx, int userIndex, int power) override;
+private:
+    void animateCast(GameContext& ctx, int userIndex, int distance);
 };

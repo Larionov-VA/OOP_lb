@@ -300,7 +300,7 @@ void NCURSESVisualizer::drawInGame() {
 
     drawLeftPanel(0, top, left_w, height);
     drawFieldPanel(left_w + 1, top, center_w, height);
-    drawRightPanel(left_w + 1 + center_w + 1, top, right_w, height);
+    drawRightPanel(left_w + 1 + center_w + 1, top, right_w);
 
     std::string hint = "WASD/arrows - move | Q/E - actions | Esc - menu | 1-4 - use item";
     mvprintw(term_h - 1, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
@@ -382,7 +382,7 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
 
 
 void NCURSESVisualizer::setColor(char out) {
-    if (out == 'E' || out == 'T' || out == 'B') {
+    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
         attron(COLOR_PAIR(4));
     }
     if (out == 'P') {
@@ -391,7 +391,7 @@ void NCURSESVisualizer::setColor(char out) {
 }
 
 void NCURSESVisualizer::unsetColor(char out) {
-    if (out == 'E' || out == 'T' || out == 'B') {
+    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
         attroff(COLOR_PAIR(4));
     }
     if (out == 'P') {
@@ -461,7 +461,7 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     }
 }
 
-void NCURSESVisualizer::drawRightPanel(int x, int y, int w, int h) {
+void NCURSESVisualizer::drawRightPanel(int x, int y, int w) {
     drawBoxTitle(x, y, w, " HAND ");
     int cur_y = y + 1;
 
