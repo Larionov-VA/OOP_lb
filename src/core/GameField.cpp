@@ -265,6 +265,9 @@ bool GameField::playerTurn(char command) {
             }
             else {
                 if (isMoveCorrect(playerIndex, newPlayerIndex)) {
+                    if (cells[newPlayerIndex].returnCellState().haveSpecificState()) {
+                        entityManager[playerIndex]->setDebaffState(); // to do: сделать этот метод под IState;
+                    }
                     moveEntity(playerIndex, newPlayerIndex);
                 }
             }
@@ -351,70 +354,134 @@ void GameField::update() {
 }
 
 
-int GameField::getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex) {
-    Entity* ent = entityManager[indexEnemy];
-    if (!ent) {
-        return indexEnemy;
+void GameField::enemyTurn() {
+    std::unordered_map<int, int> grid;
+    grid.reserve(widthField * heightField);
+    auto enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
+    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    for (int i = 0; i < widthField*heightField; ++i) {
+        if (cells[i].returnCellState().getAvaible() ||
+            std::find(enemyIndexes.begin(), enemyIndexes.end(), i) != enemyIndexes.end() ||
+            i == playerIndex
+            ) {
+            grid[i] = 0;
+        }
+        else {
+            grid[i] = -1;
+        }
     }
-    Enemy* enemy = dynamic_cast<Enemy*>(ent);
-    if (!enemy) {
-        return indexEnemy;
-    }
-
-    if (enemy->getIterative()) {
-        std::vector<int> enemyTurns;
-        enemyTurns.push_back(indexEnemy - widthField);
-        enemyTurns.push_back(indexEnemy + widthField);
-        enemyTurns.push_back(indexEnemy - 1);
-        enemyTurns.push_back(indexEnemy + 1);
-        std::vector<std::pair<int, float>> enemyTurnsWithDist = getDistanceToPlayer(enemyTurns, playerIndex);
-        std::pair<int, float> bestTurn{indexEnemy, cells[indexEnemy].getDistance(cells[playerIndex])};
-        for (const auto& [turn, dist] : enemyTurnsWithDist) {
-            if (isMoveCorrect(indexEnemy, turn) && dist < bestTurn.second) {
-                bestTurn.first = turn;
-                bestTurn.second = dist;
+    std::queue<int> wave;
+    wave.push(playerIndex);
+    while (!wave.empty()) {
+        int currentIndex = wave.front();
+        int waveCount = grid[currentIndex];
+        wave.pop();
+        int upIndex = currentIndex - widthField;
+        int downIndex = currentIndex + widthField;
+        int leftIndex = currentIndex - 1;
+        int rightIndex = currentIndex + 1;
+        if (upIndex >= 0 && upIndex < widthField * heightField) {
+            auto it = grid.find(upIndex);
+            if (it != grid.end() && it->second == 0) {
+                if (isMoveCorrect(currentIndex, upIndex)) {
+                    grid[upIndex] = waveCount + 1;
+                    wave.push(upIndex);
+                }
             }
         }
-        if (bestTurn.first == indexEnemy) {
-            enemy->setIterative(false);
+        if (downIndex >= 0 && downIndex < widthField * heightField) {
+            auto it = grid.find(downIndex);
+            if (it != grid.end() && it->second == 0) {
+                if (isMoveCorrect(currentIndex, downIndex)) {
+                    grid[downIndex] = waveCount + 1;
+                    wave.push(downIndex);
+                }
+            }
         }
-        return bestTurn.first;
-    } else {
-        std::unordered_map<int, int> visited{};
-        int res = getBestTurnForEnemyRecursive(indexEnemy, playerIndex, visited);
+        if (leftIndex >= 0 && leftIndex < widthField * heightField) {
+            auto it = grid.find(leftIndex);
+            if (it != grid.end() && it->second == 0) {
+                if (isMoveCorrect(currentIndex, leftIndex)) {
+                    grid[leftIndex] = waveCount + 1;
+                    wave.push(leftIndex);
+                }
+            }
+        }
+        if (rightIndex >= 0 && rightIndex < widthField * heightField) {
+            auto it = grid.find(rightIndex);
+            if (it != grid.end() && it->second == 0) {
+                if (isMoveCorrect(currentIndex, rightIndex)) {
+                    grid[rightIndex] = waveCount + 1;
+                    wave.push(rightIndex);
+                }
+            }
+        }
+    }
+    std::vector<std::pair<int,int>> enemyIndexesWithDistance;
+    for(auto enemyIndex: enemyIndexes) {
+        enemyIndexesWithDistance.push_back({enemyIndex, grid[enemyIndex]});
+    }
+    std::sort(enemyIndexesWithDistance.begin(),
+                enemyIndexesWithDistance.end(),
+                [](const auto& a, const auto& b) {return a.second < b.second;}
+            );
+    for (auto [index, distance] : enemyIndexesWithDistance) {
+        Entity* currentEnemy = entityManager[index];
+        if (!currentEnemy) continue;
+        if (!currentEnemy->alive()) continue;
+        if (cells[playerIndex].getDistance(cells[index]) == 1.0) {
+            Entity* player = entityManager[playerIndex];
+            if (player) {
+                player->causeDamage(currentEnemy->getDamage());
+            }
+            continue;
+        }
+        int currentEnemyBestTurn = getBestTurnForEnemy(index, playerIndex, grid);
+        bool haveSpecificState = cells[currentEnemyBestTurn].returnCellState().haveSpecificState();
 
-        return (res == -1) ? indexEnemy : res;
+        if (haveSpecificState) {
+            int trapDamage = cells[currentEnemyBestTurn].returnCellState().getStateDamage();
+            currentEnemy->causeDamage(trapDamage);
+        }
+        if (currentEnemyBestTurn == index) continue;
+        if (isMoveCorrect(index, currentEnemyBestTurn)) {
+            if (!entityManager[currentEnemyBestTurn] && cells[currentEnemyBestTurn].returnCellState().getAvaible()) {
+                moveEntity(index, currentEnemyBestTurn);
+            }
+        }
     }
 }
 
 
-int GameField::getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited) {
-    visited[playerIndex] = 1;
-    int up = playerIndex - widthField;
-    int down = playerIndex + widthField;
-    int left = playerIndex - 1;
-    int right = playerIndex + 1;
-    int result = -1;
-    if (up == indexEnemy || down == indexEnemy || left == indexEnemy || right == indexEnemy) {
-        return playerIndex;
+int GameField::getBestTurnForEnemy(int enemyIndex, int playerIndex, std::unordered_map<int, int>& grid) {
+    std::vector<int> directions = {
+        enemyIndex - widthField,
+        enemyIndex + widthField,
+        enemyIndex - 1,
+        enemyIndex + 1
+    };
+
+    int bestTurn = enemyIndex;
+    int bestDistance = std::numeric_limits<int>::max();
+
+    for (int turn : directions) {
+        if (turn < 0 || turn >= widthField * heightField) continue;
+        auto it = grid.find(turn);
+        if (it == grid.end() || it->second <= 0) continue;
+        if (!isMoveCorrect(enemyIndex, turn)) continue;
+        if (it->second < bestDistance) {
+            bestDistance = it->second;
+            bestTurn = turn;
+        }
+        else if (it->second == bestDistance) {
+            float currentDist = cells[bestTurn].getDistance(cells[playerIndex]);
+            float newDist = cells[turn].getDistance(cells[playerIndex]);
+            if (newDist < currentDist) {
+                bestTurn = turn;
+            }
+        }
     }
-    if (isMoveCorrect(playerIndex, up) && !visited[up]) {
-        result = getBestTurnForEnemyRecursive(indexEnemy, up, visited);
-        if (result != -1) return result;
-    }
-    if (isMoveCorrect(playerIndex, down) && !visited[down]) {
-        result = getBestTurnForEnemyRecursive(indexEnemy, down, visited);
-        if (result != -1) return result;
-    }
-    if (isMoveCorrect(playerIndex, left) && !visited[left]) {
-        result = getBestTurnForEnemyRecursive(indexEnemy, left, visited);
-        if (result != -1) return result;
-    }
-    if (isMoveCorrect(playerIndex, right) && !visited[right]) {
-        result = getBestTurnForEnemyRecursive(indexEnemy, right, visited);
-        if (result != -1) return result;
-    }
-    return -1;
+    return bestTurn;
 }
 
 
@@ -427,51 +494,6 @@ GameField::getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex) {
         distances.push_back({enemyIndexes[i], distance});
     }
     return distances;
-}
-
-void GameField::enemyTurn() {
-    int playerIndex = entityManager.getIndexesWithEntity(Entity::entityType::PLAYER)[0];
-
-    auto enemyIndexes = entityManager.getIndexesWithEntity(Entity::entityType::ENEMY);
-    if (enemyIndexes.empty()) return;
-
-    auto enemyIndexesWithDistances = getDistanceToPlayer(enemyIndexes, playerIndex);
-    std::sort(enemyIndexesWithDistances.begin(), enemyIndexesWithDistances.end(),
-              [](const std::pair<int, float>& a, const std::pair<int, float>& b) {
-                  return a.second > b.second;
-              });
-
-    std::unordered_set<int> occupiedNewIndices;
-
-    for (const auto& [index, dist] : enemyIndexesWithDistances) {
-        Entity* e = entityManager[index];
-        if (!e) continue;
-        if (!e->alive()) continue;
-        if (cells[playerIndex].getDistance(cells[index]) <= 1) {
-            Entity* playerEnt = entityManager[playerIndex];
-            if (playerEnt) {
-                playerEnt->causeDamage(e->getDamage());
-            }
-            continue;
-        }
-
-        int bestTurn = getBestTurnForEnemyPrimitive(index, playerIndex);
-        bool haveSpecificState = cells[bestTurn].returnCellState().haveSpecificState();
-
-        if (haveSpecificState) {
-            int trapDamage = cells[bestTurn].returnCellState().getStateDamage();
-            e->causeDamage(trapDamage);
-        }
-        if (bestTurn == index) continue;
-        if (occupiedNewIndices.count(bestTurn)) continue;
-
-        if (isMoveCorrect(index, bestTurn)) {
-            if (!entityManager[bestTurn] && cells[bestTurn].returnCellState().getAvaible()) {
-                moveEntity(index, bestTurn);
-                occupiedNewIndices.insert(bestTurn);
-            }
-        }
-    }
 }
 
 

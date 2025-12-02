@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <string>
 #include <queue>
+#include <numeric>
+#include <limits>
 
 #include "./states/CoupreAnimate.hpp"
 #include "./states/DecelerationEffect.hpp"
@@ -55,6 +57,7 @@ private:
     int firstEnemyIndexOnLine(int oldIndex, int newIndex);
     int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
     int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
+    int getBestTurnForEnemy(int enemyIndex, int playerIndex, std::unordered_map<int, int>& grid);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
@@ -65,6 +68,7 @@ public:
     std::vector<EnemyData> getEnemyData();
     bool playerTurn(char command);
     void enemyTurn();
+    void enemyTurnA();
     void buildingsTurn();
     int getCountOfEnemy();
     void playerLevelUp(char attribute);

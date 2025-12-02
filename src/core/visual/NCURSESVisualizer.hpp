@@ -31,6 +31,7 @@ private:
     std::vector<std::string> main_menu_items = { "New Game", "Continue Game", "Exit" };
     int main_menu_selected = 0;
 
+    const int frame_ms = 15;
     std::chrono::steady_clock::time_point last_frame_time;
 
     void initCurses();
