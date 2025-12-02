@@ -5,7 +5,7 @@
 #include "./visual/IVisualizer.hpp"
 #include "./visual/NCURSESVisualizer.hpp"
 #include "InputController.hpp"
-
+#include "AudioPlayer.hpp"
 
 void choiceVisualizer(IVisualizer*& vis) {
     int visChoice;
@@ -26,7 +26,12 @@ int main() {
     choiceVisualizer(vis);
     vis->setGameController(&game);
     vis->setInputController(&inp);
+    AudioPlayer player;
+    if (player.loadAndPlay("../sounds/main_theme.wav", true)) {
+        player.setVolume(0.5f);
+    }
     vis->display();
+    player.stop();
     return 0;
 }
 
