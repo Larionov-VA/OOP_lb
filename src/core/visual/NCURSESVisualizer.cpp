@@ -659,7 +659,7 @@ void NCURSESVisualizer::loopAutorsMenu() {
 
 void NCURSESVisualizer::drawAutorsMenu() {
     std::vector<std::wstring> autorsArt = {
-        L"_____                                                                          _____ ",
+        L" _____                                                                          _____ ",
         L"( ___ )------------------------------------------------------------------------( ___ )",
         L" |   |                                                                          |   | ",
         L" |   |    ▄████████ ███    █▄      ███      ▄██████▄     ▄████████    ▄████████ |   | ",
@@ -675,8 +675,8 @@ void NCURSESVisualizer::drawAutorsMenu() {
         L"(_____)------------------------------------------------------------------------(_____)"
     };
     std::vector<std::string> autors = {
-        "Game developer: 4342 Larionov V.",
-        "Composer      : 4344 Kozyrev M. "
+        "Game developer : 4342 Larionov V.",
+        "   Composer    : 4344 Kozyrev M. "
     };
     drawPatternSelectedMenu(autorsArt, autors, 5, (int)autors.size() + 1, false);
 }
