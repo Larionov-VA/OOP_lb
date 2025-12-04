@@ -1,21 +1,26 @@
 #include "NCURSESVisualizer.hpp"
 
+
 NCURSESVisualizer::NCURSESVisualizer() {
     initCurses();
     last_frame_time = std::chrono::steady_clock::now();
 }
 
+
 NCURSESVisualizer::~NCURSESVisualizer() {
     deinitCurses();
 }
+
 
 void NCURSESVisualizer::setInputController(InputController* ic) {
     inputController = ic;
 }
 
+
 void NCURSESVisualizer::setGameController(IGameController* gc) {
     gameController = gc;
 }
+
 
 void NCURSESVisualizer::initCurses() {
     setlocale(LC_ALL, "");
@@ -38,15 +43,44 @@ void NCURSESVisualizer::initCurses() {
     refresh();
 }
 
+
 void NCURSESVisualizer::deinitCurses() {
     if (!isendwin()) {
         endwin();
     }
 }
 
+
+void NCURSESVisualizer::drawBoxTitle(int x, int y, int w, const std::string& title) {
+    mvhline(y, x, ' ', w);
+    mvprintw(y, x + (w - (int)title.size())/2, "%s", title.c_str());
+}
+
+
+void NCURSESVisualizer::setColor(char out) {
+    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
+        attron(COLOR_PAIR(4));
+    }
+    if (out == 'P') {
+        attron(COLOR_PAIR(3));
+    }
+}
+
+
+void NCURSESVisualizer::unsetColor(char out) {
+    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
+        attroff(COLOR_PAIR(4));
+    }
+    if (out == 'P') {
+        attroff(COLOR_PAIR(3));
+    }
+}
+
+
 void NCURSESVisualizer::updateTermSize() {
     getmaxyx(stdscr, term_h, term_w);
 }
+
 
 int NCURSESVisualizer::fetchInput() {
     if (inputController) {
@@ -57,6 +91,14 @@ int NCURSESVisualizer::fetchInput() {
     if (ch == ERR) return 0;
     return ch;
 }
+
+
+void NCURSESVisualizer::drawWideAsciiArt(int x, int y, const std::vector<std::wstring>& art) {
+    for (size_t i = 0; i < art.size(); ++i) {
+        mvwaddwstr(stdscr, y + i, x, art[i].c_str());
+    }
+}
+
 
 void NCURSESVisualizer::display() {
     state = State::MainMenu;
@@ -86,6 +128,53 @@ void NCURSESVisualizer::display() {
         }
     }
 }
+
+
+void NCURSESVisualizer::drawPatternSelectedMenu(
+    std::vector<std::wstring>& asciiArt,
+    std::vector<std::string>& selectedOptions,
+    int artColor,
+    int selector,
+    bool needHints
+) {
+    clear();
+    int art_x = (term_w - (int)asciiArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(artColor));
+    drawWideAsciiArt(art_x, art_y, asciiArt);
+    attroff(COLOR_PAIR(artColor));
+    int box_w = 40;
+    int box_h = (int)selectedOptions.size() + 4;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 3 * 2;
+    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
+    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
+    for (int i = 0; i < box_h; ++i) {
+        mvaddch(by + i, bx, '|');
+        mvaddch(by + i, bx + box_w - 1, '|');
+    }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
+    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
+    if (needHints) {
+        std::string title = "Choose action";
+        mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
+        std::string hint = "Use 'W'&'S' + Enter/E to choose";
+        mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+    }
+
+    for (size_t i = 0; i < selectedOptions.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == selector) {
+            attron(COLOR_PAIR(artColor));
+            mvprintw(iy, bx + 2, " %s ", selectedOptions[i].c_str());
+            attroff(COLOR_PAIR(artColor));
+        } else {
+            mvprintw(iy, bx + 1, " %s ", selectedOptions[i].c_str());
+        }
+    }
+    refresh();
+}
+
 
 void NCURSESVisualizer::loopGameOverMenu() {
     auto frame_start = std::chrono::steady_clock::now();
@@ -123,6 +212,32 @@ void NCURSESVisualizer::loopGameOverMenu() {
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
 
+
+void NCURSESVisualizer::drawGameOverMenu() {
+    std::vector<std::wstring> gameOverArt = {
+        L" _____                                                                              _____ ",
+        L"( ___ )----------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                              |   | ",
+        L" |   | ▄██   ▄    ▄██████▄  ███    █▄       ████████▄   ▄█     ▄████████ ████████▄  |   | ",
+        L" |   | ███   ██▄ ███    ███ ███    ███      ███   ▀███ ███    ███    ███ ███   ▀███ |   | ",
+        L" |   | ███▄▄▄███ ███    ███ ███    ███      ███    ███ ███▌   ███    █▀  ███    ███ |   | ",
+        L" |   | ▀▀▀▀▀▀███ ███    ███ ███    ███      ███    ███ ███▌  ▄███▄▄▄     ███    ███ |   | ",
+        L" |   | ▄██   ███ ███    ███ ███    ███      ███    ███ ███▌ ▀▀███▀▀▀     ███    ███ |   | ",
+        L" |   | ███   ███ ███    ███ ███    ███      ███    ███ ███    ███    █▄  ███    ███ |   | ",
+        L" |   | ███   ███ ███    ███ ███    ███      ███   ▄███ ███    ███    ███ ███   ▄███ |   | ",
+        L" |   |  ▀█████▀   ▀██████▀  ████████▀       ████████▀  █▀     ██████████ ████████▀  |   | ",
+        L" |___|                                                                              |___| ",
+        L"(_____)----------------------------------------------------------------------------(_____)"
+    };
+    std::vector<std::string> gameOverOptions = {
+        "New game",
+        "Load game",
+        "Main menu"
+    };
+    drawPatternSelectedMenu(gameOverArt, gameOverOptions, 4, gameOverSelected, true);
+}
+
+
 void NCURSESVisualizer::loopMainMenu() {
     auto frame_start = std::chrono::steady_clock::now();
     drawMainMenu();
@@ -155,6 +270,37 @@ void NCURSESVisualizer::loopMainMenu() {
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+
+void NCURSESVisualizer::drawMainMenu() {
+    std::vector<std::wstring> mainMenuArt = {
+        L" _____                                                                                                 _____ ",
+        L"( ___ )-----------------------------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                                                 |   | ",
+        L" |   |                   ▄█    █▄       ▄████████    ▄████████  ▄██████▄     ▄████████                 |   | ",
+        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███   ███    ███                 |   | ",
+        L" |   |                  ███    ███     ███    █▀    ███    ███ ███    ███   ███    █▀                  |   | ",
+        L" |   |                 ▄███▄▄▄▄███▄▄  ▄███▄▄▄      ▄███▄▄▄▄██▀ ███    ███   ███                        |   | ",
+        L" |   |                ▀▀███▀▀▀▀███▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀   ███    ███ ▀███████████                 |   | ",
+        L" |   |                  ███    ███     ███    █▄  ▀███████████ ███    ███          ███                 |   | ",
+        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███    ▄█    ███                 |   | ",
+        L" |   |                  ███    █▀      ██████████   ███    ███  ▀██████▀   ▄████████▀                  |   | ",
+        L" |   |                                    ███    ███                                                   |   | ",
+        L" |   |         ▄████████    ▄████████  ▄█    █▄     ▄████████ ███▄▄▄▄      ▄██████▄     ▄████████      |   | ",
+        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███▀▀▀██▄   ███    ███   ███    ███      |   | ",
+        L" |   |        ███    ███   ███    █▀  ███    ███   ███    █▀  ███   ███   ███    █▀    ███    █▀       |   | ",
+        L" |   |       ▄███▄▄▄▄██▀  ▄███▄▄▄     ███    ███  ▄███▄▄▄     ███   ███  ▄███         ▄███▄▄▄          |   | ",
+        L" |   |      ▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ███    ███ ▀▀███▀▀▀     ███   ███ ▀▀███ ████▄  ▀▀███▀▀▀          |   | ",
+        L" |   |      ▀███████████   ███    █▄  ███    ███   ███    █▄  ███   ███   ███    ███   ███    █▄       |   | ",
+        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███   ███   ███    ███   ███    ███      |   | ",
+        L" |   |        ███    ███   ██████████  ▀██████▀    ██████████  ▀█   █▀    ████████▀    ██████████      |   | ",
+        L" |   |        ███    ███                                                                               |   | ",
+        L" |___|                                                                                                 |___| ",
+        L"(_____)-----------------------------------------------------------------------------------------------(_____)",
+    };
+    std::vector<std::string> mainMenuOptions = { "New Game", "Load Game", "Authors", "Exit" };
+    drawPatternSelectedMenu(mainMenuArt, mainMenuOptions, 5, mainMenuSelected, true);
 }
 
 
@@ -207,7 +353,6 @@ void NCURSESVisualizer::drawLevelUpMenu() {
         "STR +10 -- sword damage & life",
         "DEX +10 -- bow damage"
     };
-
     drawPatternSelectedMenu(levelUpArt, levelUpOptions, 5, levelUpSelected, true);
     int left_w = term_w / 4;
     int right_w = term_w / 4;
@@ -222,36 +367,6 @@ void NCURSESVisualizer::drawLevelUpMenu() {
     drawRightPanel(left_w + 1 + center_w + 1, top, right_w);
 }
 
-
-void NCURSESVisualizer::drawMainMenu() {
-    std::vector<std::wstring> mainMenuArt = {
-        L" _____                                                                                                 _____ ",
-        L"( ___ )-----------------------------------------------------------------------------------------------( ___ )",
-        L" |   |                                                                                                 |   | ",
-        L" |   |                   ▄█    █▄       ▄████████    ▄████████  ▄██████▄     ▄████████                 |   | ",
-        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███   ███    ███                 |   | ",
-        L" |   |                  ███    ███     ███    █▀    ███    ███ ███    ███   ███    █▀                  |   | ",
-        L" |   |                 ▄███▄▄▄▄███▄▄  ▄███▄▄▄      ▄███▄▄▄▄██▀ ███    ███   ███                        |   | ",
-        L" |   |                ▀▀███▀▀▀▀███▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀   ███    ███ ▀███████████                 |   | ",
-        L" |   |                  ███    ███     ███    █▄  ▀███████████ ███    ███          ███                 |   | ",
-        L" |   |                  ███    ███     ███    ███   ███    ███ ███    ███    ▄█    ███                 |   | ",
-        L" |   |                  ███    █▀      ██████████   ███    ███  ▀██████▀   ▄████████▀                  |   | ",
-        L" |   |                                    ███    ███                                                   |   | ",
-        L" |   |         ▄████████    ▄████████  ▄█    █▄     ▄████████ ███▄▄▄▄      ▄██████▄     ▄████████      |   | ",
-        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███▀▀▀██▄   ███    ███   ███    ███      |   | ",
-        L" |   |        ███    ███   ███    █▀  ███    ███   ███    █▀  ███   ███   ███    █▀    ███    █▀       |   | ",
-        L" |   |       ▄███▄▄▄▄██▀  ▄███▄▄▄     ███    ███  ▄███▄▄▄     ███   ███  ▄███         ▄███▄▄▄          |   | ",
-        L" |   |      ▀▀███▀▀▀▀▀   ▀▀███▀▀▀     ███    ███ ▀▀███▀▀▀     ███   ███ ▀▀███ ████▄  ▀▀███▀▀▀          |   | ",
-        L" |   |      ▀███████████   ███    █▄  ███    ███   ███    █▄  ███   ███   ███    ███   ███    █▄       |   | ",
-        L" |   |        ███    ███   ███    ███ ███    ███   ███    ███ ███   ███   ███    ███   ███    ███      |   | ",
-        L" |   |        ███    ███   ██████████  ▀██████▀    ██████████  ▀█   █▀    ████████▀    ██████████      |   | ",
-        L" |   |        ███    ███                                                                               |   | ",
-        L" |___|                                                                                                 |___| ",
-        L"(_____)-----------------------------------------------------------------------------------------------(_____)",
-    };
-    std::vector<std::string> mainMenuOptions = { "New Game", "Load Game", "Authors", "Exit" };
-    drawPatternSelectedMenu(mainMenuArt, mainMenuOptions, 5, mainMenuSelected, true);
-}
 
 void NCURSESVisualizer::loopInGame() {
     auto frame_start = std::chrono::steady_clock::now();
@@ -285,40 +400,33 @@ void NCURSESVisualizer::loopInGame() {
             }
         }
     }
-
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
 
+
 void NCURSESVisualizer::drawInGame() {
     clear();
-
     int left_w = term_w / 4;
     int right_w = term_w / 4;
     int center_w = term_w - left_w - right_w - 2;
     int top = 1;
     int height = term_h - 2;
-
     for (int y = top; y <= top + height; ++y) {
         mvaddch(y, left_w, '|');
         mvaddch(y, left_w + 1 + center_w, '|');
     }
-
     drawLeftPanel(0, top, left_w, height);
     drawFieldPanel(left_w + 1, top, center_w, height);
     drawRightPanel(left_w + 1 + center_w + 1, top, right_w);
-
     std::string hint = "WASD/arrows - move | Q - swap weapon | E - use item | Esc - menu | 1-4 - swap spell";
     mvprintw(term_h - 1, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
-
     refresh();
 }
 
-void NCURSESVisualizer::drawBoxTitle(int x, int y, int w, const std::string& title) {
-    mvhline(y, x, ' ', w);
-    mvprintw(y, x + (w - (int)title.size())/2, "%s", title.c_str());
-}
+
+
 
 void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
     int half = h / 2;
@@ -394,25 +502,6 @@ void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
 }
 
 
-void NCURSESVisualizer::setColor(char out) {
-    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
-        attron(COLOR_PAIR(4));
-    }
-    if (out == 'P') {
-        attron(COLOR_PAIR(3));
-    }
-}
-
-void NCURSESVisualizer::unsetColor(char out) {
-    if (out == 'E' || out == 'T' || out == 'B' || out == '&') {
-        attroff(COLOR_PAIR(4));
-    }
-    if (out == 'P') {
-        attroff(COLOR_PAIR(3));
-    }
-}
-
-
 void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     std::vector<wchar_t> fieldChars;
     int fw = GlobalGameConfig::fieldWidth;
@@ -472,6 +561,7 @@ void NCURSESVisualizer::drawFieldPanel(int x, int y, int w, int h) {
     }
 }
 
+
 void NCURSESVisualizer::drawRightPanel(int x, int y, int w) {
     drawBoxTitle(x, y, w, " HAND ");
     int cur_y = y + 1;
@@ -497,35 +587,6 @@ void NCURSESVisualizer::drawRightPanel(int x, int y, int w) {
     }
 }
 
-void NCURSESVisualizer::drawWideAsciiArt(int x, int y, const std::vector<std::wstring>& art) {
-    for (size_t i = 0; i < art.size(); ++i) {
-        mvwaddwstr(stdscr, y + i, x, art[i].c_str());
-    }
-}
-
-void NCURSESVisualizer::drawGameOverMenu() {
-    std::vector<std::wstring> gameOverArt = {
-        L" _____                                                                              _____ ",
-        L"( ___ )----------------------------------------------------------------------------( ___ )",
-        L" |   |                                                                              |   | ",
-        L" |   | ▄██   ▄    ▄██████▄  ███    █▄       ████████▄   ▄█     ▄████████ ████████▄  |   | ",
-        L" |   | ███   ██▄ ███    ███ ███    ███      ███   ▀███ ███    ███    ███ ███   ▀███ |   | ",
-        L" |   | ███▄▄▄███ ███    ███ ███    ███      ███    ███ ███▌   ███    █▀  ███    ███ |   | ",
-        L" |   | ▀▀▀▀▀▀███ ███    ███ ███    ███      ███    ███ ███▌  ▄███▄▄▄     ███    ███ |   | ",
-        L" |   | ▄██   ███ ███    ███ ███    ███      ███    ███ ███▌ ▀▀███▀▀▀     ███    ███ |   | ",
-        L" |   | ███   ███ ███    ███ ███    ███      ███    ███ ███    ███    █▄  ███    ███ |   | ",
-        L" |   | ███   ███ ███    ███ ███    ███      ███   ▄███ ███    ███    ███ ███   ▄███ |   | ",
-        L" |   |  ▀█████▀   ▀██████▀  ████████▀       ████████▀  █▀     ██████████ ████████▀  |   | ",
-        L" |___|                                                                              |___| ",
-        L"(_____)----------------------------------------------------------------------------(_____)"
-    };
-    std::vector<std::string> gameOverOptions = {
-        "New game",
-        "Load game",
-        "Main menu"
-    };
-    drawPatternSelectedMenu(gameOverArt, gameOverOptions, 4, gameOverSelected, true);
-}
 
 void NCURSESVisualizer::loopPauseMenu() {
     auto frame_start = std::chrono::steady_clock::now();
@@ -548,9 +609,11 @@ void NCURSESVisualizer::loopPauseMenu() {
                     }
                     else if (pauseMenuSelected == 1) {
                         state = State::InGame;
+                        gameController->saveGame();
                     }
                     else if (pauseMenuSelected == 2) {
                         state = State::InGame;
+                        gameController->loadGame();
                     }
                     else if (pauseMenuSelected == 3) {
                         state = State::MainMenu;
@@ -567,6 +630,7 @@ void NCURSESVisualizer::loopPauseMenu() {
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
+
 
 void NCURSESVisualizer::drawPauseMenu() {
     std::vector<std::wstring> pauseArt = {
@@ -593,51 +657,6 @@ void NCURSESVisualizer::drawPauseMenu() {
     drawPatternSelectedMenu(pauseArt, pauseOptions, 5, pauseMenuSelected, true);
 }
 
-void NCURSESVisualizer::drawPatternSelectedMenu(
-    std::vector<std::wstring>& asciiArt,
-    std::vector<std::string>& selectedOptions,
-    int artColor,
-    int selector,
-    bool needHints
-) {
-    clear();
-    int art_x = (term_w - (int)asciiArt[0].size()) / 2;
-    int art_y = 2;
-    attron(COLOR_PAIR(artColor));
-    drawWideAsciiArt(art_x, art_y, asciiArt);
-    attroff(COLOR_PAIR(artColor));
-    int box_w = 40;
-    int box_h = (int)selectedOptions.size() + 4;
-    int bx = (term_w - box_w) / 2;
-    int by = (term_h - box_h) / 3 * 2;
-    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
-    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
-    for (int i = 0; i < box_h; ++i) {
-        mvaddch(by + i, bx, '|');
-        mvaddch(by + i, bx + box_w - 1, '|');
-    }
-    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
-    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
-    if (needHints) {
-        std::string title = "Choose action";
-        mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
-        std::string hint = "Use 'W'&'S' + Enter/E to choose";
-        mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
-    }
-
-    for (size_t i = 0; i < selectedOptions.size(); ++i) {
-        int iy = by + 2 + (int)i;
-        if ((int)i == selector) {
-            attron(COLOR_PAIR(artColor));
-            mvprintw(iy, bx + 2, " %s ", selectedOptions[i].c_str());
-            attroff(COLOR_PAIR(artColor));
-        } else {
-            mvprintw(iy, bx + 1, " %s ", selectedOptions[i].c_str());
-        }
-    }
-    refresh();
-}
-
 
 void NCURSESVisualizer::loopAutorsMenu() {
     auto frame_start = std::chrono::steady_clock::now();
@@ -656,6 +675,7 @@ void NCURSESVisualizer::loopAutorsMenu() {
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
+
 
 void NCURSESVisualizer::drawAutorsMenu() {
     std::vector<std::wstring> autorsArt = {
