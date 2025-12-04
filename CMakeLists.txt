@@ -4,8 +4,6 @@ project(OOP)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(external/ftxui)
-
 set(SRCS
     src/core/CellState.cpp
     src/core/main.cpp
@@ -17,7 +15,6 @@ set(SRCS
     src/core/FileHandler.cpp
     src/core/InputController.cpp
 
-    src/core/visual/FTXUIVisualizer.cpp
     src/core/visual/NCURSESVisualizer.cpp
 
     src/core/states/TrapEffect.cpp
@@ -45,23 +42,13 @@ set(SRCS
     src/items/UpgradeSpell.cpp
     src/items/TrapSpell.cpp
 )
-# add_definitions(-D_XOPEN_SOURCE_EXTENDED)
 
-# set(CURSES_NEED_WIDE TRUE)
 add_executable(game ${SRCS})
 
 target_compile_options(game PRIVATE -Wall -Wextra -pthread)
 target_include_directories(game PRIVATE src/)
 
-# target_compile_definitions(game PRIVATE
-#     _GNU_SOURCE
-#     _XOPEN_SOURCE=600
-# )
-
 target_link_libraries(game
-    PRIVATE ftxui::screen
-    PRIVATE ftxui::dom
-    PRIVATE ftxui::component
     PRIVATE ncursesw
     PRIVATE bluetooth
 )
