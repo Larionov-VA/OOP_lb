@@ -11,12 +11,11 @@
 
 class Game : public IGameController{
 private:
-    GameField* field;
+    GameField* field = nullptr;
     int gameID = 0;
 public:
     ~Game();
     void startNewGame() override;
-    void ContinueGame() override;
     void stopGame() override;
     void saveGame() override;
     void loadGame() override;

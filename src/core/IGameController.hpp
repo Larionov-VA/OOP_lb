@@ -3,7 +3,6 @@
 
 struct IGameController {
     virtual void startNewGame() = 0;
-    virtual void ContinueGame() = 0;
     virtual void stopGame() = 0;
     virtual void saveGame() = 0;
     virtual void loadGame() = 0;

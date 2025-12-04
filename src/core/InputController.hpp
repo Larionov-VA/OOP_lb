@@ -26,6 +26,8 @@ private:
 public:
     InputController();
     ~InputController();
+    void stop();
+    void join();
     char getInputChar();
 private:
     void bluetooth_thread(const std::string& mac_addr);

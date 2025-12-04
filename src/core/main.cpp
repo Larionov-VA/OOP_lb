@@ -9,17 +9,15 @@
 
 int main() {
     Game game;
-    IVisualizer* vis = new NCURSESVisualizer();
+    NCURSESVisualizer vis;
     InputController inp;
-    vis->setGameController(&game);
-    vis->setInputController(&inp);
+    vis.setGameController(&game);
+    vis.setInputController(&inp);
     AudioPlayer player;
     if (player.loadAndPlay("../sounds/main_theme.wav", true)) {
         player.setVolume(0.5f);
     }
-    vis->display();
+    vis.display();
     player.stop();
     return 0;
 }
-
-

@@ -8,11 +8,6 @@ Game::~Game() {
 }
 
 
-void Game::ContinueGame() {
-
-}
-
-
 void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
     this->field = new GameField(

@@ -17,6 +17,7 @@ InputController::~InputController() {
 
 
 char InputController::getInputChar() {
+    if (!running) return 0;
     if(bt_event_ready) {
         bt_event_ready = false;
         return bt_last_key;
@@ -74,4 +75,14 @@ void InputController::bluetooth_thread(const std::string& mac_addr) {
     if(sock >= 0)
         close(sock);
     sock = -1;
+}
+
+
+void InputController::stop() {
+    running = false;
+}
+
+void InputController::join() {
+    if (bt_thread.joinable())
+        bt_thread.join();
 }

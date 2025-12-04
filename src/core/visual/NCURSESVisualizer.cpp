@@ -39,7 +39,9 @@ void NCURSESVisualizer::initCurses() {
 }
 
 void NCURSESVisualizer::deinitCurses() {
-    endwin();
+    if (!isendwin()) {
+        endwin();
+    }
 }
 
 void NCURSESVisualizer::updateTermSize() {
@@ -138,7 +140,7 @@ void NCURSESVisualizer::loopMainMenu() {
                     if (gameController) gameController->startNewGame();
                     state = State::InGame;
                 } else if (mainMenuSelected == 1) {
-                    if (gameController) gameController->ContinueGame();
+                    if (gameController) gameController->loadGame();
                     state = State::InGame;
                 } else if (mainMenuSelected == 2) {
                     state = State::AutorsMenu;
@@ -185,32 +187,37 @@ void NCURSESVisualizer::loopLevelUp() {
 
 void NCURSESVisualizer::drawLevelUpMenu() {
     std::vector<std::wstring> levelUpArt = {
-        L" _____                                                                                                 _____ ",
-        L"( ___ )-----------------------------------------------------------------------------------------------( ___ )",
-        L" |   |                                                                                                 |   | ",
-        L" |   |       ▄█          ▄████████  ▄█    █▄     ▄████████  ▄█            ███    █▄     ▄███████▄      |   | ",
-        L" |   |      ███         ███    ███ ███    ███   ███    ███ ███            ███    ███   ███    ███      |   | ",
-        L" |   |      ███         ███    █▀  ███    ███   ███    █▀  ███            ███    ███   ███    ███      |   | ",
-        L" |   |      ███        ▄███▄▄▄     ███    ███  ▄███▄▄▄     ███            ███    ███   ███    ███      |   | ",
-        L" |   |      ███       ▀▀███▀▀▀     ███    ███ ▀▀███▀▀▀     ███            ███    ███ ▀█████████▀       |   | ",
-        L" |   |      ███         ███    █▄  ███    ███   ███    █▄  ███            ███    ███   ███             |   | ",
-        L" |   |      ███▌    ▄   ███    ███ ███    ███   ███    ███ ███▌    ▄      ███    ███   ███             |   | ",
-        L" |   |      █████▄▄██   ██████████  ▀██████▀    ██████████ █████▄▄██      ████████▀   ▄████▀           |   | ",
-        L" |   |      ▀                                              ▀                                           |   | ",
-        L" |___|                                                                                                 |___| ",
-        L"(_____)-----------------------------------------------------------------------------------------------(_____)"
+        L" _____                                                                                _____ ",
+        L"( ___ )------------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                                |   | ",
+        L" |   |  ▄█         ▄███████  ▄█   █▄     ▄███████  ▄█          ███   █▄     ▄███████▄ |   | ",
+        L" |   | ███        ███   ███ ███   ███   ███   ███ ███          ███   ███   ███    ███ |   | ",
+        L" |   | ███        ███   █▀  ███   ███   ███   █▀  ███          ███   ███   ███    ███ |   | ",
+        L" |   | ███       ▄███▄▄▄    ███   ███  ▄███▄▄▄    ███          ███   ███   ███    ███ |   | ",
+        L" |   | ███      ▀▀███▀▀▀    ███   ███ ▀▀███▀▀▀    ███          ███   ███ ▀█████████▀  |   | ",
+        L" |   | ███        ███   █▄  ███   ███   ███   █▄  ███          ███   ███   ███        |   | ",
+        L" |   | ███▌    ▄  ███   ███ ███   ███   ███   ███ ███▌    ▄    ███   ███   ███        |   | ",
+        L" |   | █████▄▄██  █████████  ▀█████▀    █████████ █████▄▄██    ███████▀   ▄████▀      |   | ",
+        L" |   | ▀                                              ▀                               |   | ",
+        L" |___|                                                                                |___| ",
+        L"(_____)------------------------------------------------------------------------------(_____)"
     };
     std::vector<std::string> levelUpOptions = {
         "INT +10 -- spell damage",
         "STR +10 -- sword damage & life",
         "DEX +10 -- bow damage"
     };
+
     drawPatternSelectedMenu(levelUpArt, levelUpOptions, 5, levelUpSelected, true);
     int left_w = term_w / 4;
     int right_w = term_w / 4;
     int center_w = term_w - left_w - right_w - 2;
     int top = 1;
     int height = term_h - 2;
+    for (int y = top; y <= top + height; ++y) {
+        mvaddch(y, left_w, '|');
+        mvaddch(y, left_w + 1 + center_w, '|');
+    }
     drawLeftPanel(0, top, left_w, height);
     drawRightPanel(left_w + 1 + center_w + 1, top, right_w);
 }
@@ -542,10 +549,10 @@ void NCURSESVisualizer::loopPauseMenu() {
                     else if (pauseMenuSelected == 1) {
                         state = State::InGame;
                     }
-                    else if (pauseMenuSelected == 1) {
+                    else if (pauseMenuSelected == 2) {
                         state = State::InGame;
                     }
-                    else if (pauseMenuSelected == 2) {
+                    else if (pauseMenuSelected == 3) {
                         state = State::MainMenu;
                     }
                 }
@@ -668,8 +675,8 @@ void NCURSESVisualizer::drawAutorsMenu() {
         L"(_____)------------------------------------------------------------------------(_____)"
     };
     std::vector<std::string> autors = {
-        "Game developer : 4342 Larionov V.",
-        "Composer       : 4344 Kozyrev M."
+        "Game developer: 4342 Larionov V.",
+        "Composer      : 4344 Kozyrev M. "
     };
     drawPatternSelectedMenu(autorsArt, autors, 5, (int)autors.size() + 1, false);
 }
