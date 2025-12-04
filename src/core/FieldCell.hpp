@@ -18,8 +18,8 @@ public:
         int index,
         int X,
         int Y,
-        std::unique_ptr<IState> constState = nullptr,
-        std::unique_ptr<IState> temporaryState = nullptr
+        std::shared_ptr<IState> constState = nullptr,
+        std::shared_ptr<IState> temporaryState = nullptr
     );
     int getIndex() const;
     char getCellSymbol();

@@ -18,6 +18,9 @@ GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height 
 }
 
 
+GameField::GameField() {};
+
+
 void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
     cells.reserve(widthField * heightField);
     for (int i = 0; i < widthField * heightField; ++i) {
@@ -89,7 +92,7 @@ void GameField::generateFieldCells(std::unique_ptr<Entity> player) {
             (!upCellAvaible || !downCellAvaible || !leftCellAvaible || !rightCellAvaible) &&
             (i % widthField)
         ) {
-            std::unique_ptr<IState> decelerationCellEffect = std::make_unique<DecelerationEffect>();
+            std::shared_ptr<IState> decelerationCellEffect = std::make_shared<DecelerationEffect>();
             cells[i].returnCellState().setConstState(move(decelerationCellEffect));
         }
     }
@@ -323,7 +326,7 @@ void GameField::update() {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
             cells[index].returnCellState().setAvaible(true);
-            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            std::shared_ptr<IState> coupreAnimate = std::make_shared<CoupreAnimate>();
             cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
             entityManager[playerIndex]->addExperience(enemyLevel * 10 + 10);
             entityManager.killEntity(index);
@@ -334,7 +337,7 @@ void GameField::update() {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
             cells[index].returnCellState().setAvaible(true);
-            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            std::shared_ptr<IState> coupreAnimate = std::make_shared<CoupreAnimate>();
             cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
             entityManager[playerIndex]->addExperience(enemyLevel * 30 + 10);
             entityManager.killEntity(index);
@@ -345,7 +348,7 @@ void GameField::update() {
         if (!entityManager[index]->alive()) {
             int enemyLevel = entityManager[index]->getLevel();
             cells[index].returnCellState().setAvaible(true);
-            std::unique_ptr<IState> coupreAnimate = std::make_unique<CoupreAnimate>();
+            std::shared_ptr<IState> coupreAnimate = std::make_shared<CoupreAnimate>();
             cells[index].returnCellState().setTemporaryState(move(coupreAnimate));
             entityManager[playerIndex]->addExperience(enemyLevel * 50 + 10);
             entityManager.killEntity(index);
@@ -683,17 +686,17 @@ void GameField::animateBowAttack(int playerIndex, int enemyIndex) {
         arrowSymbol = '|';
     }
     while (currentIndex != enemyIndex) {
-        std::unique_ptr<IState> bowAnimate = std::make_unique<AttackEffect>(arrowSymbol, animateDelay++, 1);
+        std::shared_ptr<IState> bowAnimate = std::make_shared<AttackEffect>(arrowSymbol, animateDelay++, 1);
         cells[currentIndex].returnCellState().setTemporaryState(std::move(bowAnimate));
         currentIndex += step;
     }
-    std::unique_ptr<IState> hitEffect = std::make_unique<AttackEffect>('*', animateDelay, 1);
+    std::shared_ptr<IState> hitEffect = std::make_shared<AttackEffect>('*', animateDelay, 1);
     cells[enemyIndex].returnCellState().setTemporaryState(std::move(hitEffect));
 }
 
 
 void GameField::animateSwordAttack(int enemyIndex) {
-    std::unique_ptr<IState> swordAnimate = std::make_unique<AttackEffect>();
+    std::shared_ptr<IState> swordAnimate = std::make_shared<AttackEffect>();
     cells[enemyIndex].returnCellState().setTemporaryState(move(swordAnimate));
 }
 
@@ -750,4 +753,26 @@ void GameField::setGameLevel(int newGameLevel) {
 
 void GameField::setGameTurn(int newGameTurn) {
     this->gameTurn = newGameTurn;
+}
+
+
+void GameField::setCells(std::vector<FieldCell> cells) {
+    this->cells = cells;
+}
+
+
+void GameField::setEntityManager(EntityManager entityManager) {
+    this->entityManager = entityManager;
+}
+
+
+FieldSaveData getFieldData() {
+    FieldSaveData data;
+
+    return data;
+}
+
+
+void setFieldData(FieldSaveData data) {
+    (void)data;
 }

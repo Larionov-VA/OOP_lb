@@ -2,8 +2,8 @@
 
 
 FieldCell::FieldCell(int index, int X, int Y,
-    std::unique_ptr<IState> constState,
-    std::unique_ptr<IState> temporaryState) {
+    std::shared_ptr<IState> constState,
+    std::shared_ptr<IState> temporaryState) {
     this->index = index;
     this->X = X;
     this->Y = Y;

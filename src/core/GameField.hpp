@@ -23,7 +23,7 @@
 #include "entities/Enemy.hpp"
 #include "entities/EnemyBarracks.hpp"
 #include "entities/EnemyTower.hpp"
-
+#include "SaveData.hpp"
 #include "Config.hpp"
 
 #define MAX_FIELD_SIZE 25
@@ -48,6 +48,8 @@ private:
     void setFieldHeight(int newFieldHeight);
     void setGameLevel(int newGameLevel);
     void setGameTurn(int newGameTurn);
+    void setCells(std::vector<FieldCell> cells);
+    void setEntityManager(EntityManager entityManager);
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
@@ -55,12 +57,11 @@ private:
     void spawnEntity(std::unique_ptr<Entity> entity, int index);
     void generateEnemy();
     int firstEnemyIndexOnLine(int oldIndex, int newIndex);
-    int getBestTurnForEnemyRecursive(int indexEnemy, int playerIndex, std::unordered_map<int, int>& visited);
-    int getBestTurnForEnemyPrimitive(int indexEnemy, int playerIndex);
     int getBestTurnForEnemy(int enemyIndex, int playerIndex, std::unordered_map<int, int>& grid);
     std::vector<std::pair<int, float>> getDistanceToPlayer(std::vector<int> enemyIndexes, int playerIndex);
     bool enemyOnIndex(int index) const;
 public:
+    GameField();
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
     std::unique_ptr<Entity> returnPlayer();
     bool playerAlive() const;
@@ -68,7 +69,6 @@ public:
     std::vector<EnemyData> getEnemyData();
     bool playerTurn(char command);
     void enemyTurn();
-    void enemyTurnA();
     void buildingsTurn();
     int getCountOfEnemy();
     void playerLevelUp(char attribute);
@@ -76,4 +76,6 @@ public:
     std::vector<wchar_t> show();
     void animateBowAttack(int playerIndex, int enemyIndex);
     void animateSwordAttack(int enemyIndex);
+    FieldSaveData getFieldData();
+    void setFieldData(FieldSaveData data);
 };

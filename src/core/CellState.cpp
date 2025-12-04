@@ -3,7 +3,7 @@
 CellState::CellState() : CellState(nullptr, nullptr) {};
 
 
-CellState::CellState(std::unique_ptr<IState> constState, std::unique_ptr<IState> temporaryState) {
+CellState::CellState(std::shared_ptr<IState> constState, std::shared_ptr<IState> temporaryState) {
     this->constState = move(constState);
     this->temporaryState = move(temporaryState);
 }
@@ -88,10 +88,10 @@ bool CellState::haveSpecificState() const {
     return this->constState || this->temporaryState;
 }
 
-void CellState::setConstState(std::unique_ptr<IState> constState) {
+void CellState::setConstState(std::shared_ptr<IState> constState) {
     this->constState = move(constState);
 }
 
-void CellState::setTemporaryState(std::unique_ptr<IState> temporaryState) {
+void CellState::setTemporaryState(std::shared_ptr<IState> temporaryState) {
     this->temporaryState = move(temporaryState);
 }

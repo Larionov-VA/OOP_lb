@@ -5,8 +5,8 @@
 
 class CellState {
 private:
-    std::unique_ptr<IState> constState;
-    std::unique_ptr<IState> temporaryState;
+    std::shared_ptr<IState> constState;
+    std::shared_ptr<IState> temporaryState;
     bool avaible;
     // bool enemyCorpse;
     // bool slow;
@@ -14,11 +14,11 @@ private:
     // int trapDamage;
 public:
     CellState();
-    CellState(std::unique_ptr<IState> constState, std::unique_ptr<IState> temporaryState);
+    CellState(std::shared_ptr<IState> constState, std::shared_ptr<IState> temporaryState);
     char getCellSymbol();
     bool haveSpecificState() const;
-    void setConstState(std::unique_ptr<IState> constState);
-    void setTemporaryState(std::unique_ptr<IState> temporaryState);
+    void setConstState(std::shared_ptr<IState> constState);
+    void setTemporaryState(std::shared_ptr<IState> temporaryState);
     // bool getEnemyCorpse() const;
     bool getAvaible() const;
     void setAvaible(bool newAvaible);

@@ -17,7 +17,7 @@ bool TrapSpell::cast(GameContext& ctx, int userIndex, int power) {
     CellState& downCellState = ctx.cells[down].returnCellState();
     CellState& leftCellState = ctx.cells[left].returnCellState();
     CellState& rightCellState = ctx.cells[right].returnCellState();
-    std::unique_ptr<IState> trapState = std::make_unique<TrapEffect>('o', currentTrapDamage, 1);
+    std::shared_ptr<IState> trapState = std::make_shared<TrapEffect>('o', currentTrapDamage, 1);
     if (upCellState.getAvaible() && !upCellState.haveSpecificState()) {
         upCellState.setConstState(move(trapState));
         return true;

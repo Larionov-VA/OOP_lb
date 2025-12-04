@@ -14,7 +14,7 @@ set(SRCS
     src/core/Config.cpp
     src/core/FileHandler.cpp
     src/core/InputController.cpp
-
+    src/core/SavesManager.cpp
     src/core/visual/NCURSESVisualizer.cpp
 
     src/core/states/TrapEffect.cpp

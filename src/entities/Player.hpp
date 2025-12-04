@@ -10,7 +10,7 @@
 #include "../items/DirectDamageSpell.hpp"
 #include "../items/Item.hpp"
 
-// #include "../core/GameContext.hpp"
+#include "../core/SaveData.hpp"
 
 #include <utility>
 #include <memory>
@@ -23,13 +23,13 @@ private:
     Hand playerHand;
     Stats playerStats;
     Health playerHealth;
-    // Inventory playerInventory;
     bool slowed = false;
 public:
     entityType getType() const override {
         return entityType::PLAYER;
     }
     Player();
+    Player(PlayerSaveData data);
     Player(
         int playerAttack, int playerHealth, int playerLevel,
         long long prevLevelUpExperience, long long playerExperience,

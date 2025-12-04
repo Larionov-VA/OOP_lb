@@ -25,6 +25,9 @@ Player::Player() {
 
 }
 
+Player::Player(PlayerSaveData data) {
+    (void)data;
+}
 
 bool Player::checkDebaffState() {
     if (slowed) {

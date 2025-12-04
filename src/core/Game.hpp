@@ -6,11 +6,14 @@
 #include "IGameController.hpp"
 #include "Config.hpp"
 #include "FileHandler.hpp"
+#include "SavesManager.hpp"
+#include "SaveData.hpp"
 
 #define GAME_SAVES_DIR "/Game/"
 
 class Game : public IGameController{
 private:
+    SavesManager savesManager;
     GameField* field = nullptr;
     int gameID = 0;
 public:
