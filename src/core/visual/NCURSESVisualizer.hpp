@@ -19,21 +19,22 @@ public:
     void setGameController(IGameController* gc);
     void display();
 private:
-    enum class State { MainMenu, InGame, LevelUpMenu, Exit };
+    enum class State { MainMenu, InGame, LevelUpMenu, GameOver, PauseGame, Exit };
     State state = State::MainMenu;
-    int levelup_selected = 0;
+
+    std::vector<std::string> mainMenuItems = { "New Game", "Continue Game", "Exit" };
+    int mainMenuSelected = 0;
+    int levelUpSelected = 0;
+    int pauseMenuSelected = 0;
+    int gameOverSelected = 0;
+    const int frame_ms = 15;
+    std::chrono::steady_clock::time_point last_frame_time;
 
     InputController* inputController = nullptr;
     IGameController* gameController = nullptr;
 
     int term_w = 0;
     int term_h = 0;
-
-    std::vector<std::string> main_menu_items = { "New Game", "Continue Game", "Exit" };
-    int main_menu_selected = 0;
-
-    const int frame_ms = 15;
-    std::chrono::steady_clock::time_point last_frame_time;
 
     void initCurses();
     void deinitCurses();
@@ -42,10 +43,21 @@ private:
     void loopMainMenu();
     void loopInGame();
     void loopLevelUp();
+    void loopGameOverMenu();
+    void loopPauseMenu();
 
+    void drawPatternSelectedMenu(
+        std::vector<std::wstring>& asciiArt,
+        std::vector<std::string>& selectedOptions,
+        int artColor,
+        int selector
+    );
+
+    void drawGameOverMenu();
     void drawMainMenu();
     void drawInGame();
     void drawLevelUpMenu();
+    void drawPauseMenu();
 
     int fetchInput();
 

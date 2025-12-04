@@ -69,43 +69,78 @@ void NCURSESVisualizer::display() {
             case State::LevelUpMenu:
                 loopLevelUp();
                 break;
+            case State::GameOver:
+                loopGameOverMenu();
+                break;
+            case State::PauseGame:
+                loopPauseMenu();
+                break;
             default:
                 break;
         }
     }
 }
 
-void NCURSESVisualizer::loopMainMenu() {
+void NCURSESVisualizer::loopGameOverMenu() {
     auto frame_start = std::chrono::steady_clock::now();
-
-    drawMainMenu();
-
+    drawGameOverMenu();
     int input = fetchInput();
     if (input) {
         switch (input) {
             case KEY_UP:
-            case 'w':
-                main_menu_selected = (main_menu_selected - 1 + (int)main_menu_items.size()) % (int)main_menu_items.size();
+            case 'w': case 'W':
+                gameOverSelected = (gameOverSelected - 1 + 3) % 3;
                 break;
             case KEY_DOWN:
-            case 's':
-                main_menu_selected = (main_menu_selected + 1) % (int)main_menu_items.size();
+            case 's': case 'S':
+                gameOverSelected = (gameOverSelected + 1) % 3;
                 break;
-            case '\n':
-            case 'e':
-            case KEY_ENTER:
-                if (main_menu_selected == 0) {
+            case '\n': case 'e': case KEY_ENTER:
+                if (gameController) {
+                    if (gameOverSelected == 0) {
+                        state = State::InGame;
+                    }
+                    else if (gameOverSelected == 1) {
+                        state = State::InGame;
+                    }
+                    else if (gameOverSelected == 2) {
+                        state = State::MainMenu;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+void NCURSESVisualizer::loopMainMenu() {
+    auto frame_start = std::chrono::steady_clock::now();
+    drawMainMenu();
+    int input = fetchInput();
+    if (input) {
+        switch (input) {
+            case KEY_UP: case 'w':
+                mainMenuSelected = (mainMenuSelected - 1 + (int)mainMenuItems.size()) % (int)mainMenuItems.size();
+                break;
+            case KEY_DOWN: case 's':
+                mainMenuSelected = (mainMenuSelected + 1) % (int)mainMenuItems.size();
+                break;
+            case '\n': case 'e': case KEY_ENTER:
+                if (mainMenuSelected == 0) {
                     if (gameController) gameController->startNewGame();
                     state = State::InGame;
-                } else if (main_menu_selected == 1) {
+                } else if (mainMenuSelected == 1) {
                     if (gameController) gameController->ContinueGame();
                     state = State::InGame;
-                } else if (main_menu_selected == 2) {
+                } else if (mainMenuSelected == 2) {
                     state = State::Exit;
                 }
                 break;
-            case 'q':
-            case 'Q':
+            case 'q': case 'Q':
                 state = State::Exit;
                 break;
             default:
@@ -120,21 +155,19 @@ void NCURSESVisualizer::loopMainMenu() {
 
 void NCURSESVisualizer::loopLevelUp() {
     auto frame_start = std::chrono::steady_clock::now();
-
     drawLevelUpMenu();
-
     int input = fetchInput();
     if (input) {
         switch (input) {
             case KEY_UP:
             case 'w': case 'W':
-                levelup_selected = (levelup_selected - 1 + 3) % 3; break;
+                levelUpSelected = (levelUpSelected - 1 + 3) % 3; break;
             case KEY_DOWN:
             case 's': case 'S':
-                levelup_selected = (levelup_selected + 1) % 3; break;
+                levelUpSelected = (levelUpSelected + 1) % 3; break;
             case '\n': case 'e': case KEY_ENTER:
                 if (gameController) {
-                    char choice = '1' + levelup_selected;
+                    char choice = '1' + levelUpSelected;
                     gameController->playerLevelUp(choice);
                 }
                 state = State::InGame;
@@ -149,6 +182,27 @@ void NCURSESVisualizer::loopLevelUp() {
 
 void NCURSESVisualizer::drawLevelUpMenu() {
     clear();
+    std::vector<std::wstring> levelUpArt = {
+        L" _____                                                                                                 _____ ",
+        L"( ___ )-----------------------------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                                                 |   | ",
+        L" |   |       ▄█          ▄████████  ▄█    █▄     ▄████████  ▄█            ███    █▄     ▄███████▄      |   | ",
+        L" |   |      ███         ███    ███ ███    ███   ███    ███ ███            ███    ███   ███    ███      |   | ",
+        L" |   |      ███         ███    █▀  ███    ███   ███    █▀  ███            ███    ███   ███    ███      |   | ",
+        L" |   |      ███        ▄███▄▄▄     ███    ███  ▄███▄▄▄     ███            ███    ███   ███    ███      |   | ",
+        L" |   |      ███       ▀▀███▀▀▀     ███    ███ ▀▀███▀▀▀     ███            ███    ███ ▀█████████▀       |   | ",
+        L" |   |      ███         ███    █▄  ███    ███   ███    █▄  ███            ███    ███   ███             |   | ",
+        L" |   |      ███▌    ▄   ███    ███ ███    ███   ███    ███ ███▌    ▄      ███    ███   ███             |   | ",
+        L" |   |      █████▄▄██   ██████████  ▀██████▀    ██████████ █████▄▄██      ████████▀   ▄████▀           |   | ",
+        L" |   |      ▀                                              ▀                                           |   | ",
+        L" |___|                                                                                                 |___| ",
+        L"(_____)-----------------------------------------------------------------------------------------------(_____)"
+    };
+    int art_x = (term_w - (int)levelUpArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(5));
+    drawWideAsciiArt(art_x, art_y, levelUpArt);
+    attroff(COLOR_PAIR(5));
 
     if (!gameController) return;
 
@@ -166,14 +220,14 @@ void NCURSESVisualizer::drawLevelUpMenu() {
     mvaddch(by + box_h -1, bx, '+'); mvaddch(by + box_h -1, bx + box_w -1, '+');
 
     std::vector<std::string> options = {
-        "INT +10 -- Increases spell damage",
-        "STR +10 -- Increases sword damage and max life",
-        "DEX +10 -- Increases bow damage"
+        "INT +10 -- spell damage",
+        "STR +10 -- sword damage and max life",
+        "DEX +10 -- bow damage"
     };
 
     for (size_t i = 0; i < options.size(); ++i) {
         int iy = by + 2 + (int)i;
-        if ((int)i == levelup_selected) {
+        if ((int)i == levelUpSelected) {
             attron(COLOR_PAIR(2));
             mvprintw(iy, bx + 5, " %s ", options[i].c_str());
             attroff(COLOR_PAIR(2));
@@ -222,15 +276,13 @@ void NCURSESVisualizer::drawMainMenu() {
         L" |___|                                                                                                 |___| ",
         L"(_____)-----------------------------------------------------------------------------------------------(_____)",
     };
-
-
     int art_x = (term_w - (int)titleArt[0].size()) / 2;
     int art_y = 2;
     attron(COLOR_PAIR(5));
     drawWideAsciiArt(art_x, art_y, titleArt);
     attroff(COLOR_PAIR(5));
     int box_w = 40;
-    int box_h = (int)main_menu_items.size() + 4;
+    int box_h = (int)mainMenuItems.size() + 4;
     int bx = (term_w - box_w) / 2;
     int by = (term_h - box_h) / 3 * 2;
 
@@ -246,20 +298,18 @@ void NCURSESVisualizer::drawMainMenu() {
     std::string title = "Choose action";
     mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
 
-    for (size_t i = 0; i < main_menu_items.size(); ++i) {
+    for (size_t i = 0; i < mainMenuItems.size(); ++i) {
         int iy = by + 2 + (int)i;
-        if ((int)i == main_menu_selected) {
+        if ((int)i == mainMenuSelected) {
             attron(COLOR_PAIR(5));
-            mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
+            mvprintw(iy, bx + 3, " %s ", mainMenuItems[i].c_str());
             attroff(COLOR_PAIR(5));
         } else {
-            mvprintw(iy, bx + 3, " %s ", main_menu_items[i].c_str());
+            mvprintw(iy, bx + 3, " %s ", mainMenuItems[i].c_str());
         }
     }
-
     std::string hint = "Use 'W'&'S' + Enter/E. Esc/Q to quit.";
     mvprintw(by + box_h, bx + (box_w - (int)hint.size())/2, "%s", hint.c_str());
-
     refresh();
 }
 
@@ -271,15 +321,12 @@ void NCURSESVisualizer::loopInGame() {
         return;
     }
     drawInGame();
-
     int input = fetchInput();
     if (input) {
         if (input == 27) {
-            if (gameController) gameController->stopGame();
-            state = State::MainMenu;
+            state = State::PauseGame;
             return;
         }
-
         char c = (char)input;
         if (gameController) {
             bool consumed = false;
@@ -293,7 +340,7 @@ void NCURSESVisualizer::loopInGame() {
                 gameController->performAnAction((char)('0' + (c - '1')));
             }
             if (consumed) {
-                state = State::MainMenu;
+                state = State::GameOver;
                 return;
             }
         }
@@ -514,4 +561,200 @@ void NCURSESVisualizer::drawWideAsciiArt(int x, int y, const std::vector<std::ws
     for (size_t i = 0; i < art.size(); ++i) {
         mvwaddwstr(stdscr, y + i, x, art[i].c_str());
     }
+}
+
+void NCURSESVisualizer::drawGameOverMenu() {
+    clear();
+    std::vector<std::wstring> levelUpArt = {
+        L" _____                                                                              _____ ",
+        L"( ___ )----------------------------------------------------------------------------( ___ )",
+        L" |   |                                                                              |   | ",
+        L" |   | ▄██   ▄    ▄██████▄  ███    █▄       ████████▄   ▄█     ▄████████ ████████▄  |   | ",
+        L" |   | ███   ██▄ ███    ███ ███    ███      ███   ▀███ ███    ███    ███ ███   ▀███ |   | ",
+        L" |   | ███▄▄▄███ ███    ███ ███    ███      ███    ███ ███▌   ███    █▀  ███    ███ |   | ",
+        L" |   | ▀▀▀▀▀▀███ ███    ███ ███    ███      ███    ███ ███▌  ▄███▄▄▄     ███    ███ |   | ",
+        L" |   | ▄██   ███ ███    ███ ███    ███      ███    ███ ███▌ ▀▀███▀▀▀     ███    ███ |   | ",
+        L" |   | ███   ███ ███    ███ ███    ███      ███    ███ ███    ███    █▄  ███    ███ |   | ",
+        L" |   | ███   ███ ███    ███ ███    ███      ███   ▄███ ███    ███    ███ ███   ▄███ |   | ",
+        L" |   |  ▀█████▀   ▀██████▀  ████████▀       ████████▀  █▀     ██████████ ████████▀  |   | ",
+        L" |___|                                                                              |___| ",
+        L"(_____)----------------------------------------------------------------------------(_____)"
+    };
+    int art_x = (term_w - (int)levelUpArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(4));
+    drawWideAsciiArt(art_x, art_y, levelUpArt);
+    attroff(COLOR_PAIR(4));
+    std::vector<std::string> options = {
+        "New game",
+        "Load game",
+        "Main menu"
+    };
+    int box_w = 40;
+    int box_h = (int)options.size() + 4;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 3 * 2;
+    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
+    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
+    for (int i = 0; i < box_h; ++i) {
+        mvaddch(by + i, bx, '|');
+        mvaddch(by + i, bx + box_w - 1, '|');
+    }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
+    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
+    std::string title = "Choose action";
+    mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
+    for (size_t i = 0; i < options.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == gameOverSelected) {
+            attron(COLOR_PAIR(4));
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+            attroff(COLOR_PAIR(4));
+        } else {
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+        }
+    }
+    std::string hint = "Use 'W'&'S' + Enter/E to choose";
+    mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+    refresh();
+}
+
+void NCURSESVisualizer::loopPauseMenu() {
+    auto frame_start = std::chrono::steady_clock::now();
+    drawPauseMenu();
+    int input = fetchInput();
+    if (input) {
+        switch (input) {
+            case KEY_UP:
+            case 'w': case 'W':
+                pauseMenuSelected = (pauseMenuSelected - 1 + 3) % 3;
+                break;
+            case KEY_DOWN:
+            case 's': case 'S':
+                pauseMenuSelected = (pauseMenuSelected + 1) % 3;
+                break;
+            case '\n': case 'e': case KEY_ENTER:
+                if (gameController) {
+                    if (pauseMenuSelected == 0) {
+                        state = State::InGame;
+                    }
+                    else if (pauseMenuSelected == 1) {
+                        state = State::InGame;
+                    }
+                    else if (pauseMenuSelected == 2) {
+                        state = State::MainMenu;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+void NCURSESVisualizer::drawPauseMenu() {
+    clear();
+    std::vector<std::wstring> levelUpArt = {
+        L"_____                                                                _____ ",
+        L"( ___ )--------------------------------------------------------------( ___ )",
+        L" |   |                                                                |   | ",
+        L" |   |    ▄███████▄    ▄████████ ███    █▄     ▄████████    ▄████████ |   | ",
+        L" |   |   ███    ███   ███    ███ ███    ███   ███    ███   ███    ███ |   | ",
+        L" |   |   ███    ███   ███    ███ ███    ███   ███    █▀    ███    █▀  |   | ",
+        L" |   |   ███    ███   ███    ███ ███    ███   ███         ▄███▄▄▄     |   | ",
+        L" |   | ▀█████████▀  ▀███████████ ███    ███ ▀███████████ ▀▀███▀▀▀     |   | ",
+        L" |   |   ███          ███    ███ ███    ███          ███   ███    █▄  |   | ",
+        L" |   |   ███          ███    ███ ███    ███    ▄█    ███   ███    ███ |   | ",
+        L" |   |  ▄████▀        ███    █▀  ████████▀   ▄████████▀    ██████████ |   | ",
+        L" |___|                                                                |___| ",
+        L"(_____)--------------------------------------------------------------(_____)"
+    };
+    int art_x = (term_w - (int)levelUpArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(5));
+    drawWideAsciiArt(art_x, art_y, levelUpArt);
+    attroff(COLOR_PAIR(5));
+    std::vector<std::string> options = {
+        "Continue",
+        "Save game",
+        "Load game",
+        "Main menu"
+    };
+    int box_w = 40;
+    int box_h = (int)options.size() + 4;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 3 * 2;
+    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
+    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
+    for (int i = 0; i < box_h; ++i) {
+        mvaddch(by + i, bx, '|');
+        mvaddch(by + i, bx + box_w - 1, '|');
+    }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
+    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
+    std::string title = "Choose action";
+    mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
+    for (size_t i = 0; i < options.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == pauseMenuSelected) {
+            attron(COLOR_PAIR(5));
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+            attroff(COLOR_PAIR(5));
+        } else {
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+        }
+    }
+    std::string hint = "Use 'W'&'S' + Enter/E to choose";
+    mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+    refresh();
+}
+
+void NCURSESVisualizer::drawPatternSelectedMenu(
+    std::vector<std::wstring>& asciiArt,
+    std::vector<std::string>& selectedOptions,
+    int artColor,
+    int selector
+) {
+    clear();
+    int art_x = (term_w - (int)asciiArt[0].size()) / 2;
+    int art_y = 2;
+    attron(COLOR_PAIR(artColor));
+    drawWideAsciiArt(art_x, art_y, asciiArt);
+    attroff(COLOR_PAIR(artColor));
+    std::vector<std::string> options = {
+        "Continue",
+        "Save game",
+        "Load game",
+        "Main menu"
+    };
+    int box_w = 40;
+    int box_h = (int)options.size() + 4;
+    int bx = (term_w - box_w) / 2;
+    int by = (term_h - box_h) / 3 * 2;
+    for (int i = 0; i < box_w; ++i) mvaddch(by, bx + i, '-');
+    for (int i = 0; i < box_w; ++i) mvaddch(by + box_h - 1, bx + i, '-');
+    for (int i = 0; i < box_h; ++i) {
+        mvaddch(by + i, bx, '|');
+        mvaddch(by + i, bx + box_w - 1, '|');
+    }
+    mvaddch(by, bx, '+'); mvaddch(by, bx + box_w - 1, '+');
+    mvaddch(by + box_h - 1, bx, '+'); mvaddch(by + box_h - 1, bx + box_w - 1, '+');
+    std::string title = "Choose action";
+    mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
+    for (size_t i = 0; i < options.size(); ++i) {
+        int iy = by + 2 + (int)i;
+        if ((int)i == pauseMenuSelected) {
+            attron(COLOR_PAIR(5));
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+            attroff(COLOR_PAIR(5));
+        } else {
+            mvprintw(iy, bx + 5, " %s ", options[i].c_str());
+        }
+    }
+    std::string hint = "Use 'W'&'S' + Enter/E to choose";
+    mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+    refresh();
 }
