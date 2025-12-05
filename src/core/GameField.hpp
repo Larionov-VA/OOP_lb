@@ -48,8 +48,8 @@ private:
     void setFieldHeight(int newFieldHeight);
     void setGameLevel(int newGameLevel);
     void setGameTurn(int newGameTurn);
-    void setCells(std::vector<FieldCell> cells);
-    void setEntityManager(EntityManager entityManager);
+    // void setCells(std::vector<FieldCell> cells);
+    // void setEntityManager(EntityManager entityManager);
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);

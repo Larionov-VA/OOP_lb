@@ -8,10 +8,6 @@ private:
     std::shared_ptr<IState> constState;
     std::shared_ptr<IState> temporaryState;
     bool avaible;
-    // bool enemyCorpse;
-    // bool slow;
-    // bool trapped;
-    // int trapDamage;
 public:
     CellState();
     CellState(std::shared_ptr<IState> constState, std::shared_ptr<IState> temporaryState);

@@ -9,34 +9,9 @@ CellState::CellState(std::shared_ptr<IState> constState, std::shared_ptr<IState>
 }
 
 
-// bool CellState::getEnemyCorpse() const {
-//     return this->enemyCorpse;
-// }
-
-
 bool CellState::getAvaible() const {
     return this->avaible;
 }
-
-
-// bool CellState::getSlow() const {
-//     return this->slow;
-// }
-
-
-// bool CellState::getTrapped() const {
-//     return this->trapped;
-// }
-
-
-// int CellState::getTrapDamage() const {
-//     return this->trapDamage;
-// }
-
-
-// void CellState::setEnemyCorpse(int newEnemyCorpse) {
-//     this->enemyCorpse = newEnemyCorpse;
-// }
 
 
 void CellState::setAvaible(bool newAvaible) {
@@ -56,19 +31,6 @@ int CellState::getStateDamage() const {
     return tDamage + cDamage;
 }
 
-// void CellState::setSlow(int newSlow) {
-//     this->slow = newSlow;
-// }
-
-
-// void CellState::setTrapped(int newTrapped) {
-//     this->trapped = newTrapped;
-// }
-
-
-// void CellState::setTrapDamage(int newTrapDamage) {
-//     this->trapDamage = newTrapDamage;
-// }
 
 char CellState::getCellSymbol() {
     if (temporaryState) {
@@ -84,13 +46,16 @@ char CellState::getCellSymbol() {
     }
 }
 
+
 bool CellState::haveSpecificState() const {
     return this->constState || this->temporaryState;
 }
 
+
 void CellState::setConstState(std::shared_ptr<IState> constState) {
     this->constState = move(constState);
 }
+
 
 void CellState::setTemporaryState(std::shared_ptr<IState> temporaryState) {
     this->temporaryState = move(temporaryState);

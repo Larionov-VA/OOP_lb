@@ -16,39 +16,80 @@
 
 
 struct AttributesSaveData {
-    int data;
+    int intelligence;
+    int dexterity;
+    int strength;
 };
 
 struct AttackSaveData {
-    int data;
+    int attack;
 };
 
 struct EquipmentSaveData {
-    int data;
+    int currentWeapon;
+    int meleeWeaponMulti;
+    int rangeWeaponMulti;
 };
 
 struct HandSaveData {
-    int data;
+    int itemInHand;
+    int countOfFirstSpell;
+    int countOfSecondSpell;
+    int countOfThirdpell;
+    int countOfFourSpell;
+    int countOfFiveSpell;
+    int powerUp;
+    int maxSize;
+    int currentSize;
 };
 
 struct StatsSaveData {
-    int data;
+    long long prevLevelUpExperience;
+    long long currentExperience;
+    long long levelUpExperience;
+    int level;
+    bool levelIncreased;
 };
 
 struct HealthSaveData {
-    int data;
+    int currentHealth;
+    int maxHealth;
 };
 
+struct StateSaveData {
+    int durationOfState;
+    int damage;
+    char stateSymbol;
+}
+
+struct CellStateSaveData {
+    int haveConstState;
+    StateSaveData constState;
+    int haveTempState;
+    StateSaveData tempState;
+    int avaible;
+}
+
 struct CellsSaveData {
-    int data;
+    CellStateSaveData stateData;
+    int index;
+    int X;
+    int Y;
 };
 
 struct BarrackSaveData {
-    int data;
+    HealthSaveData barracksHealth;
+    int spawnPeriod;
+    int barracksLevel;
+    int counter;
 };
 
 struct TowerSaveData {
-    int data;
+    HealthSaveData towerHealth;
+    DirectDamageSpell towerSpell;
+    int attackPeriod;
+    int attackCooldown;
+    int towerlevel;
 };
 
 struct EnemySaveData {
