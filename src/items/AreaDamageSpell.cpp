@@ -42,7 +42,7 @@ void AreaDamageSpell::animateCast(GameContext& ctx, int userIndex, int distance)
     for (size_t i = 0; i < ctx.cells.size(); ++i) {
         float currentDistanceToUser = ctx.cells[userIndex].getDistance(ctx.cells[i]);
         if (currentDistanceToUser <= (float)distance) {
-            std::unique_ptr<IState> castEffect = std::make_unique<AttackEffect>('&', currentDistanceToUser, 2);
+            std::shared_ptr<IState> castEffect = std::make_shared<AttackEffect>('&', currentDistanceToUser, 2);
             ctx.cells[i].returnCellState().setTemporaryState(move(castEffect));
         }
     }

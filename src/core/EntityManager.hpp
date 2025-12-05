@@ -4,12 +4,15 @@
 #include <vector>
 #include "entities/Entity.hpp"
 #include "../core/GameContext.hpp"
+#include "SaveData.hpp"
+
 
 class EntityManager {
 private:
     std::unordered_map<int, std::unique_ptr<Entity>> infoMap{};
 public:
     EntityManager(){};
+    EntitySaveData getEntitySaveData();
     Entity* operator[](int index);
     const Entity* operator[](int index) const;
     void createEntity(std::unique_ptr<Entity> entity, int index);

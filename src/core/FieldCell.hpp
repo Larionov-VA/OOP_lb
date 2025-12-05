@@ -4,8 +4,7 @@
 #include <cmath>
 #include "CellState.hpp"
 #include "FileHandler.hpp"
-
-#define CELL_SAVES_DIR "/Game/GameField/FieldCells/Cells/"
+#include "SaveData.hpp"
 
 class FieldCell {
 private:
@@ -23,6 +22,7 @@ public:
     );
     int getIndex() const;
     char getCellSymbol();
+    CellSaveData getCellSaveData();
     void setIndex(int index);
     float getDistance(const FieldCell& oth) const;
     std::pair<int, int> getCoord() const;

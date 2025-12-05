@@ -21,6 +21,7 @@ public:
 private:
     enum class State {
         MainMenu,
+        LoadMenu,
         InGame,
         LevelUpMenu,
         GameOver,
@@ -47,6 +48,7 @@ private:
     void initCurses();
     void deinitCurses();
     void updateTermSize();
+    int fetchInput();
 
     void loopMainMenu();
     void loopInGame();
@@ -54,6 +56,7 @@ private:
     void loopGameOverMenu();
     void loopPauseMenu();
     void loopAutorsMenu();
+    void loopLoadMenu();
 
     void drawPatternSelectedMenu(
         std::vector<std::wstring>& asciiArt,
@@ -69,8 +72,7 @@ private:
     void drawLevelUpMenu();
     void drawPauseMenu();
     void drawAutorsMenu();
-
-    int fetchInput();
+    void drawLoadMenu();
 
     void drawLeftPanel(int x, int y, int w, int h);
     void drawFieldPanel(int x, int y, int w, int h);

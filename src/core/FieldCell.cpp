@@ -51,3 +51,8 @@ char FieldCell::getCellSymbol() {
 CellState& FieldCell::returnCellState() {
     return state;
 }
+
+CellSaveData FieldCell::getCellSaveData() {
+    CellSaveData data;
+    return data;
+}

@@ -71,3 +71,9 @@ std::vector<int> EntityManager::getIndexesWithEntity(Entity::entityType type) co
 const std::unordered_map<int, std::unique_ptr<Entity>>& EntityManager::returnInfoMap() {
     return this->infoMap;
 }
+
+
+EntitySaveData EntityManager::getEntitySaveData() {
+    EntitySaveData data;
+    return data;
+}

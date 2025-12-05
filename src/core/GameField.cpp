@@ -755,7 +755,6 @@ void GameField::setGameTurn(int newGameTurn) {
     this->gameTurn = newGameTurn;
 }
 
-
 // void GameField::setCells(std::vector<FieldCell> cells) {
 //     this->cells = cells;
 // }
@@ -766,13 +765,24 @@ void GameField::setGameTurn(int newGameTurn) {
 // }
 
 
-FieldSaveData getFieldData() {
+FieldSaveData GameField::getFieldSaveData() {
     FieldSaveData data;
-
+    EntitySaveData entityData = entityManager.getEntitySaveData();
+    std::vector<struct CellSaveData> cellsData;
+    for (auto& cell : cells) {
+        CellSaveData cellData = cell.getCellSaveData();
+        cellsData.push_back(cellData);
+    }
+    data.cellsData = cellsData;
+    data.entityData = entityData;
+    data.gameLevel = this->gameLevel;
+    data.gameTurn = this->gameTurn;
+    data.heightField = this->heightField;
+    data.widthField = this->widthField;
     return data;
 }
 
 
-void setFieldData(FieldSaveData data) {
+void GameField::setFieldSaveData(FieldSaveData data) {
     (void)data;
 }

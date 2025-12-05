@@ -48,8 +48,6 @@ private:
     void setFieldHeight(int newFieldHeight);
     void setGameLevel(int newGameLevel);
     void setGameTurn(int newGameTurn);
-    // void setCells(std::vector<FieldCell> cells);
-    // void setEntityManager(EntityManager entityManager);
 private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
@@ -63,6 +61,7 @@ private:
 public:
     GameField();
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
+    EntitySaveData getEntitySaveData();
     std::unique_ptr<Entity> returnPlayer();
     bool playerAlive() const;
     std::shared_ptr<PlayerData> getPlayerData();
@@ -76,6 +75,6 @@ public:
     std::vector<wchar_t> show();
     void animateBowAttack(int playerIndex, int enemyIndex);
     void animateSwordAttack(int enemyIndex);
-    FieldSaveData getFieldData();
-    void setFieldData(FieldSaveData data);
+    FieldSaveData getFieldSaveData();
+    void setFieldSaveData(FieldSaveData data);
 };

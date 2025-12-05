@@ -39,7 +39,7 @@ void NCURSESVisualizer::initCurses() {
     init_pair(5, COLOR_CYAN, -1);
     updateTermSize();
     set_escdelay(25);
-    clear();
+    erase();
     refresh();
 }
 
@@ -123,6 +123,9 @@ void NCURSESVisualizer::display() {
             case State::AutorsMenu:
                 loopAutorsMenu();
                 break;
+            case State::LoadMenu:
+                loopLoadMenu();
+                break;
             default:
                 break;
         }
@@ -137,7 +140,7 @@ void NCURSESVisualizer::drawPatternSelectedMenu(
     int selector,
     bool needHints
 ) {
-    clear();
+    erase();
     int art_x = (term_w - (int)asciiArt[0].size()) / 2;
     int art_y = 2;
     attron(COLOR_PAIR(artColor));
@@ -255,8 +258,7 @@ void NCURSESVisualizer::loopMainMenu() {
                     if (gameController) gameController->startNewGame();
                     state = State::InGame;
                 } else if (mainMenuSelected == 1) {
-                    if (gameController) gameController->loadGame();
-                    state = State::InGame;
+                    state = State::LoadMenu;
                 } else if (mainMenuSelected == 2) {
                     state = State::AutorsMenu;
                 } else if (mainMenuSelected == 3) {
@@ -407,7 +409,7 @@ void NCURSESVisualizer::loopInGame() {
 
 
 void NCURSESVisualizer::drawInGame() {
-    clear();
+    erase();
     int left_w = term_w / 4;
     int right_w = term_w / 4;
     int center_w = term_w - left_w - right_w - 2;
@@ -431,7 +433,6 @@ void NCURSESVisualizer::drawInGame() {
 void NCURSESVisualizer::drawLeftPanel(int x, int y, int w, int h) {
     int half = h / 2;
     int cur_y = y;
-
     drawBoxTitle(x, cur_y, w, " PLAYER INFO ");
     cur_y++;
     if (gameController) {
@@ -699,4 +700,30 @@ void NCURSESVisualizer::drawAutorsMenu() {
         "   Composer    : 4344 Kozyrev M. "
     };
     drawPatternSelectedMenu(autorsArt, autors, 5, (int)autors.size() + 1, false);
+}
+
+
+void NCURSESVisualizer::loopLoadMenu() {
+    auto frame_start = std::chrono::steady_clock::now();
+    drawLoadMenu();
+    int input = fetchInput();
+    if (input) {
+        switch (input) {
+            case '\n': case 'e': case KEY_ENTER: case '\e': case 'q':
+                state = State::MainMenu;
+                break;
+            default:
+                break;
+        }
+    }
+    auto frame_end = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
+    if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
+}
+
+
+void NCURSESVisualizer::drawLoadMenu() {
+    std::vector<std::wstring> loadMenuArt = {};
+    std::vector<std::string> loadMenuOptions = gameController->getSavesList();
+
 }

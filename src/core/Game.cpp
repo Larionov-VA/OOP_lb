@@ -98,10 +98,27 @@ void Game::setGameID(int newGameID) {
     this->gameID = newGameID;
 }
 
-void Game::saveGame() {
-
+SaveData Game::collectGameData() {
+    SaveData data;
+    FieldSaveData fieldData = field->getFieldSaveData();
+    data.fieldData = fieldData;
+    data.gameID = this->gameID;
+    return data;
 }
 
-void Game::loadGame() {
+void Game::saveGame(std::string saveName) {
+    SaveData data = collectGameData();
+    savesManager.newSave(data, saveName);
+}
 
+bool Game::loadGame() {
+    std::vector<std::string> saveList = savesManager.getSavesList();
+    for (auto& save : saveList) {
+        std::cout << save << '\n';
+    }
+    return false;
+}
+
+std::vector<std::string> Game::getSavesList() {
+    return savesManager.getSavesList();
 }
