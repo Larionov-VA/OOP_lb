@@ -1,4 +1,5 @@
 #pragma once
+#include "../core/SaveData.hpp"
 
 class Equipment {
 private:
@@ -10,6 +11,7 @@ private:
 public:
     Equipment();
     ~Equipment();
+    EquipmentSaveData getEquipmentSavedata();
     int getAttackBonus();
     void setMeleeWeapon(int newMulti);
     void setRangeWeapon(int newMulti);

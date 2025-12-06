@@ -1,4 +1,5 @@
 #pragma once
+#include "../core/SaveData.hpp"
 
 class Attributes {
 private:
@@ -6,6 +7,7 @@ private:
     int dexterity;
     int strength;
 public:
+    AttributesSaveData getAttributesSavedata();
     int getIntelligence() const;
     int getDexterity() const;
     int getStrength() const;

@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <random>
+#include "../core/SaveData.hpp"
 
 struct GameContext;
 class Item;
@@ -16,6 +17,7 @@ private:
 public:
     Hand(int sizeOfHand);
     Hand();
+    HandSaveData getHandSavedata();
     void updateSize();
     bool useItem(GameContext &ctx, int userIndex, int powerUp);
     void swapItem(int indexInHand);

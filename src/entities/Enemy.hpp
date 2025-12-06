@@ -5,6 +5,7 @@
 #include "../actor_utility/ActorEquipment.hpp"
 #include "../actor_utility/ActorHealth.hpp"
 #include "../core/Config.hpp"
+#include "../core/SaveData.hpp"
 #include <utility>
 #include <memory>
 
@@ -14,7 +15,6 @@ private:
     Attack enemyAttack;
     Health enemyHealth;
     int enemyLevel;
-    bool iterative;
 public:
     Enemy();
     Enemy(int enemyLevel);
@@ -25,8 +25,7 @@ public:
     int getLevel() override;
     std::pair<int, int>  getHealth() override;
     void causeDamage(int damage) override;
-    bool getIterative();
-    void setIterative(bool it);
     bool alive() const override;
     char returnEntitySymbol() override;
+    EnemySaveData getEnemySaveData();
 };

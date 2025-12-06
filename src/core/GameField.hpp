@@ -61,7 +61,6 @@ private:
 public:
     GameField();
     GameField(std::unique_ptr<Entity> player, int weight, int height, int gameLevel);
-    EntitySaveData getEntitySaveData();
     std::unique_ptr<Entity> returnPlayer();
     bool playerAlive() const;
     std::shared_ptr<PlayerData> getPlayerData();

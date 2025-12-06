@@ -43,3 +43,14 @@ bool Stats::checkAndSwitchLevelIncreased() {
     }
     return false;
 }
+
+
+StatsSaveData Stats::getStatsSavedata() {
+    StatsSaveData data;
+    data.currentExperience = this->currentExperience;
+    data.level = this->level;
+    data.levelIncreased = this->levelIncreased;
+    data.levelUpExperience = this->levelUpExperience;
+    data.prevLevelUpExperience = this->prevLevelUpExperience;
+    return data;
+}

@@ -6,6 +6,11 @@
 #include "../core/GameContext.hpp"
 #include "SaveData.hpp"
 
+class EnemyTower;
+class Player;
+class Enemy;
+class EnemyBarracks;
+
 
 class EntityManager {
 private:

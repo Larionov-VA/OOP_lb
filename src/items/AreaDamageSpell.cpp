@@ -47,3 +47,12 @@ void AreaDamageSpell::animateCast(GameContext& ctx, int userIndex, int distance)
         }
     }
 }
+
+SpellSaveData AreaDamageSpell::getSpellSaveData() {
+    SpellSaveData data;
+    data.countOfItem = this->countOfItem;
+    data.powerOfSpell = this->powerOfSpell;
+    data.baseDamage = this->baseDamage;
+    data.baseDistance = this->baseDistance;
+    return data;
+}

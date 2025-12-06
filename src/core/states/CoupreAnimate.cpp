@@ -37,3 +37,12 @@ int CoupreAnimate::getDuration() const {
 char CoupreAnimate::getSymbol() const {
     return this->stateSymbol;
 }
+
+
+StateSaveData CoupreAnimate::getStateSaveData() {
+    StateSaveData data;
+    data.damage = this->damage;
+    data.durationOfState = this->durationOfState;
+    data.stateSymbol = this->stateSymbol;
+    return data;
+}

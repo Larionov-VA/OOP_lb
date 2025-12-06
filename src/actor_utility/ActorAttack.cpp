@@ -21,3 +21,10 @@ int Attack::getAttack() const {
 void Attack::setAttack(int attack) {
     this->attack = attack;
 }
+
+
+AttackSaveData Attack::getAttackSavedata() {
+    AttackSaveData data;
+    data.attack = this->attack;
+    return data;
+}

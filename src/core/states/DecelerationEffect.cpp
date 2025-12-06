@@ -43,3 +43,12 @@ int DecelerationEffect::getDuration() const {
 char DecelerationEffect::getSymbol() const {
     return this->stateSymbol;
 }
+
+
+StateSaveData DecelerationEffect::getStateSaveData() {
+    StateSaveData data;
+    data.damage = this->damage;
+    data.durationOfState = this->durationOfState;
+    data.stateSymbol = this->stateSymbol;
+    return data;
+}

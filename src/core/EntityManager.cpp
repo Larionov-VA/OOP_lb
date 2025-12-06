@@ -1,5 +1,8 @@
 #include "EntityManager.hpp"
-
+#include "entities/Enemy.hpp"
+#include "entities/EnemyBarracks.hpp"
+#include "entities/Player.hpp"
+#include "entities/EnemyTower.hpp"
 
 Entity* EntityManager::operator[](int index) {
     auto it = infoMap.find(index);
@@ -75,5 +78,20 @@ const std::unordered_map<int, std::unique_ptr<Entity>>& EntityManager::returnInf
 
 EntitySaveData EntityManager::getEntitySaveData() {
     EntitySaveData data;
+    std::vector<int> enemyIndexes = getIndexesWithEntity(Entity::entityType::ENEMY);
+    for (int index : enemyIndexes) {
+        EnemySaveData enemyData = dynamic_cast<Enemy*>((Entity*)getEntity(index))->getEnemySaveData();
+        enemyData.enemyIndex = index;
+        data.enemyData.push_back(enemyData);
+    }
+    int playerIndex = getIndexesWithEntity(Entity::entityType::PLAYER)[0];
+    PlayerSaveData playerData = dynamic_cast<Player*>((Entity*)getEntity(playerIndex))->getPlayerSaveData();
+    data.playerData = playerData;
+    int towerIndex = getIndexesWithEntity(Entity::entityType::TOWER)[0];
+    TowerSaveData towerData = dynamic_cast<EnemyTower*>((Entity*)getEntity(towerIndex))->getTowerSaveData();
+    data.towerData = towerData;
+    int barrackIndexes = getIndexesWithEntity(Entity::entityType::BARRACKS)[0];
+    BarrackSaveData barrackData = dynamic_cast<EnemyBarracks*>((Entity*)getEntity(barrackIndexes))->getBarrackSaveData();
+    data.barrackData = barrackData;
     return data;
 }

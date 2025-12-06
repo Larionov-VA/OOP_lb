@@ -60,3 +60,18 @@ void CellState::setConstState(std::shared_ptr<IState> constState) {
 void CellState::setTemporaryState(std::shared_ptr<IState> temporaryState) {
     this->temporaryState = move(temporaryState);
 }
+
+
+CellStateSaveData CellState::getStateCellSaveData() {
+    CellStateSaveData data;
+    data.avaible = avaible;
+    data.haveTempState = (bool)this->temporaryState ? 1 : 0;
+    data.haveConstState = (bool)this->constState ? 1 : 0;
+    if (data.haveTempState) {
+        data.tempState = temporaryState->getStateSaveData();
+    }
+    if (data.haveConstState) {
+        data.constState = constState->getStateSaveData();
+    }
+    return data;
+}

@@ -36,3 +36,12 @@ bool TrapSpell::cast(GameContext& ctx, int userIndex, int power) {
     }
     return false;
 }
+
+SpellSaveData TrapSpell::getSpellSaveData() {
+    SpellSaveData data;
+    data.countOfItem = this->countOfItem;
+    data.powerOfSpell = this->powerOfSpell;
+    data.trapDamage = this->trapDamage;
+    data.trapLevel = this->trapLevel;
+    return data;
+}

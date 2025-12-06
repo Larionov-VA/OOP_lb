@@ -4,6 +4,7 @@
 #include "../core/FieldCell.hpp"
 #include "../core/states/AttackEffect.hpp"
 #include "../core/states/IState.hpp"
+#include "../core/SaveData.hpp"
 
 class DirectDamageSpell : public SpellScroll {
 private:
@@ -22,6 +23,7 @@ public:
     void setBaseDamage(int newDamage);
     void setBaseDistance(int newDistance);
     int getBaseDistance();
+    SpellSaveData getSpellSaveData();
 private:
     void animateCast(GameContext& ctx, int target);
 };

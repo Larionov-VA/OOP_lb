@@ -1,6 +1,7 @@
 #pragma once
 #include "Item.hpp"
 #include "../core/Config.hpp"
+#include "../core/SaveData.hpp"
 
 class SpellScroll : public Item {
 protected:
@@ -23,4 +24,5 @@ public:
             this->decCountOfItem();
         }
     }
+    virtual SpellSaveData getSpellSaveData() = 0;
 };

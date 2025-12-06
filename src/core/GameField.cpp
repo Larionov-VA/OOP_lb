@@ -755,15 +755,6 @@ void GameField::setGameTurn(int newGameTurn) {
     this->gameTurn = newGameTurn;
 }
 
-// void GameField::setCells(std::vector<FieldCell> cells) {
-//     this->cells = cells;
-// }
-
-
-// void GameField::setEntityManager(EntityManager entityManager) {
-//     this->entityManager = entityManager;
-// }
-
 
 FieldSaveData GameField::getFieldSaveData() {
     FieldSaveData data;

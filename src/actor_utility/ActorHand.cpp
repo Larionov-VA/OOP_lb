@@ -132,3 +132,21 @@ void Hand::addSpells(int indexInHand, int count) {
     }
     updateSize();
 }
+
+
+HandSaveData Hand::getHandSavedata() {
+    HandSaveData data;
+    data.currentSize = this->currentSize;
+    data.maxSize = this->maxSize;
+    data.powerUp = this->powerUp;
+    data.areaSpell = allItems[0].second->getSpellSaveData();
+    data.directSpell = allItems[1].second->getSpellSaveData();
+    data.updateSpell = allItems[2].second->getSpellSaveData();
+    data.trapSpell = allItems[3].second->getSpellSaveData();
+    for (int i = 0; i < 4; ++i) {
+        if (allItems[i].second == itemInHand) {
+            data.itemInHand = i;
+        }
+    }
+    return data;
+}

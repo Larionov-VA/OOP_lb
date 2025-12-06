@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include "../core/SaveData.hpp"
 
 class Stats {
 private:
@@ -12,6 +12,7 @@ private:
 public:
     Stats();
     Stats(long long prevLevelUp, long long experience, long long levelUp, int level);
+    StatsSaveData getStatsSavedata();
     void addExperience(int experience);
     int getLevel();
     bool checkAndSwitchLevelIncreased();

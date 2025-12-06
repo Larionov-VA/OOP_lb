@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "EntityManager.hpp"
+// #include "EntityManager.hpp"
 #include "FieldCell.hpp"
 #include "../entities/Entity.hpp"
 #define DEFAULT_ATTACK 5

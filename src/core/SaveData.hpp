@@ -14,7 +14,7 @@ struct AttackSaveData {
 
 
 struct EquipmentSaveData {
-    int currentWeapon;
+    int currentWeapon; // 0 - MELLE 1 - RANGE
     int meleeWeaponMulti;
     int rangeWeaponMulti;
 };
@@ -23,27 +23,8 @@ struct EquipmentSaveData {
 struct SpellSaveData {
     int countOfItem;
     int powerOfSpell;
-};
-
-
-struct AreaDamageSpellSaveData : SpellSaveData {
     int baseDamage;
     int baseDistance;
-};
-
-
-struct DirectDamageSpellSaveData : SpellSaveData {
-    int baseDamage;
-    int baseDistance;
-};
-
-
-struct UpdateSpellSaveData : SpellSaveData {
-
-};
-
-
-struct TrapSpellSaveData : SpellSaveData {
     int trapLevel;
     int trapDamage;
 };
@@ -51,13 +32,13 @@ struct TrapSpellSaveData : SpellSaveData {
 
 struct HandSaveData {
     int itemInHand; //0-3 Area, Direct, Update, Trap
-    struct AreaDamageSpellSaveData areaSpell;
-    struct DirectDamageSpellSaveData directSpell;
-    struct UpdateSpellSaveData updateSpell;
-    struct TrapSpellSaveData trapSpell;
     int powerUp;
     int maxSize;
     int currentSize;
+    struct SpellSaveData areaSpell;
+    struct SpellSaveData directSpell;
+    struct SpellSaveData updateSpell;
+    struct SpellSaveData trapSpell;
 };
 
 
@@ -84,54 +65,54 @@ struct StateSaveData {
 
 
 struct CellStateSaveData {
-    int haveConstState;
-    struct StateSaveData constState;
-    int haveTempState;
-    struct StateSaveData tempState;
     int avaible;
+    int haveConstState;
+    int haveTempState;
+    struct StateSaveData constState;
+    struct StateSaveData tempState;
 };
 
 
 struct CellSaveData {
-    struct CellStateSaveData stateData;
     int index;
     int X;
     int Y;
+    struct CellStateSaveData stateData;
 };
 
 
 struct BarrackSaveData {
-    struct HealthSaveData barracksHealth;
     int spawnPeriod;
     int barracksLevel;
     int counter;
+    struct HealthSaveData barracksHealth;
 };
 
 
 struct TowerSaveData {
-    struct HealthSaveData towerHealth;
-    struct DirectDamageSpellSaveData towerSpell;
     int attackPeriod;
     int attackCooldown;
     int towerlevel;
+    struct HealthSaveData towerHealth;
+    struct SpellSaveData towerSpell;
 };
 
 
 struct EnemySaveData {
     struct AttackSaveData enemyAttack;
-    struct HealthSaveData playerHealth;
+    struct HealthSaveData enemyHealth;
     int enemyLevel;
-    bool iterative;
+    int enemyIndex;
 };
 
 
 struct PlayerSaveData {
-    struct AttributesSaveData playerAttributes;
     struct AttackSaveData playerAttack;
+    struct AttributesSaveData playerAttributes;
     struct EquipmentSaveData playerEquipment;
     struct HandSaveData playerHand;
-    struct StatsSaveData playerStats;
     struct HealthSaveData playerHealth;
+    struct StatsSaveData playerStats;
     bool slowed;
 };
 
@@ -145,16 +126,16 @@ struct EntitySaveData {
 
 
 struct FieldSaveData {
-    struct EntitySaveData entityData;
-    std::vector<struct CellSaveData> cellsData;
     int widthField;
     int heightField;
     int gameLevel;
     int gameTurn;
+    struct EntitySaveData entityData;
+    std::vector<struct CellSaveData> cellsData;
 };
 
 
 struct SaveData {
-    struct FieldSaveData fieldData;
     int gameID;
+    struct FieldSaveData fieldData;
 };

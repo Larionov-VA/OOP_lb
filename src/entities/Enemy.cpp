@@ -8,7 +8,6 @@ Enemy::Enemy(int enemyLevel) {
     enemyHealth.setMaxHealth(GlobalGameConfig::enemyHealth * enemyLevel * GlobalGameConfig::difficulty);
     enemyHealth.restoreHealth();
     enemyAttack.setAttack(GlobalGameConfig::enemyAttack * enemyLevel * GlobalGameConfig::difficulty);
-    iterative = true;
 }
 
 
@@ -16,17 +15,9 @@ int Enemy::getDamage() {
     return enemyAttack.getAttack();
 }
 
+
 int Enemy::getLevel() {
     return this->enemyLevel;
-}
-
-
-bool Enemy::getIterative() {
-    return iterative;
-}
-
-void Enemy::setIterative(bool it) {
-    this->iterative = it;
 }
 
 
@@ -45,4 +36,12 @@ bool Enemy::alive() const {
 
 char Enemy::returnEntitySymbol() {
     return 'E';
+}
+
+EnemySaveData Enemy::getEnemySaveData() {
+    EnemySaveData data;
+    data.enemyHealth = this->enemyHealth.getHealthSavedata();
+    data.enemyAttack = this->enemyAttack.getAttackSavedata();
+    data.enemyLevel = this->enemyLevel;
+    return data;
 }

@@ -40,3 +40,11 @@ char AttackEffect::getSymbol() const {
     }
     return '_';
 }
+
+StateSaveData AttackEffect::getStateSaveData() {
+    StateSaveData data;
+    data.damage = this->damage;
+    data.durationOfState = this->durationOfState;
+    data.stateSymbol = this->stateSymbol;
+    return data;
+}

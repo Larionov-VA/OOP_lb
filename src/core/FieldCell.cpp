@@ -54,5 +54,9 @@ CellState& FieldCell::returnCellState() {
 
 CellSaveData FieldCell::getCellSaveData() {
     CellSaveData data;
+    data.stateData = state.getStateCellSaveData();
+    data.index = index;
+    data.X = X;
+    data.Y = Y;
     return data;
 }

@@ -168,3 +168,15 @@ std::pair<int, int> Player::getHandSize() {
 char Player::returnEntitySymbol() {
     return 'P';
 }
+
+PlayerSaveData Player::getPlayerSaveData() {
+    PlayerSaveData data;
+    data.playerAttack = this->playerAttack.getAttackSavedata();
+    data.playerAttributes = this->playerAttributes.getAttributesSavedata();
+    data.playerEquipment = this->playerEquipment.getEquipmentSavedata();
+    data.playerHand = this->playerHand.getHandSavedata();
+    data.playerHealth = this->playerHealth.getHealthSavedata();
+    data.playerStats = this->playerStats.getStatsSavedata();
+    data.slowed = (int)this->slowed;
+    return data;
+}

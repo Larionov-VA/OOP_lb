@@ -6,9 +6,10 @@
 
 class UpdateSpell : public SpellScroll {
 private:
-    
+
 public:
     bool cast(GameContext& ctx, int userIndex, int power);
     UpdateSpell() {};
     ~UpdateSpell() {};
+    SpellSaveData getSpellSaveData();
 };

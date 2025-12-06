@@ -3,6 +3,7 @@
 #include "../actor_utility/ActorHealth.hpp"
 #include "../items/DirectDamageSpell.hpp"
 #include "../core/Config.hpp"
+#include "../core/SaveData.hpp"
 
 class EnemyTower : public Entity{
 private:
@@ -27,4 +28,5 @@ public:
     int getLevel() override;
     int getInt() override;
     char returnEntitySymbol() override;
+    TowerSaveData getTowerSaveData();
 };

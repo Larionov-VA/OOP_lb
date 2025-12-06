@@ -63,3 +63,13 @@ int EnemyTower::getInt() {
 char EnemyTower::returnEntitySymbol() {
     return 'T';
 }
+
+TowerSaveData EnemyTower::getTowerSaveData() {
+    TowerSaveData data;
+    data.towerHealth = this->towerHealth.getHealthSavedata();
+    data.towerSpell = this->towerSpell.getSpellSaveData();
+    data.attackCooldown = this->attackCooldown;
+    data.attackPeriod = this->attackPeriod;
+    data.towerlevel = this->towerlevel;
+    return data;
+}

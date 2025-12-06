@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <memory>
+#include "../core/SaveData.hpp"
 
 class Inventory {
 private:

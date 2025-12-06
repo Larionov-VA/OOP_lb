@@ -52,3 +52,11 @@ int Health::getCurrentHealth() const {
 int Health::getMaxHealth() const {
     return maxHealth;
 }
+
+
+HealthSaveData Health::getHealthSavedata() {
+    HealthSaveData data;
+    data.currentHealth = this->currentHealth;
+    data.maxHealth = this->maxHealth;
+    return data;
+}

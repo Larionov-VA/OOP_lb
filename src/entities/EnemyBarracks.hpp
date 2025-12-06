@@ -2,6 +2,7 @@
 #include "Entity.hpp"
 #include "../actor_utility/ActorHealth.hpp"
 #include "../core/Config.hpp"
+#include "../core/SaveData.hpp"
 #include <iostream>
 
 class EnemyBarracks : public Entity {
@@ -24,4 +25,5 @@ public:
     bool alive() const override;
     int getLevel() override;
     char returnEntitySymbol() override;
+    BarrackSaveData getBarrackSaveData();
 };

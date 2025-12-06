@@ -48,3 +48,12 @@ int EnemyBarracks::getLevel() {
 char EnemyBarracks::returnEntitySymbol() {
     return 'B';
 }
+
+BarrackSaveData EnemyBarracks::getBarrackSaveData() {
+    BarrackSaveData data;
+    data.barracksHealth = this->barracksHealth.getHealthSavedata();
+    data.barracksLevel = this->barracksLevel;
+    data.counter = this->counter;
+    data.spawnPeriod = this->spawnPeriod;
+    return data;
+}

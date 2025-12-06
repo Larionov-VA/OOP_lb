@@ -1,4 +1,5 @@
 #pragma once
+#include "../SaveData.hpp"
 
 class IState {
 protected:
@@ -15,4 +16,6 @@ public:
     virtual void setDuration(int countOfRounds) = 0;
     virtual int getDuration() const = 0;
     virtual char getSymbol() const = 0;
+
+    virtual StateSaveData getStateSaveData() = 0;
 };

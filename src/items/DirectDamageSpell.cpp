@@ -73,3 +73,12 @@ void DirectDamageSpell::setBaseDistance(int newDistance) {
 int DirectDamageSpell::getBaseDistance() {
     return baseDistance;
 }
+
+SpellSaveData DirectDamageSpell::getSpellSaveData() {
+    SpellSaveData data;
+    data.countOfItem = this->countOfItem;
+    data.powerOfSpell = this->powerOfSpell;
+    data.baseDamage = this->baseDamage;
+    data.baseDistance = this->baseDistance;
+    return data;
+}

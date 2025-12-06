@@ -29,14 +29,26 @@ int Attributes::getStrength() const {
     return strength;
 }
 
+
 void Attributes::setIntelligence(int newInt) {
     intelligence = newInt;
 }
+
 
 void Attributes::setDexterity(int newDex) {
     dexterity = newDex;
 }
 
+
 void Attributes::setStrength(int newStr) {
     strength = newStr;
+}
+
+
+AttributesSaveData Attributes::getAttributesSavedata() {
+    AttributesSaveData data;
+    data.dexterity = this->dexterity;
+    data.intelligence = this->intelligence;
+    data.strength = this->strength;
+    return data;
 }

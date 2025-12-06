@@ -1,4 +1,5 @@
 #pragma once
+#include "../core/SaveData.hpp"
 
 struct GameContext;
 
@@ -13,4 +14,5 @@ public:
     void incCountOfItem() { ++countOfItem; };
     virtual void useItem(GameContext& ctx, int userIndex, int power) = 0;
     virtual ~Item() = default;
+    virtual SpellSaveData getSpellSaveData() = 0;
 };

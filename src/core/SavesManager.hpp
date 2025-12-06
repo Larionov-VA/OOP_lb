@@ -11,6 +11,10 @@
 class SavesManager {
 private:
     std::string getCorrectSaveName(std::string saveName);
+    std::string serializeData(SaveData& data);
+    std::string getStringFromEnemySaveData(std::vector<struct EnemySaveData>& enemySaveData);
+    std::string getStringFromSpellSaveData(struct SpellSaveData& spellData);
+    std::string getStringFromCellsSaveData(std::vector<struct CellSaveData>& cellsData);
 public:
     SavesManager();
     ~SavesManager();

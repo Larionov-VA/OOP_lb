@@ -57,3 +57,12 @@ void Equipment::swapWeapon() {
         currentWeapon = Equipment::equippedWeapon::RANGE;
     }
 }
+
+
+EquipmentSaveData Equipment::getEquipmentSavedata() {
+    EquipmentSaveData data;
+    data.currentWeapon = (int)this->currentWeapon;
+    data.meleeWeaponMulti = this->meleeWeaponMulti;
+    data.rangeWeaponMulti = this->rangeWeaponMulti;
+    return data;
+}

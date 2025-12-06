@@ -38,7 +38,6 @@ set(SRCS
 
     src/items/DirectDamageSpell.cpp
     src/items/AreaDamageSpell.cpp
-    src/items/HealPotion.cpp
     src/items/UpgradeSpell.cpp
     src/items/TrapSpell.cpp
 )

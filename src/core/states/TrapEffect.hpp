@@ -16,4 +16,6 @@ public:
     void setDuration(int countOfRounds) override;
     int getDuration() const override;
     char getSymbol() const override;
+
+    StateSaveData getStateSaveData() override;
 };

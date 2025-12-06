@@ -12,4 +12,5 @@ public:
     bool cast(GameContext& ctx, int userIndex, int power) override;
     TrapSpell() : TrapSpell(1, 50){};
     TrapSpell(int trapLevel, int trapDamage) : trapLevel(trapLevel), trapDamage(trapDamage) {};
+    SpellSaveData getSpellSaveData();
 };

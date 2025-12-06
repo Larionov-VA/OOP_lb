@@ -7,6 +7,12 @@ FileHandler::FileHandler(const std::string& filename, std::ios::openmode mode) :
     }
 }
 
+FileHandler::FileHandler(const std::string& filename) : file_(filename) {
+    if (!file_.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+}
+
 
 FileHandler::~FileHandler() {
     if (file_.is_open()) file_.close();

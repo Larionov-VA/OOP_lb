@@ -6,6 +6,7 @@ class FileHandler {
 private:
     std::fstream file_;
 public:
+    FileHandler(const std::string& filename);
     FileHandler(const std::string& filename, std::ios::openmode mode);
     ~FileHandler();
     void write(const std::string& string);

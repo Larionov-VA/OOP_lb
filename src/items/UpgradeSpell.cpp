@@ -12,3 +12,10 @@ bool UpdateSpell::cast(GameContext& ctx, int userIndex, int power) {
     ctx.entityManager[userIndex]->setPowerOfSpell(newPowerOfSpells + 1 * power);
     return true;
 }
+
+SpellSaveData UpdateSpell::getSpellSaveData() {
+    SpellSaveData data;
+    data.countOfItem = this->countOfItem;
+    data.powerOfSpell = this->powerOfSpell;
+    return data;
+}
