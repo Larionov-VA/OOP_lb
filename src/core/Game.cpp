@@ -10,6 +10,8 @@ Game::~Game() {
 
 void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
+    GlobalGameConfig::fieldWidth = 10 + rand() % 16;
+    GlobalGameConfig::fieldHeight = 10 + rand() % 16;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -25,6 +27,8 @@ void Game::nextLevel() {
     player->regenerateLife(1.0);
     GlobalGameConfig::gameLevel++;
     deleteField();
+    GlobalGameConfig::fieldWidth = 10 + rand() % 16;
+    GlobalGameConfig::fieldHeight = 10 + rand() % 16;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -127,10 +131,17 @@ void Game::setGameData(SaveData& data) {
 
 bool Game::loadGame(std::string saveName) {
     try {
-        if (!this->field) {
-            startNewGame();
-        }
+        std::unique_ptr<Entity> player = std::make_unique<Player>();
+        deleteField();
         SaveData data = savesManager.getLoadGameData(saveName);
+        GlobalGameConfig::fieldWidth = data.fieldData.widthField;
+        GlobalGameConfig::fieldHeight = data.fieldData.heightField;
+        this->field = new GameField(
+            std::move(player),
+            GlobalGameConfig::fieldWidth,
+            GlobalGameConfig::fieldHeight,
+            data.fieldData.gameLevel
+        );
         setGameData(data);
         return true;
     }
