@@ -40,15 +40,6 @@ private:
     int gameLevel;
     int gameTurn;
 private:
-    int getFieldWidth();
-    int getFieldHeight();
-    int getGameLevel();
-    int getGameTurn();
-    void setFieldWidth(int newFieldWidth);
-    void setFieldHeight(int newFieldHeight);
-    void setGameLevel(int newGameLevel);
-    void setGameTurn(int newGameTurn);
-private:
     void generateFieldCells(std::unique_ptr<Entity> player);
     void moveEntity(int oldIndex, int newIndex);
     bool isMoveCorrect(int oldIndex, int newIndex);

@@ -52,3 +52,10 @@ AttributesSaveData Attributes::getAttributesSavedata() {
     data.strength = this->strength;
     return data;
 }
+
+
+void Attributes::setAttributesSavedata(AttributesSaveData data) {
+    this->dexterity = data.dexterity;
+    this->intelligence = data.intelligence;
+    this->strength = data.strength;
+}

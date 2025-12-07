@@ -117,7 +117,7 @@ void NCURSESVisualizer::display() {
             case State::GameOver:
                 loopGameOverMenu();
                 break;
-            case State::PauseGame:
+            case State::PauseMenu:
                 loopPauseMenu();
                 break;
             case State::AutorsMenu:
@@ -138,7 +138,8 @@ void NCURSESVisualizer::drawPatternSelectedMenu(
     std::vector<std::string>& selectedOptions,
     int artColor,
     int selector,
-    bool needHints
+    bool needHints,
+    std::string speshializeHint
 ) {
     erase();
     int art_x = (term_w - (int)asciiArt[0].size()) / 2;
@@ -161,8 +162,7 @@ void NCURSESVisualizer::drawPatternSelectedMenu(
     if (needHints) {
         std::string title = "Choose action";
         mvprintw(by + 1, bx + (box_w - (int)title.size())/2, "%s", title.c_str());
-        std::string hint = "Use 'W'&'S' + Enter/E to choose";
-        mvprintw(by + box_h, (term_w - (int)hint.size()) / 2, "%s", hint.c_str());
+        mvprintw(by + box_h, (term_w - (int)speshializeHint.size()) / 2, "%s", speshializeHint.c_str());
     }
 
     for (size_t i = 0; i < selectedOptions.size(); ++i) {
@@ -196,10 +196,12 @@ void NCURSESVisualizer::loopGameOverMenu() {
             case '\n': case 'e': case KEY_ENTER:
                 if (gameController) {
                     if (gameOverSelected == 0) {
+                        if (gameController) gameController->startNewGame();
                         state = State::InGame;
                     }
                     else if (gameOverSelected == 1) {
-                        state = State::InGame;
+                        state = State::LoadMenu;
+                        prevState = State::GameOver;
                     }
                     else if (gameOverSelected == 2) {
                         state = State::MainMenu;
@@ -258,7 +260,9 @@ void NCURSESVisualizer::loopMainMenu() {
                     if (gameController) gameController->startNewGame();
                     state = State::InGame;
                 } else if (mainMenuSelected == 1) {
+                    if (gameController) gameController->startNewGame();
                     state = State::LoadMenu;
+                    prevState = State::MainMenu;
                 } else if (mainMenuSelected == 2) {
                     state = State::AutorsMenu;
                 } else if (mainMenuSelected == 3) {
@@ -381,7 +385,7 @@ void NCURSESVisualizer::loopInGame() {
     int input = fetchInput();
     if (input) {
         if (input == 27) {
-            state = State::PauseGame;
+            state = State::PauseMenu;
             return;
         }
         char c = (char)input;
@@ -613,8 +617,8 @@ void NCURSESVisualizer::loopPauseMenu() {
                         gameController->saveGame();
                     }
                     else if (pauseMenuSelected == 2) {
-                        state = State::InGame;
-                        gameController->loadGame();
+                        state = State::LoadMenu;
+                        prevState = State::PauseMenu;
                     }
                     else if (pauseMenuSelected == 3) {
                         state = State::MainMenu;
@@ -699,31 +703,101 @@ void NCURSESVisualizer::drawAutorsMenu() {
         "Game developer : 4342 Larionov V.",
         "   Composer    : 4344 Kozyrev M. "
     };
-    drawPatternSelectedMenu(autorsArt, autors, 5, (int)autors.size() + 1, false);
+    drawPatternSelectedMenu(autorsArt, autors, 5, (int)autors.size() + 1);
 }
 
 
 void NCURSESVisualizer::loopLoadMenu() {
     auto frame_start = std::chrono::steady_clock::now();
-    drawLoadMenu();
+    static const int PAGE_SIZE = 10;
+    static int startList = 0;
+    static int endList = PAGE_SIZE;
+    static std::vector<std::string> loadMenuOptions;
+    static bool firstCall = true;
+    if (firstCall) {
+        loadMenuOptions = gameController->getSavesList(startList, endList);
+        firstCall = false;
+    }
+
+    drawLoadMenu(loadMenuOptions);
     int input = fetchInput();
+
     if (input) {
         switch (input) {
-            case '\n': case 'e': case KEY_ENTER: case '\e': case 'q':
-                state = State::MainMenu;
+            case KEY_UP:
+            case 'w': case 'W':
+                if (loadMenuSelected == 0 && startList > 0) {
+                    startList = std::max(0, startList - PAGE_SIZE);
+                    endList = startList + PAGE_SIZE;
+                    loadMenuOptions = gameController->getSavesList(startList, endList);
+                    loadMenuSelected = (int)loadMenuOptions.size() - 1;
+                } else {
+                    loadMenuSelected = std::max(0, loadMenuSelected - 1);
+                }
                 break;
+
+            case KEY_DOWN:
+            case 's': case 'S':
+                if (loadMenuSelected == (int)loadMenuOptions.size() - 1) {
+                    int totalSaves = (int)gameController->getSavesList(0,-1).size();
+                    if (endList < totalSaves) {
+                        startList = endList;
+                        endList = std::min(startList + PAGE_SIZE, totalSaves);
+                        loadMenuOptions = gameController->getSavesList(startList, endList);
+                        loadMenuSelected = 0;
+                    }
+                } else {
+                    loadMenuSelected = std::min((int)loadMenuOptions.size() - 1, loadMenuSelected + 1);
+                }
+                break;
+
+            case '\n': case 'e': case KEY_ENTER:
+                if (gameController && !loadMenuOptions.empty()) {
+                    std::string selectedSave = loadMenuOptions[loadMenuSelected];
+                    gameController->loadGame(selectedSave);
+                    startList = 0;
+                    endList = PAGE_SIZE;
+                    loadMenuSelected = 0;
+                    firstCall = true;
+                    state = State::InGame;
+                }
+                break;
+
+            case '\e':
+                startList = 0;
+                endList = PAGE_SIZE;
+                loadMenuSelected = 0;
+                firstCall = true;
+                state = prevState;
+                break;
+
             default:
                 break;
         }
     }
+
     auto frame_end = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(frame_end - frame_start).count();
     if (ms < frame_ms) std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms - ms));
 }
 
 
-void NCURSESVisualizer::drawLoadMenu() {
-    std::vector<std::wstring> loadMenuArt = {};
-    std::vector<std::string> loadMenuOptions = gameController->getSavesList();
-
+void NCURSESVisualizer::drawLoadMenu(std::vector<std::string> loadMenuOptions) {
+    std::vector<std::wstring> loadMenuArt = {
+        L" _____                                              _____ ",
+        L"( ___ )--------------------------------------------( ___ )",
+        L" |   |                                              |   | ",
+        L" |   |  ▄█        ▄██████▄     ▄████████ ████████▄  |   | ",
+        L" |   | ███       ███    ███   ███    ███ ███   ▀███ |   | ",
+        L" |   | ███       ███    ███   ███    ███ ███    ███ |   | ",
+        L" |   | ███       ███    ███   ███    ███ ███    ███ |   | ",
+        L" |   | ███       ███    ███ ▀███████████ ███    ███ |   | ",
+        L" |   | ███       ███    ███   ███    ███ ███    ███ |   | ",
+        L" |   | ███▌    ▄ ███    ███   ███    ███ ███   ▄███ |   | ",
+        L" |   | █████▄▄██  ▀██████▀    ███    █▀  ████████▀  |   | ",
+        L" |   | ▀                                            |   | ",
+        L" |___|                                              |___| ",
+        L"(_____)--------------------------------------------(_____)",
+    };
+    drawPatternSelectedMenu(loadMenuArt, loadMenuOptions, 5, loadMenuSelected);
 }

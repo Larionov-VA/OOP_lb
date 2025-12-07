@@ -60,3 +60,10 @@ CellSaveData FieldCell::getCellSaveData() {
     data.Y = Y;
     return data;
 }
+
+void FieldCell::setCellSaveData(CellSaveData data) {
+    this->index = data.index;
+    this->X = data.X;
+    this->Y = data.Y;
+    this->state.setStateCellSaveData(data.stateData);
+}

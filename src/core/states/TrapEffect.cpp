@@ -46,7 +46,7 @@ char TrapEffect::getSymbol() const {
 
 
 StateSaveData TrapEffect::getStateSaveData() {
-    StateSaveData data;
+    StateSaveData data{};
     data.damage = this->damage;
     data.durationOfState = this->durationOfState;
     data.stateSymbol = this->stateSymbol;

@@ -42,8 +42,8 @@ char AttackEffect::getSymbol() const {
 }
 
 StateSaveData AttackEffect::getStateSaveData() {
-    StateSaveData data;
-    data.damage = this->damage;
+    StateSaveData data{};
+    data.damage = 0;
     data.durationOfState = this->durationOfState;
     data.stateSymbol = this->stateSymbol;
     return data;

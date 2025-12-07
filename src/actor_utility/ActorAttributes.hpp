@@ -8,6 +8,7 @@ private:
     int strength;
 public:
     AttributesSaveData getAttributesSavedata();
+    void setAttributesSavedata(AttributesSaveData data);
     int getIntelligence() const;
     int getDexterity() const;
     int getStrength() const;

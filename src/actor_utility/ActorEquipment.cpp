@@ -66,3 +66,15 @@ EquipmentSaveData Equipment::getEquipmentSavedata() {
     data.rangeWeaponMulti = this->rangeWeaponMulti;
     return data;
 }
+
+
+void Equipment::setEquipmentSavedata(EquipmentSaveData data) {
+    if (data.currentWeapon) {
+        this->currentWeapon = Equipment::equippedWeapon::RANGE;
+    }
+    else {
+        this->currentWeapon = Equipment::equippedWeapon::MELEE;
+    }
+    this->meleeWeaponMulti = data.meleeWeaponMulti;
+    this->rangeWeaponMulti = data.rangeWeaponMulti;
+}

@@ -14,7 +14,7 @@ struct AttackSaveData {
 
 
 struct EquipmentSaveData {
-    int currentWeapon; // 0 - MELLE 1 - RANGE
+    int currentWeapon; // 0 - MELEE 1 - RANGE
     int meleeWeaponMulti;
     int rangeWeaponMulti;
 };
@@ -85,6 +85,7 @@ struct BarrackSaveData {
     int spawnPeriod;
     int barracksLevel;
     int counter;
+    int barrackIndex;
     struct HealthSaveData barracksHealth;
 };
 
@@ -93,6 +94,7 @@ struct TowerSaveData {
     int attackPeriod;
     int attackCooldown;
     int towerlevel;
+    int towerIndex;
     struct HealthSaveData towerHealth;
     struct SpellSaveData towerSpell;
 };
@@ -113,6 +115,7 @@ struct PlayerSaveData {
     struct HandSaveData playerHand;
     struct HealthSaveData playerHealth;
     struct StatsSaveData playerStats;
+    int playerIndex;
     bool slowed;
 };
 

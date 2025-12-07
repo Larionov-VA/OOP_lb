@@ -80,5 +80,7 @@ SpellSaveData DirectDamageSpell::getSpellSaveData() {
     data.powerOfSpell = this->powerOfSpell;
     data.baseDamage = this->baseDamage;
     data.baseDistance = this->baseDistance;
+    data.trapLevel = 0;
+    data.trapLevel = 0;
     return data;
 }

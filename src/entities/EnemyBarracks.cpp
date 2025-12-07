@@ -57,3 +57,11 @@ BarrackSaveData EnemyBarracks::getBarrackSaveData() {
     data.spawnPeriod = this->spawnPeriod;
     return data;
 }
+
+
+void EnemyBarracks::setBarrackSaveData(BarrackSaveData data) {
+    this->barracksHealth.setHealthSavedata(data.barracksHealth);
+    this->spawnPeriod = data.spawnPeriod;
+    this->barracksLevel = data.barracksLevel;
+    this->counter = data.counter;
+}

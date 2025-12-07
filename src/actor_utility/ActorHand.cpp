@@ -150,3 +150,46 @@ HandSaveData Hand::getHandSavedata() {
     }
     return data;
 }
+
+
+void Hand::setHandSavedata(HandSaveData data) {
+    this->allItems.clear();
+    this->itemInHand = nullptr;
+    this->maxSize = data.maxSize;
+    this->powerUp = data.powerUp;
+    this->allItems = {
+        {false, std::make_shared<AreaDamageSpell>(data.areaSpell)},
+        {false, std::make_shared<DirectDamageSpell>(data.directSpell)},
+        {false, std::make_shared<UpdateSpell>(data.updateSpell)},
+        {false, std::make_shared<TrapSpell>(data.trapSpell)}
+    };
+    restoreActiveItem(data.itemInHand);
+    updateSize();
+}
+
+void Hand::restoreActiveItem(int savedIndex) {
+    if (savedIndex >= 0 && savedIndex < (int)allItems.size() &&
+        allItems[savedIndex].second->getCountOfItem() > 0) {
+        setActiveItem(savedIndex);
+        return;
+    }
+    for (int i = 0; i < (int)allItems.size(); ++i) {
+        if (allItems[i].second->getCountOfItem() > 0) {
+            setActiveItem(i);
+            return;
+        }
+    }
+    if (!allItems.empty()) {
+        setActiveItem(0);
+    }
+}
+
+void Hand::setActiveItem(int index) {
+    for (auto& item : allItems) {
+        item.first = false;
+    }
+    if (index >= 0 && index < (int)allItems.size()) {
+        allItems[index].first = true;
+        itemInHand = allItems[index].second;
+    }
+}

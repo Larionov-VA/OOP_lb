@@ -25,16 +25,18 @@ private:
         InGame,
         LevelUpMenu,
         GameOver,
-        PauseGame,
+        PauseMenu,
         AutorsMenu,
         Exit
     };
     State state = State::MainMenu;
+    State prevState = State::MainMenu;
 
     int mainMenuSelected = 0;
     int levelUpSelected = 0;
     int pauseMenuSelected = 0;
     int gameOverSelected = 0;
+    int loadMenuSelected = 0;
 
     const int frame_ms = 15;
     std::chrono::steady_clock::time_point last_frame_time;
@@ -63,7 +65,8 @@ private:
         std::vector<std::string>& selectedOptions,
         int artColor,
         int selector,
-        bool needHints
+        bool needHints = false,
+        std::string speshializeHint = "Use 'W'&'S' + Enter/E to choose"
     );
 
     void drawGameOverMenu();
@@ -72,7 +75,7 @@ private:
     void drawLevelUpMenu();
     void drawPauseMenu();
     void drawAutorsMenu();
-    void drawLoadMenu();
+    void drawLoadMenu(std::vector<std::string> loadMenuOptions);
 
     void drawLeftPanel(int x, int y, int w, int h);
     void drawFieldPanel(int x, int y, int w, int h);

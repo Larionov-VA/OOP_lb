@@ -18,6 +18,10 @@ public:
         this->powerOfSpell = power;
         this->countOfItem = count;
     }
+    DirectDamageSpell(const SpellSaveData& data) : baseDamage(data.baseDamage),  baseDistance(data.baseDistance) {
+        this->powerOfSpell = data.powerOfSpell;
+        this->countOfItem = data.countOfItem;
+    }
     ~DirectDamageSpell() override = default;
     bool cast(GameContext& ctx, int userIndex, int power) override;
     void setBaseDamage(int newDamage);

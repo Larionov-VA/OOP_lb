@@ -17,5 +17,9 @@ SpellSaveData UpdateSpell::getSpellSaveData() {
     SpellSaveData data;
     data.countOfItem = this->countOfItem;
     data.powerOfSpell = this->powerOfSpell;
+    data.baseDamage = 0;
+    data.baseDistance = 0;
+    data.trapLevel = 0;
+    data.trapDamage = 0;
     return data;
 }

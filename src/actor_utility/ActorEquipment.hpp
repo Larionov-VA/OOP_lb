@@ -12,6 +12,7 @@ public:
     Equipment();
     ~Equipment();
     EquipmentSaveData getEquipmentSavedata();
+    void setEquipmentSavedata(EquipmentSaveData data);
     int getAttackBonus();
     void setMeleeWeapon(int newMulti);
     void setRangeWeapon(int newMulti);

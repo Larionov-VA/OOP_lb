@@ -60,3 +60,9 @@ HealthSaveData Health::getHealthSavedata() {
     data.maxHealth = this->maxHealth;
     return data;
 }
+
+
+void Health::setHealthSavedata(HealthSaveData data) {
+    this->currentHealth = data.currentHealth;
+    this->maxHealth = data.maxHealth;
+}

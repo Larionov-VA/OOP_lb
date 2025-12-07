@@ -13,6 +13,7 @@ public:
     Stats();
     Stats(long long prevLevelUp, long long experience, long long levelUp, int level);
     StatsSaveData getStatsSavedata();
+    void setStatsSavedata(StatsSaveData data);
     void addExperience(int experience);
     int getLevel();
     bool checkAndSwitchLevelIncreased();

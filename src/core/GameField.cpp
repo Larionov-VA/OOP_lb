@@ -716,48 +716,8 @@ std::vector<wchar_t> GameField::show() {
 }
 
 
-int GameField::getFieldWidth() {
-    return this->widthField;
-}
-
-
-int GameField::getFieldHeight() {
-    return this->heightField;
-}
-
-
-int GameField::getGameLevel() {
-    return this->gameLevel;
-}
-
-
-int GameField::getGameTurn() {
-    return this->gameTurn;
-}
-
-
-void GameField::setFieldWidth(int newFieldWidth) {
-    this->widthField = newFieldWidth;
-}
-
-
-void GameField::setFieldHeight(int newFieldHeight) {
-    this->heightField = newFieldHeight;
-}
-
-
-void GameField::setGameLevel(int newGameLevel) {
-    this->gameLevel = newGameLevel;
-}
-
-
-void GameField::setGameTurn(int newGameTurn) {
-    this->gameTurn = newGameTurn;
-}
-
-
 FieldSaveData GameField::getFieldSaveData() {
-    FieldSaveData data;
+    FieldSaveData data{};
     EntitySaveData entityData = entityManager.getEntitySaveData();
     std::vector<struct CellSaveData> cellsData;
     for (auto& cell : cells) {
@@ -775,5 +735,13 @@ FieldSaveData GameField::getFieldSaveData() {
 
 
 void GameField::setFieldSaveData(FieldSaveData data) {
-    (void)data;
+    this->widthField = data.widthField;
+    this->heightField = data.heightField;
+    this->gameLevel = data.gameLevel;
+    this->gameTurn = data.gameTurn;
+    entityManager.setEntitySaveData(data.entityData);
+    cells.reserve(this->widthField * this->heightField);
+    for (int i = 0; i < (int)cells.size(); ++i) {
+        cells[i].setCellSaveData(data.cellsData[i]);
+    }
 }

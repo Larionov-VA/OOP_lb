@@ -64,4 +64,5 @@ public:
     std::pair<int, int> getHandSize();
     char returnEntitySymbol() override;
     PlayerSaveData getPlayerSaveData();
+    void setPlayerSaveData(PlayerSaveData data);
 };

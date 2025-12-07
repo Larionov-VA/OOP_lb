@@ -41,6 +41,8 @@ SpellSaveData TrapSpell::getSpellSaveData() {
     SpellSaveData data;
     data.countOfItem = this->countOfItem;
     data.powerOfSpell = this->powerOfSpell;
+    data.baseDamage = 0;
+    data.baseDistance = 0;
     data.trapDamage = this->trapDamage;
     data.trapLevel = this->trapLevel;
     return data;

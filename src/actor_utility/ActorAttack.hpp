@@ -7,6 +7,7 @@ private:
     int attack;
 public:
     AttackSaveData getAttackSavedata();
+    void setAttackSaveData(AttackSaveData data);
     void setAttack(int attack);
     int getAttack() const;
     Attack();

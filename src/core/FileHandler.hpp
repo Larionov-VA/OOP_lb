@@ -11,6 +11,5 @@ public:
     ~FileHandler();
     void write(const std::string& string);
     std::string read();
-private:
     std::fstream& stream();
 };

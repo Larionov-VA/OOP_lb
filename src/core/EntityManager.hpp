@@ -18,6 +18,7 @@ private:
 public:
     EntityManager(){};
     EntitySaveData getEntitySaveData();
+    void setEntitySaveData(EntitySaveData data);
     Entity* operator[](int index);
     const Entity* operator[](int index) const;
     void createEntity(std::unique_ptr<Entity> entity, int index);

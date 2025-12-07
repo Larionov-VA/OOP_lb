@@ -1,4 +1,7 @@
 #include "CellState.hpp"
+#include "states/TrapEffect.hpp"
+#include "states/DecelerationEffect.hpp"
+
 
 CellState::CellState() : CellState(nullptr, nullptr) {};
 
@@ -63,7 +66,7 @@ void CellState::setTemporaryState(std::shared_ptr<IState> temporaryState) {
 
 
 CellStateSaveData CellState::getStateCellSaveData() {
-    CellStateSaveData data;
+    CellStateSaveData data{};
     data.avaible = avaible;
     data.haveTempState = (bool)this->temporaryState ? 1 : 0;
     data.haveConstState = (bool)this->constState ? 1 : 0;
@@ -74,4 +77,26 @@ CellStateSaveData CellState::getStateCellSaveData() {
         data.constState = constState->getStateSaveData();
     }
     return data;
+}
+
+
+void CellState::setStateCellSaveData(CellStateSaveData data) {
+    this->constState = nullptr;
+    this->temporaryState = nullptr;
+    this->avaible = data.avaible;
+    if (data.haveConstState) {
+        if (data.constState.damage) {
+            this->constState = std::make_shared<TrapEffect>(
+                data.constState.stateSymbol,
+                data.constState.damage,
+                data.constState.durationOfState
+            );
+        }
+        else {
+            this->constState = std::make_shared<DecelerationEffect>(
+                data.constState.durationOfState,
+                data.constState.stateSymbol
+            );
+        }
+    }
 }

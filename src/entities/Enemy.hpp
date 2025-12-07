@@ -28,4 +28,5 @@ public:
     bool alive() const override;
     char returnEntitySymbol() override;
     EnemySaveData getEnemySaveData();
+    void setEnemySaveData(EnemySaveData data);
 };

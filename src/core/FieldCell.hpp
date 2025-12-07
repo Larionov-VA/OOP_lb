@@ -23,6 +23,8 @@ public:
     int getIndex() const;
     char getCellSymbol();
     CellSaveData getCellSaveData();
+
+    void setCellSaveData(CellSaveData data);
     void setIndex(int index);
     float getDistance(const FieldCell& oth) const;
     std::pair<int, int> getCoord() const;

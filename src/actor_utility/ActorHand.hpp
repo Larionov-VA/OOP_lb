@@ -18,6 +18,7 @@ public:
     Hand(int sizeOfHand);
     Hand();
     HandSaveData getHandSavedata();
+    void setHandSavedata(HandSaveData data);
     void updateSize();
     bool useItem(GameContext &ctx, int userIndex, int powerUp);
     void swapItem(int indexInHand);
@@ -32,4 +33,6 @@ public:
 private:
     void setRandomSpell();
     void setAvailableSpells();
+    void restoreActiveItem(int savedIndex);
+    void setActiveItem(int index);
 };

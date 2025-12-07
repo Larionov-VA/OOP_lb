@@ -73,3 +73,13 @@ TowerSaveData EnemyTower::getTowerSaveData() {
     data.towerlevel = this->towerlevel;
     return data;
 }
+
+
+void EnemyTower::setTowerSaveData(TowerSaveData data) {
+    this->attackCooldown = data.attackCooldown;
+    this->attackPeriod = data.attackPeriod;
+    this->towerlevel = data.towerlevel;
+    this->towerHealth.setHealthSavedata(data.towerHealth);
+    this->towerSpell.setBaseDamage(data.towerSpell.baseDamage);
+    this->towerSpell.setBaseDistance(data.towerSpell.baseDistance);
+ }

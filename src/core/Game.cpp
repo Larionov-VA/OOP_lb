@@ -98,27 +98,48 @@ void Game::setGameID(int newGameID) {
     this->gameID = newGameID;
 }
 
+
 SaveData Game::collectGameData() {
     SaveData data;
-    FieldSaveData fieldData = field->getFieldSaveData();
-    data.fieldData = fieldData;
     data.gameID = this->gameID;
+    if (field) {
+        FieldSaveData fieldData = field->getFieldSaveData();
+        data.fieldData = fieldData;
+    }
+    else {
+        data.fieldData = FieldSaveData{};
+    }
     return data;
 }
+
 
 void Game::saveGame(std::string saveName) {
     SaveData data = collectGameData();
     savesManager.newSave(data, saveName);
 }
 
-bool Game::loadGame() {
-    std::vector<std::string> saveList = savesManager.getSavesList();
-    for (auto& save : saveList) {
-        std::cout << save << '\n';
-    }
-    return false;
+
+void Game::setGameData(SaveData& data) {
+    this->gameID = data.gameID;
+    this->field->setFieldSaveData(data.fieldData);
 }
 
-std::vector<std::string> Game::getSavesList() {
-    return savesManager.getSavesList();
+
+bool Game::loadGame(std::string saveName) {
+    try {
+        if (!this->field) {
+            startNewGame();
+        }
+        SaveData data = savesManager.getLoadGameData(saveName);
+        setGameData(data);
+        return true;
+    }
+    catch(...) {
+        return false;
+    }
+}
+
+
+std::vector<std::string> Game::getSavesList(int start, int end) {
+    return savesManager.getSavesList(start, end);
 }

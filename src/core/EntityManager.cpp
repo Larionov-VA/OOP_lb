@@ -78,20 +78,79 @@ const std::unordered_map<int, std::unique_ptr<Entity>>& EntityManager::returnInf
 
 EntitySaveData EntityManager::getEntitySaveData() {
     EntitySaveData data;
-    std::vector<int> enemyIndexes = getIndexesWithEntity(Entity::entityType::ENEMY);
-    for (int index : enemyIndexes) {
-        EnemySaveData enemyData = dynamic_cast<Enemy*>((Entity*)getEntity(index))->getEnemySaveData();
-        enemyData.enemyIndex = index;
-        data.enemyData.push_back(enemyData);
+
+    for (int index : getIndexesWithEntity(Entity::entityType::ENEMY)) {
+        if (auto* enemy = dynamic_cast<Enemy*>(getEntity(index))) {
+            EnemySaveData enemyData = enemy->getEnemySaveData();
+            enemyData.enemyIndex = index;
+            data.enemyData.push_back(enemyData);
+        }
     }
-    int playerIndex = getIndexesWithEntity(Entity::entityType::PLAYER)[0];
-    PlayerSaveData playerData = dynamic_cast<Player*>((Entity*)getEntity(playerIndex))->getPlayerSaveData();
-    data.playerData = playerData;
-    int towerIndex = getIndexesWithEntity(Entity::entityType::TOWER)[0];
-    TowerSaveData towerData = dynamic_cast<EnemyTower*>((Entity*)getEntity(towerIndex))->getTowerSaveData();
-    data.towerData = towerData;
-    int barrackIndexes = getIndexesWithEntity(Entity::entityType::BARRACKS)[0];
-    BarrackSaveData barrackData = dynamic_cast<EnemyBarracks*>((Entity*)getEntity(barrackIndexes))->getBarrackSaveData();
-    data.barrackData = barrackData;
+
+    auto players = getIndexesWithEntity(Entity::entityType::PLAYER);
+    if (!players.empty()) {
+        int index = players[0];
+        if (auto* player = dynamic_cast<Player*>(getEntity(index))) {
+            data.playerData = player->getPlayerSaveData();
+            data.playerData.playerIndex = index;
+        }
+    }
+    else {
+        data.playerData.playerIndex = -1;
+    }
+
+    auto towers = getIndexesWithEntity(Entity::entityType::TOWER);
+    if (!towers.empty()) {
+        int index = towers[0];
+        if (auto* tower = dynamic_cast<EnemyTower*>(getEntity(index))) {
+            data.towerData = tower->getTowerSaveData();
+            data.towerData.towerIndex = index;
+        }
+    }
+    else {
+        data.towerData.towerIndex = -1;
+    }
+
+    auto barracks = getIndexesWithEntity(Entity::entityType::BARRACKS);
+    if (!barracks.empty()) {
+        int index = barracks[0];
+        if (auto* bar = dynamic_cast<EnemyBarracks*>(getEntity(index))) {
+            data.barrackData = bar->getBarrackSaveData();
+            data.barrackData.barrackIndex = index;
+        }
+    }
+    else {
+        data.barrackData.barrackIndex = -1;
+    }
+
     return data;
 }
+
+
+void EntityManager::setEntitySaveData(EntitySaveData data) {
+    infoMap.clear();
+    for (const auto& enemyData : data.enemyData) {
+        auto enemy = std::make_unique<Enemy>();
+        enemy->setEnemySaveData(enemyData);
+        if (enemyData.enemyIndex >= 0) {
+            if (getEntity(enemyData.enemyIndex) == nullptr) {
+                createEntity(std::move(enemy), enemyData.enemyIndex);
+            }
+        }
+    }
+    auto player = std::make_unique<Player>();
+    player->setPlayerSaveData(data.playerData);
+    if (data.playerData.playerIndex >= 0) {
+        createEntity(std::move(player), data.playerData.playerIndex);
+    }
+    auto tower = std::make_unique<EnemyTower>();
+    tower->setTowerSaveData(data.towerData);
+    if (data.towerData.towerIndex >= 0) {
+        createEntity(std::move(tower), data.towerData.towerIndex);
+    }
+    auto barrack = std::make_unique<EnemyBarracks>();
+    barrack->setBarrackSaveData(data.barrackData);
+    if (data.barrackData.barrackIndex >= 0) {
+        createEntity(std::move(barrack), data.barrackData.barrackIndex);
+    }
+    }

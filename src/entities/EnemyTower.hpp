@@ -29,4 +29,5 @@ public:
     int getInt() override;
     char returnEntitySymbol() override;
     TowerSaveData getTowerSaveData();
+    void setTowerSaveData(TowerSaveData data);
 };

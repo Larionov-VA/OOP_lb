@@ -28,3 +28,7 @@ AttackSaveData Attack::getAttackSavedata() {
     data.attack = this->attack;
     return data;
 }
+
+void Attack::setAttackSaveData(AttackSaveData data) {
+    this->attack = data.attack;
+}

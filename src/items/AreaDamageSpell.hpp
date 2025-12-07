@@ -18,6 +18,10 @@ public:
         this->powerOfSpell = power;
         this->countOfItem = count;
     }
+    AreaDamageSpell(const SpellSaveData& data) : baseDamage(data.baseDamage), baseDistance(data.baseDistance) {
+        this->powerOfSpell = data.powerOfSpell;
+        this->countOfItem = data.countOfItem;
+    }
     ~AreaDamageSpell() override = default;
     bool cast(GameContext& ctx, int userIndex, int power) override;
     SpellSaveData getSpellSaveData();

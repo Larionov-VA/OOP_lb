@@ -54,3 +54,12 @@ StatsSaveData Stats::getStatsSavedata() {
     data.prevLevelUpExperience = this->prevLevelUpExperience;
     return data;
 }
+
+
+void Stats::setStatsSavedata(StatsSaveData data) {
+    this->currentExperience = data.currentExperience;
+    this->level = data.level;
+    this->levelIncreased = data.levelIncreased;
+    this->levelUpExperience = data.levelUpExperience;
+    this->prevLevelUpExperience = data.prevLevelUpExperience;
+}

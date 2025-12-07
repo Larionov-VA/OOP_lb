@@ -26,4 +26,5 @@ public:
     int getLevel() override;
     char returnEntitySymbol() override;
     BarrackSaveData getBarrackSaveData();
+    void setBarrackSaveData(BarrackSaveData data);
 };

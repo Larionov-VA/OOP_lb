@@ -11,6 +11,7 @@ public:
     Health(int health);
     ~Health();
     HealthSaveData getHealthSavedata();
+    void setHealthSavedata(HealthSaveData data);
     void regenerate(int amount);
     void reduseCurrentHealth(int damage);
     void restoreHealth();

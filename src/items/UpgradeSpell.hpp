@@ -10,6 +10,10 @@ private:
 public:
     bool cast(GameContext& ctx, int userIndex, int power);
     UpdateSpell() {};
+    UpdateSpell(const SpellSaveData& data) {
+        this->powerOfSpell = data.powerOfSpell;
+        this->countOfItem = data.countOfItem;
+    }
     ~UpdateSpell() {};
     SpellSaveData getSpellSaveData();
 };

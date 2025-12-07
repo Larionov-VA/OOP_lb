@@ -20,4 +20,5 @@ public:
     int getStateDamage() const;
 
     CellStateSaveData getStateCellSaveData();
+    void setStateCellSaveData(CellStateSaveData data);
 };

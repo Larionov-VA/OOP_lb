@@ -45,3 +45,10 @@ EnemySaveData Enemy::getEnemySaveData() {
     data.enemyLevel = this->enemyLevel;
     return data;
 }
+
+
+void Enemy::setEnemySaveData(EnemySaveData data) {
+    this->enemyAttack.setAttackSaveData(data.enemyAttack);
+    this->enemyHealth.setHealthSavedata(data.enemyHealth);
+    this->enemyLevel = data.enemyLevel;
+}

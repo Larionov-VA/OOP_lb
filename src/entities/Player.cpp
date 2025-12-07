@@ -127,17 +127,21 @@ std::vector<long long> Player::getExperience() {
     return playerStats.getExperience();
 }
 
+
 int Player::getLevel() {
     return playerStats.getLevel();
 }
+
 
 bool Player::isLevelIncreased() {
     return playerStats.checkAndSwitchLevelIncreased();
 }
 
+
 void Player::addExperience(int exp) {
     playerStats.addExperience(exp);
 }
+
 
 void Player::addSpells(int indexInHand, int count) {
     playerHand.addSpells(indexInHand, count);
@@ -148,10 +152,12 @@ void Player::useItem(GameContext &ctx, int userIndex, int power) {
     playerHand.useItem(ctx, userIndex, power);
 }
 
+
 void Player::regenerateLife(float procrecoveryPercentage) {
     int currentMaxHealth = playerHealth.getMaxHealth();
     playerHealth.regenerate(currentMaxHealth * procrecoveryPercentage);
 }
+
 
 void Player::swapItemInHand(int itemIndexInHand) {
     playerHand.swapItem(itemIndexInHand);
@@ -161,13 +167,16 @@ std::vector<std::pair<bool, int>> Player::getHandItems() {
     return playerHand.getHandData();
 }
 
+
 std::pair<int, int> Player::getHandSize() {
     return {playerHand.getCurrentHandSize(), playerHand.getMaxHandSize()};
 }
 
+
 char Player::returnEntitySymbol() {
     return 'P';
 }
+
 
 PlayerSaveData Player::getPlayerSaveData() {
     PlayerSaveData data;
@@ -179,4 +188,15 @@ PlayerSaveData Player::getPlayerSaveData() {
     data.playerStats = this->playerStats.getStatsSavedata();
     data.slowed = (int)this->slowed;
     return data;
+}
+
+
+void Player::setPlayerSaveData(PlayerSaveData data) {
+    this->playerAttack.setAttackSaveData(data.playerAttack);
+    this->playerAttributes.setAttributesSavedata(data.playerAttributes);
+    this->playerEquipment.setEquipmentSavedata(data.playerEquipment);
+    this->playerHand.setHandSavedata(data.playerHand);
+    this->playerHealth.setHealthSavedata(data.playerHealth);
+    this->playerStats.setStatsSavedata(data.playerStats);
+    this->slowed = data.slowed;
 }
