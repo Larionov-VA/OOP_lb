@@ -50,14 +50,22 @@ void DirectDamageSpell::animateCast(GameContext& ctx, int target) {
     int downIndex = target + GlobalGameConfig::fieldWidth;
     int leftIndex = target - 1;
     int rightIndex = target + 1;
-    std::shared_ptr<IState> upCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
-    ctx.cells[upIndex].returnCellState().setTemporaryState(move(upCastEffect));
-    std::shared_ptr<IState> downCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
-    ctx.cells[downIndex].returnCellState().setTemporaryState(move(downCastEffect));
-    std::shared_ptr<IState> leftCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
-    ctx.cells[leftIndex].returnCellState().setTemporaryState(move(leftCastEffect));
-    std::shared_ptr<IState> rightCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
-    ctx.cells[rightIndex].returnCellState().setTemporaryState(move(rightCastEffect));
+    if (upIndex >= 0) {
+        std::shared_ptr<IState> upCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
+        ctx.cells[upIndex].returnCellState().setTemporaryState(move(upCastEffect));
+    }
+    if (downIndex < GlobalGameConfig::fieldWidth * GlobalGameConfig::fieldHeight) {
+        std::shared_ptr<IState> downCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
+        ctx.cells[downIndex].returnCellState().setTemporaryState(move(downCastEffect));
+    }
+    if (leftIndex >= 0) {
+        std::shared_ptr<IState> leftCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
+        ctx.cells[leftIndex].returnCellState().setTemporaryState(move(leftCastEffect));
+    }
+    if (rightIndex < GlobalGameConfig::fieldWidth * GlobalGameConfig::fieldHeight) {
+        std::shared_ptr<IState> rightCastEffect = std::make_shared<AttackEffect>('&', 0, 4);
+        ctx.cells[rightIndex].returnCellState().setTemporaryState(move(rightCastEffect));
+    }
 }
 
 

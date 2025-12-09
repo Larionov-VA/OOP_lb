@@ -207,6 +207,7 @@ void NCURSESVisualizer::loopGameOverMenu() {
                         state = State::MainMenu;
                     }
                 }
+                gameOverSelected = 0;
                 break;
             default:
                 break;
@@ -268,6 +269,7 @@ void NCURSESVisualizer::loopMainMenu() {
                 } else if (mainMenuSelected == 3) {
                     state = State::Exit;
                 }
+                mainMenuSelected = 0;
                 break;
             default:
                 break;
@@ -328,6 +330,7 @@ void NCURSESVisualizer::loopLevelUp() {
                     gameController->playerLevelUp(choice);
                 }
                 state = State::InGame;
+                levelUpSelected = 0;
                 break;
         }
     }
@@ -624,9 +627,11 @@ void NCURSESVisualizer::loopPauseMenu() {
                         state = State::MainMenu;
                     }
                 }
+                pauseMenuSelected = 0;
                 break;
             case '\e':
                 state = State::InGame;
+                pauseMenuSelected = 0;
             default:
                 break;
         }
@@ -715,10 +720,12 @@ void NCURSESVisualizer::loopLoadMenu() {
     static std::vector<std::string> loadMenuOptions;
     static bool firstCall = true;
     if (firstCall) {
-        loadMenuOptions = gameController->getSavesList(startList, endList);
         firstCall = false;
     }
-
+    loadMenuOptions = gameController->getSavesList(startList, endList);
+    for (auto& str : loadMenuOptions) {
+        str = str.substr(std::min(9, (int)str.length()));
+    }
     drawLoadMenu(loadMenuOptions);
     int input = fetchInput();
 
@@ -754,12 +761,22 @@ void NCURSESVisualizer::loopLoadMenu() {
             case '\n': case 'e': case KEY_ENTER:
                 if (gameController && !loadMenuOptions.empty()) {
                     std::string selectedSave = loadMenuOptions[loadMenuSelected];
-                    gameController->loadGame(selectedSave);
-                    startList = 0;
-                    endList = PAGE_SIZE;
-                    loadMenuSelected = 0;
-                    firstCall = true;
-                    state = State::InGame;
+                    try {
+                        if (gameController->loadGame(selectedSave)) {
+                            startList = 0;
+                            endList = PAGE_SIZE;
+                            loadMenuSelected = 0;
+                            firstCall = true;
+                            state = State::InGame;
+                            errMessage = "";
+                        }
+                        else {
+                            errMessage = "failed to load save";
+                        }
+                    }
+                    catch(const std::exception& e) {
+                        errMessage = e.what();
+                    }
                 }
                 break;
 
@@ -799,5 +816,5 @@ void NCURSESVisualizer::drawLoadMenu(std::vector<std::string> loadMenuOptions) {
         L" |___|                                              |___| ",
         L"(_____)--------------------------------------------(_____)",
     };
-    drawPatternSelectedMenu(loadMenuArt, loadMenuOptions, 5, loadMenuSelected);
+    drawPatternSelectedMenu(loadMenuArt, loadMenuOptions, 5, loadMenuSelected, true, errMessage);
 }

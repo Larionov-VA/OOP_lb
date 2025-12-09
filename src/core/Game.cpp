@@ -44,6 +44,7 @@ void Game::playerLevelUp(char attribute) {
 
 
 bool Game::performAnAction(char playerAction) {
+    if (!this->field) return false;
     if (!this->field->playerAlive()) {
         GlobalGameConfig::gameLevel = 1;
         return false;
@@ -125,15 +126,21 @@ void Game::saveGame(std::string saveName) {
 
 void Game::setGameData(SaveData& data) {
     this->gameID = data.gameID;
-    this->field->setFieldSaveData(data.fieldData);
+    if (this->field) {
+        this->field->setFieldSaveData(data.fieldData);
+    }
+    else {
+        throw std::runtime_error("Saving field error");
+    }
+
 }
 
 
 bool Game::loadGame(std::string saveName) {
     try {
         std::unique_ptr<Entity> player = std::make_unique<Player>();
-        deleteField();
         SaveData data = savesManager.getLoadGameData(saveName);
+        deleteField();
         GlobalGameConfig::fieldWidth = data.fieldData.widthField;
         GlobalGameConfig::fieldHeight = data.fieldData.heightField;
         this->field = new GameField(
@@ -145,7 +152,8 @@ bool Game::loadGame(std::string saveName) {
         setGameData(data);
         return true;
     }
-    catch(...) {
+    catch(const std::exception& e) {
+        throw;
         return false;
     }
 }

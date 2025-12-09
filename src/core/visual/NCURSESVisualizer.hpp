@@ -44,6 +44,8 @@ private:
     InputController* inputController = nullptr;
     IGameController* gameController = nullptr;
 
+    std::string errMessage{""};
+
     int term_w = 0;
     int term_h = 0;
 

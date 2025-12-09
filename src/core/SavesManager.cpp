@@ -19,6 +19,26 @@ static int safe_stoi(const std::string& s) {
 }
 
 
+std::string SavesManager::xorEncryptDecrypt(const std::string& text, const std::string& key) {
+    std::string result = text;
+    size_t key_len = key.length();
+    for (size_t i = 0; i < text.length(); ++i) {
+        result[i] = text[i] ^ key[i % key_len];
+    }
+    return result;
+}
+
+
+std::size_t SavesManager::getHash(const std::string& text) {
+    return std::hash<std::string>{}(text);
+}
+
+
+bool SavesManager::isSaveCorrect(const std::string& text, std::string hash) {
+    return std::to_string(getHash(text)) == hash;
+}
+
+
 std::string SavesManager::getCorrectSaveName(std::string saveName) {
     std::vector<std::string> savesList = getSavesList(0, -1);
 
@@ -118,54 +138,55 @@ std::string SavesManager::serializeData(SaveData& data) {
     HealthSaveData barrackHealthSaveData = barrackSaveData.barracksHealth;
     TowerSaveData towerSaveData = entitySaveData.towerData;
     HealthSaveData towerHealthSaveData = towerSaveData.towerHealth;
-    std::string stringData(
-            std::to_string(std::time(0)) + '\n' +
-            std::to_string(saveData.gameID) + '\n' +
-            std::to_string(fieldSaveData.widthField) + '\n' +
-            std::to_string(fieldSaveData.heightField) + '\n' +
-            std::to_string(fieldSaveData.gameLevel) + '\n' +
-            std::to_string(fieldSaveData.gameTurn) + '\n' +
-            std::to_string(playerAttackSaveData.attack) + '\n' +
-            std::to_string(playerAttributesSaveData.intelligence) + '\n' +
-            std::to_string(playerAttributesSaveData.dexterity) + '\n' +
-            std::to_string(playerAttributesSaveData.strength) + '\n' +
-            std::to_string(playerEquipmentSaveData.currentWeapon) + '\n' +
-            std::to_string(playerEquipmentSaveData.meleeWeaponMulti) + '\n' +
-            std::to_string(playerEquipmentSaveData.rangeWeaponMulti) + '\n' +
-            std::to_string(playerHandSaveData.itemInHand) + '\n' +
-            std::to_string(playerHandSaveData.powerUp) + '\n' +
-            std::to_string(playerHandSaveData.maxSize) + '\n' +
-            std::to_string(playerHandSaveData.currentSize) + '\n' +
-            getStringFromSpellSaveData(playerHandSaveData.areaSpell) +
-            getStringFromSpellSaveData(playerHandSaveData.directSpell) +
-            getStringFromSpellSaveData(playerHandSaveData.updateSpell) +
-            getStringFromSpellSaveData(playerHandSaveData.trapSpell) +
-            std::to_string(playerHealthSaveData.currentHealth) + '\n' +
-            std::to_string(playerHealthSaveData.maxHealth) + '\n' +
-            std::to_string(playerStatsSaveData.prevLevelUpExperience) + '\n' +
-            std::to_string(playerStatsSaveData.currentExperience) + '\n' +
-            std::to_string(playerStatsSaveData.levelUpExperience) + '\n' +
-            std::to_string(playerStatsSaveData.level) + '\n' +
-            std::to_string(playerStatsSaveData.levelIncreased) + '\n' +
-            std::to_string(playerSaveData.slowed) + '\n' +
-            std::to_string(playerSaveData.playerIndex) + '\n' +
-            getStringFromEnemySaveData(entitySaveData.enemyData) +
-            std::to_string(barrackSaveData.spawnPeriod) + '\n' +
-            std::to_string(barrackSaveData.barracksLevel) + '\n' +
-            std::to_string(barrackSaveData.counter) + '\n' +
-            std::to_string(barrackHealthSaveData.currentHealth) + '\n' +
-            std::to_string(barrackHealthSaveData.maxHealth) + '\n' +
-            std::to_string(barrackSaveData.barrackIndex) + '\n' +
-            std::to_string(towerSaveData.attackPeriod) + '\n' +
-            std::to_string(towerSaveData.attackCooldown) + '\n' +
-            std::to_string(towerSaveData.towerlevel) + '\n' +
-            std::to_string(towerHealthSaveData.currentHealth) + '\n' +
-            std::to_string(towerHealthSaveData.maxHealth) + '\n' +
-            std::to_string(towerSaveData.towerIndex) + '\n' +
-            getStringFromSpellSaveData(towerSaveData.towerSpell) +
-            getStringFromCellsSaveData(fieldSaveData.cellsData)
+    std::string timestampData(std::to_string(std::time(0)) + '\n');
+    std::string strindSaveData(
+        std::to_string(saveData.gameID) + '\n' +
+        std::to_string(fieldSaveData.widthField) + '\n' +
+        std::to_string(fieldSaveData.heightField) + '\n' +
+        std::to_string(fieldSaveData.gameLevel) + '\n' +
+        std::to_string(fieldSaveData.gameTurn) + '\n' +
+        std::to_string(playerAttackSaveData.attack) + '\n' +
+        std::to_string(playerAttributesSaveData.intelligence) + '\n' +
+        std::to_string(playerAttributesSaveData.dexterity) + '\n' +
+        std::to_string(playerAttributesSaveData.strength) + '\n' +
+        std::to_string(playerEquipmentSaveData.currentWeapon) + '\n' +
+        std::to_string(playerEquipmentSaveData.meleeWeaponMulti) + '\n' +
+        std::to_string(playerEquipmentSaveData.rangeWeaponMulti) + '\n' +
+        std::to_string(playerHandSaveData.itemInHand) + '\n' +
+        std::to_string(playerHandSaveData.powerUp) + '\n' +
+        std::to_string(playerHandSaveData.maxSize) + '\n' +
+        std::to_string(playerHandSaveData.currentSize) + '\n' +
+        getStringFromSpellSaveData(playerHandSaveData.areaSpell) +
+        getStringFromSpellSaveData(playerHandSaveData.directSpell) +
+        getStringFromSpellSaveData(playerHandSaveData.updateSpell) +
+        getStringFromSpellSaveData(playerHandSaveData.trapSpell) +
+        std::to_string(playerHealthSaveData.currentHealth) + '\n' +
+        std::to_string(playerHealthSaveData.maxHealth) + '\n' +
+        std::to_string(playerStatsSaveData.prevLevelUpExperience) + '\n' +
+        std::to_string(playerStatsSaveData.currentExperience) + '\n' +
+        std::to_string(playerStatsSaveData.levelUpExperience) + '\n' +
+        std::to_string(playerStatsSaveData.level) + '\n' +
+        std::to_string(playerStatsSaveData.levelIncreased) + '\n' +
+        std::to_string(playerSaveData.slowed) + '\n' +
+        std::to_string(playerSaveData.playerIndex) + '\n' +
+        getStringFromEnemySaveData(entitySaveData.enemyData) +
+        std::to_string(barrackSaveData.spawnPeriod) + '\n' +
+        std::to_string(barrackSaveData.barracksLevel) + '\n' +
+        std::to_string(barrackSaveData.counter) + '\n' +
+        std::to_string(barrackHealthSaveData.currentHealth) + '\n' +
+        std::to_string(barrackHealthSaveData.maxHealth) + '\n' +
+        std::to_string(barrackSaveData.barrackIndex) + '\n' +
+        std::to_string(towerSaveData.attackPeriod) + '\n' +
+        std::to_string(towerSaveData.attackCooldown) + '\n' +
+        std::to_string(towerSaveData.towerlevel) + '\n' +
+        std::to_string(towerHealthSaveData.currentHealth) + '\n' +
+        std::to_string(towerHealthSaveData.maxHealth) + '\n' +
+        std::to_string(towerSaveData.towerIndex) + '\n' +
+        getStringFromSpellSaveData(towerSaveData.towerSpell) +
+        getStringFromCellsSaveData(fieldSaveData.cellsData)
     );
-    return stringData;
+    std::string hashSaveData(std::to_string(getHash(strindSaveData)) + '\n');
+    return timestampData + hashSaveData + xorEncryptDecrypt(strindSaveData, XORENCDECKEY);
 }
 
 
@@ -173,7 +194,7 @@ void SavesManager::newSave(SaveData& data, std::string saveName) {
     try {
         std::string fullSavePath(SAVEPATH + saveName);
         std::string correctSaveName = getCorrectSaveName(fullSavePath);
-        FileHandler file(correctSaveName, std::ios::out);
+        FileHandler file(correctSaveName, std::ios::out | std::ios::binary);
         file.write(serializeData(data));
     } catch(...) {
 
@@ -328,27 +349,38 @@ SaveData SavesManager::deserializeData(std::string& serializedData) {
     return saveData;
 }
 
-
 SaveData SavesManager::getLoadGameData(std::string saveName) {
     try {
         std::string fullSavePath = SAVEPATH + saveName;
-        FileHandler file(fullSavePath, std::ios::in);
+        FileHandler file(fullSavePath, std::ios::in | std::ios::binary);
         std::istream& is = file.stream();
         if (!is) {
-            return SaveData();
+            throw std::runtime_error("Failed to open file");
         }
-        std::string serializedData((std::istreambuf_iterator<char>(is)),
-                                   std::istreambuf_iterator<char>());
+        std::string serializedData((std::istreambuf_iterator<char>(is)), std::istreambuf_iterator<char>());
 
-        if (serializedData.empty()) return SaveData();
-
-        size_t pos = serializedData.find('\n');
-        if (pos != std::string::npos) {
-            serializedData = serializedData.substr(pos + 1);
+        if (serializedData.empty()) {
+            throw std::runtime_error("Saving contains no data");
         }
-        return deserializeData(serializedData);
-    } catch(...) {
-        return SaveData();
+
+        std::stringstream ss(serializedData);
+        std::string timestamp, hash, encryptedData;
+
+        if (!std::getline(ss, timestamp)) {
+            throw std::runtime_error("Missing timestamp");
+        }
+        if (!std::getline(ss, hash)) {
+            throw std::runtime_error("Missing hash");
+        }
+        encryptedData.assign(std::istreambuf_iterator<char>(ss), std::istreambuf_iterator<char>());
+        std::string decryptedData = xorEncryptDecrypt(encryptedData, XORENCDECKEY);
+        if (!isSaveCorrect(decryptedData, hash)) {
+            throw std::runtime_error("The file is damaged (hash mismatch)");
+        }
+        return deserializeData(decryptedData);
+    }
+    catch(const std::exception& e) {
+        throw;
     }
 }
 
