@@ -30,6 +30,7 @@ public:
     void incPowerOfSpell();
     void addSpells(int indexInHand, int count);
     std::pair<int, int> getHandItemDamageAndDistance();
+    void deleteHalfSpells();
 private:
     void setRandomSpell();
     void setAvailableSpells();

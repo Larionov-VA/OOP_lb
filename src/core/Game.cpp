@@ -25,6 +25,7 @@ void Game::startNewGame() {
 void Game::nextLevel() {
     std::unique_ptr<Entity> player = field->returnPlayer();
     player->regenerateLife(1.0);
+    player->goToTheNextLevel();
     GlobalGameConfig::gameLevel++;
     deleteField();
     GlobalGameConfig::fieldWidth = 10 + rand() % 16;

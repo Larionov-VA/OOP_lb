@@ -193,3 +193,13 @@ void Hand::setActiveItem(int index) {
         itemInHand = allItems[index].second;
     }
 }
+
+
+void Hand::deleteHalfSpells() {
+    for (auto& [inHand, spell] : allItems) {
+        if (spell) {
+            int countOfSpell = spell->getCountOfItem();
+            spell->setCountOfItem(countOfSpell/2);
+        }
+    }
+}

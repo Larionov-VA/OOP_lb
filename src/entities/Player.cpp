@@ -200,3 +200,9 @@ void Player::setPlayerSaveData(PlayerSaveData data) {
     this->playerStats.setStatsSavedata(data.playerStats);
     this->slowed = data.slowed;
 }
+
+
+void Player::goToTheNextLevel() {
+    regenerateLife(1.0f);
+    playerHand.deleteHalfSpells();
+}

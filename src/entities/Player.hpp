@@ -65,4 +65,5 @@ public:
     char returnEntitySymbol() override;
     PlayerSaveData getPlayerSaveData();
     void setPlayerSaveData(PlayerSaveData data);
+    void goToTheNextLevel() override;
 };
