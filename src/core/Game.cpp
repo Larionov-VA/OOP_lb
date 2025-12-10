@@ -10,8 +10,8 @@ Game::~Game() {
 
 void Game::startNewGame() {
     std::unique_ptr<Entity> player = std::make_unique<Player>();
-    GlobalGameConfig::fieldWidth = 10 + rand() % 16;
-    GlobalGameConfig::fieldHeight = 10 + rand() % 16;
+    GlobalGameConfig::fieldWidth = 30 + rand() % 21;
+    GlobalGameConfig::fieldHeight = 30 + rand() % 21;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,
@@ -28,8 +28,8 @@ void Game::nextLevel() {
     player->goToTheNextLevel();
     GlobalGameConfig::gameLevel++;
     deleteField();
-    GlobalGameConfig::fieldWidth = 10 + rand() % 16;
-    GlobalGameConfig::fieldHeight = 10 + rand() % 16;
+    GlobalGameConfig::fieldWidth = 30 + rand() % 21;
+    GlobalGameConfig::fieldHeight = 30 + rand() % 21;
     this->field = new GameField(
         std::move(player),
         GlobalGameConfig::fieldWidth,

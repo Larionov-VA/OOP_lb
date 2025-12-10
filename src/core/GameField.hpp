@@ -26,7 +26,7 @@
 #include "SaveData.hpp"
 #include "Config.hpp"
 
-#define MAX_FIELD_SIZE 25
+#define MAX_FIELD_SIZE 70
 #define MIN_FIELD_SIZE 10
 
 #define GAMEFIELD_SAVES_DIR "/Game/GameField/"

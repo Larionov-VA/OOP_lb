@@ -15,12 +15,17 @@ set(SRCS
     src/core/FileHandler.cpp
     src/core/InputController.cpp
     src/core/SavesManager.cpp
+    src/core/KeyboardLayout.cpp
+
     src/core/visual/NCURSESVisualizer.cpp
 
     src/core/states/TrapEffect.cpp
     src/core/states/DecelerationEffect.cpp
     src/core/states/CoupreAnimate.cpp
     src/core/states/AttackEffect.cpp
+
+    src/core/commands/PlayerActionCommand.cpp
+    src/core/commands/ControlCommand.cpp
 
     src/entities/Entity.cpp
     src/entities/Player.cpp

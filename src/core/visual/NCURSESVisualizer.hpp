@@ -10,6 +10,7 @@
 #include "../InputController.hpp"
 #include "../IGameController.hpp"
 #include "../Config.hpp"
+#include "../GameState.hpp"
 
 class NCURSESVisualizer : public IVisualizer {
 public:
@@ -19,18 +20,8 @@ public:
     void setGameController(IGameController* gc);
     void display();
 private:
-    enum class State {
-        MainMenu,
-        LoadMenu,
-        InGame,
-        LevelUpMenu,
-        GameOver,
-        PauseMenu,
-        AutorsMenu,
-        Exit
-    };
-    State state = State::MainMenu;
-    State prevState = State::MainMenu;
+    GameState state = GameState::MainMenu;
+    GameState prevState = GameState::MainMenu;
 
     int mainMenuSelected = 0;
     int levelUpSelected = 0;

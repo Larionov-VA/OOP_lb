@@ -4,7 +4,7 @@
 
 GameField::GameField(std::unique_ptr<Entity> player, int width = 10, int height = 10, int level = 1) {
     if (width > MAX_FIELD_SIZE || height > MAX_FIELD_SIZE) {
-        throw std::range_error("Max size of field is 25");
+        throw std::range_error("Max size of field is 35");
     }
     if (width < MIN_FIELD_SIZE || height < MIN_FIELD_SIZE) {
         throw std::range_error("Min size of field is 10");

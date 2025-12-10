@@ -83,13 +83,11 @@ void NCURSESVisualizer::updateTermSize() {
 
 
 int NCURSESVisualizer::fetchInput() {
+    int input = 0;
     if (inputController) {
-        char c = inputController->getInputChar();
-        if (c != 0) return (int)c;
+        input = inputController->getInputChar();
     }
-    int ch = getch();
-    if (ch == ERR) return 0;
-    return ch;
+    return input;
 }
 
 
@@ -101,29 +99,29 @@ void NCURSESVisualizer::drawWideAsciiArt(int x, int y, const std::vector<std::ws
 
 
 void NCURSESVisualizer::display() {
-    state = State::MainMenu;
-    while (state != State::Exit) {
+    state = GameState::MainMenu;
+    while (state != GameState::Exit) {
         updateTermSize();
         switch (state) {
-            case State::MainMenu:
+            case GameState::MainMenu:
                 loopMainMenu();
                 break;
-            case State::InGame:
+            case GameState::InGame:
                 loopInGame();
                 break;
-            case State::LevelUpMenu:
+            case GameState::LevelUpMenu:
                 loopLevelUp();
                 break;
-            case State::GameOver:
+            case GameState::GameOver:
                 loopGameOverMenu();
                 break;
-            case State::PauseMenu:
+            case GameState::PauseMenu:
                 loopPauseMenu();
                 break;
-            case State::AutorsMenu:
+            case GameState::AutorsMenu:
                 loopAutorsMenu();
                 break;
-            case State::LoadMenu:
+            case GameState::LoadMenu:
                 loopLoadMenu();
                 break;
             default:
@@ -196,15 +194,15 @@ void NCURSESVisualizer::loopGameOverMenu() {
             case '\n': case 'e': case KEY_ENTER:
                 if (gameController) {
                     if (gameOverSelected == 0) {
-                        if (gameController) gameController->startNewGame();
-                        state = State::InGame;
+                        gameController->startNewGame();
+                        state = GameState::InGame;
                     }
                     else if (gameOverSelected == 1) {
-                        state = State::LoadMenu;
-                        prevState = State::GameOver;
+                        state = GameState::LoadMenu;
+                        prevState = GameState::GameOver;
                     }
                     else if (gameOverSelected == 2) {
-                        state = State::MainMenu;
+                        state = GameState::MainMenu;
                     }
                 }
                 gameOverSelected = 0;
@@ -259,15 +257,15 @@ void NCURSESVisualizer::loopMainMenu() {
             case '\n': case 'e': case KEY_ENTER:
                 if (mainMenuSelected == 0) {
                     if (gameController) gameController->startNewGame();
-                    state = State::InGame;
+                    state = GameState::InGame;
                 } else if (mainMenuSelected == 1) {
                     if (gameController) gameController->startNewGame();
-                    state = State::LoadMenu;
-                    prevState = State::MainMenu;
+                    state = GameState::LoadMenu;
+                    prevState = GameState::MainMenu;
                 } else if (mainMenuSelected == 2) {
-                    state = State::AutorsMenu;
+                    state = GameState::AutorsMenu;
                 } else if (mainMenuSelected == 3) {
-                    state = State::Exit;
+                    state = GameState::Exit;
                 }
                 mainMenuSelected = 0;
                 break;
@@ -329,7 +327,7 @@ void NCURSESVisualizer::loopLevelUp() {
                     char choice = '1' + levelUpSelected;
                     gameController->playerLevelUp(choice);
                 }
-                state = State::InGame;
+                state = GameState::InGame;
                 levelUpSelected = 0;
                 break;
         }
@@ -381,14 +379,14 @@ void NCURSESVisualizer::loopInGame() {
     auto frame_start = std::chrono::steady_clock::now();
     auto pdata = gameController->getPlayerData();
     if (pdata && pdata->levelIncreased) {
-        state = State::LevelUpMenu;
+        state = GameState::LevelUpMenu;
         return;
     }
     drawInGame();
     int input = fetchInput();
     if (input) {
         if (input == 27) {
-            state = State::PauseMenu;
+            state = GameState::PauseMenu;
             return;
         }
         char c = (char)input;
@@ -404,7 +402,7 @@ void NCURSESVisualizer::loopInGame() {
                 gameController->performAnAction((char)('0' + (c - '1')));
             }
             if (consumed) {
-                state = State::GameOver;
+                state = GameState::GameOver;
                 return;
             }
         }
@@ -613,24 +611,24 @@ void NCURSESVisualizer::loopPauseMenu() {
             case '\n': case 'e': case KEY_ENTER:
                 if (gameController) {
                     if (pauseMenuSelected == 0) {
-                        state = State::InGame;
+                        state = GameState::InGame;
                     }
                     else if (pauseMenuSelected == 1) {
-                        state = State::InGame;
+                        state = GameState::InGame;
                         gameController->saveGame();
                     }
                     else if (pauseMenuSelected == 2) {
-                        state = State::LoadMenu;
-                        prevState = State::PauseMenu;
+                        state = GameState::LoadMenu;
+                        prevState = GameState::PauseMenu;
                     }
                     else if (pauseMenuSelected == 3) {
-                        state = State::MainMenu;
+                        state = GameState::MainMenu;
                     }
                 }
                 pauseMenuSelected = 0;
                 break;
             case '\e':
-                state = State::InGame;
+                state = GameState::InGame;
                 pauseMenuSelected = 0;
             default:
                 break;
@@ -675,7 +673,7 @@ void NCURSESVisualizer::loopAutorsMenu() {
     if (input) {
         switch (input) {
             case '\n': case 'e': case KEY_ENTER: case '\e': case 'q':
-                state = State::MainMenu;
+                state = GameState::MainMenu;
                 break;
             default:
                 break;
@@ -767,7 +765,7 @@ void NCURSESVisualizer::loopLoadMenu() {
                             endList = PAGE_SIZE;
                             loadMenuSelected = 0;
                             firstCall = true;
-                            state = State::InGame;
+                            state = GameState::InGame;
                             errMessage = "";
                         }
                         else {
